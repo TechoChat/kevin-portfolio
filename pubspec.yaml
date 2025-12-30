@@ -38,6 +38,7 @@ dependencies:
   macos_ui: ^2.2.2
   universal_platform: ^1.1.0
   intl: ^0.20.2
+  flutter_svg: ^2.2.3
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,7 @@ flutter:
     - assets/img/windows/
     - assets/img/windows/icons/
     - assets/img/mac/
+    - assets/img/mac/icons/
     - assets/img/linux/
     - assets/img/ios/
     - assets/img/android/

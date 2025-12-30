@@ -1,6 +1,7 @@
 import 'dart:ui' as ui; // Aliased for ImageFilter
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'dart:async';
 // ✅ CRITICAL FIX: Hide TextDirection from intl to prevent conflict with Flutter's TextDirection
 import 'package:intl/intl.dart' hide TextDirection;
@@ -231,15 +232,15 @@ class _CalendarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final monthName = _getMonthName(now.month).toUpperCase();
-    
+
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-    final firstDayOfWeek = DateTime(now.year, now.month, 1).weekday; 
-    final offset = firstDayOfWeek == 7 ? 0 : firstDayOfWeek; 
+    final firstDayOfWeek = DateTime(now.year, now.month, 1).weekday;
+    final offset = firstDayOfWeek == 7 ? 0 : firstDayOfWeek;
 
     const fontStyle = TextStyle(
       fontFamily: '.SF Pro Text',
       decoration: TextDecoration.none,
-      letterSpacing: -0.2, 
+      letterSpacing: -0.2,
     );
 
     return Column(
@@ -278,9 +279,9 @@ class _CalendarWidget extends StatelessWidget {
             itemCount: daysInMonth + offset,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisSpacing: 2, 
+              mainAxisSpacing: 2,
               crossAxisSpacing: 2,
-              childAspectRatio: 1.1, 
+              childAspectRatio: 1.1,
             ),
             itemBuilder: (context, index) {
               if (index < offset) return const SizedBox();
@@ -313,7 +314,20 @@ class _CalendarWidget extends StatelessWidget {
   }
 
   String _getMonthName(int month) {
-    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    const months = [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC",
+    ];
     return months[month - 1];
   }
 }
@@ -334,7 +348,7 @@ class _WeekdayText extends StatelessWidget {
           fontSize: 8,
           fontWeight: FontWeight.w600,
           decoration: TextDecoration.none,
-          fontFamily: '.SF Pro Text', 
+          fontFamily: '.SF Pro Text',
         ),
       ),
     );
@@ -355,7 +369,11 @@ class _WeatherWidget extends StatelessWidget {
         children: const [
           Text(
             "Cupertino",
-            style: TextStyle(color: Colors.white, fontSize: 12, decoration: TextDecoration.none),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              decoration: TextDecoration.none,
+            ),
           ),
           Text(
             "78°",
@@ -371,11 +389,19 @@ class _WeatherWidget extends StatelessWidget {
           SizedBox(height: 4),
           Text(
             "Mostly Sunny",
-            style: TextStyle(color: Colors.white70, fontSize: 10, decoration: TextDecoration.none),
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 10,
+              decoration: TextDecoration.none,
+            ),
           ),
           Text(
             "H:86° L:60°",
-            style: TextStyle(color: Colors.white70, fontSize: 10, decoration: TextDecoration.none),
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 10,
+              decoration: TextDecoration.none,
+            ),
           ),
         ],
       ),
@@ -421,7 +447,10 @@ class _DesktopIconState extends State<_DesktopIcon> {
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: _isHovered
-                ? Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1)
+                ? Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    width: 1,
+                  )
                 : Border.all(color: Colors.transparent),
           ),
           child: Column(
@@ -463,7 +492,10 @@ class _MacMenuBarState extends State<_MacMenuBar> {
   void initState() {
     super.initState();
     _timeString = _formatDateTime();
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer t) => _getTime(),
+    );
   }
 
   void _getTime() {
@@ -507,7 +539,11 @@ class _MacMenuBarState extends State<_MacMenuBar> {
               const Spacer(),
               const Icon(CupertinoIcons.wifi, size: 16, color: Colors.white),
               const SizedBox(width: 15),
-              const Icon(CupertinoIcons.battery_100, size: 16, color: Colors.white),
+              const Icon(
+                CupertinoIcons.battery_100,
+                size: 16,
+                color: Colors.white,
+              ),
               const SizedBox(width: 15),
               _MenuText(_timeString),
               const SizedBox(width: 15),
@@ -551,24 +587,79 @@ class _MacDock extends StatelessWidget {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            // 3. REDUCE PADDING
+            // Original was (horizontal: 16, vertical: 12) -> too tall
+            // New: tighter vertical padding to make icons fill the bar
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              // 4. LIGHTER BACKGROUND & SUBTLE BORDER
+              color: Colors.white.withValues(alpha: 0.2), // Keep translucent
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              // Make the border much fainter (alpha 0.1 instead of 0.2)
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 1.5,
+              ),
+              // Optional: Add a subtle shadow to the DOCK ITSELF, not the icons
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 15,
+                  spreadRadius: -5,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const _DockIcon(CupertinoIcons.smiley, Colors.blue, "Finder"),
-                const _DockIcon(CupertinoIcons.rocket_fill, Colors.grey, "Launchpad"),
-                const _DockIcon(CupertinoIcons.compass, Colors.blueAccent, "Safari"),
-                const _DockIcon(CupertinoIcons.chat_bubble_fill, Colors.green, "Messages"),
-                const _DockIcon(CupertinoIcons.mail_solid, Colors.blue, "Mail"),
-                const _DockIcon(CupertinoIcons.map_fill, Colors.greenAccent, "Maps"),
-                const _DockIcon(CupertinoIcons.photo, Colors.pink, "Photos"),
-                const _DockIcon(CupertinoIcons.settings, Colors.grey, "Settings"),
+                const _DockIcon(
+                  "assets/img/mac/icons/finder.png",
+                  // Colors.blue,
+                  "Finder",
+                ),
+                const _DockIcon(
+                  // CupertinoIcons.rocket_fill,
+                  "assets/img/mac/icons/launchpad.png",
+                  // Colors.grey,
+                  "Launchpad",
+                ),
+                const _DockIcon(
+                  // CupertinoIcons.compass,
+                  "assets/img/mac/icons/safari.png",
+                  // Colors.blueAccent,
+                  "Safari",
+                ),
+                const _DockIcon(
+                  // CupertinoIcons.chat_bubble_fill,
+                  "assets/img/mac/icons/messages.png",
+                  // Colors.green,
+                  "Messages",
+                ),
+                const _DockIcon(
+                  "assets/img/mac/icons/mail.png",
+                  // Colors.blue,
+                  "Mail",
+                ),
+                const _DockIcon(
+                  // CupertinoIcons.map_fill,
+                  "assets/img/mac/icons/maps.png",
+                  // Colors.greenAccent,
+                  "Maps",
+                ),
+                const _DockIcon(
+                  "assets/img/mac/icons/photos.png",
+                  // Colors.pink,
+                  "Photos",
+                ),
+                const _DockIcon(
+                  // CupertinoIcons.settings,
+                  "assets/img/mac/icons/settings.png",
+                  // Colors.grey,
+                  "Settings",
+                ),
                 const SizedBox(width: 10),
                 Container(
                   width: 1,
@@ -577,7 +668,11 @@ class _MacDock extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 5),
                 ),
                 const SizedBox(width: 10),
-                const _DockIcon(CupertinoIcons.trash, Colors.grey, "Bin"),
+                const _DockIcon(
+                  "assets/img/mac/icons/bin.png",
+                  // Colors.grey,
+                  "Bin",
+                ),
               ],
             ),
           ),
@@ -588,11 +683,18 @@ class _MacDock extends StatelessWidget {
 }
 
 class _DockIcon extends StatefulWidget {
-  final IconData icon;
-  final Color color;
+  // final IconData? icon;
+  final String? imagePath;
+  // final Color color;
   final String label;
 
-  const _DockIcon(this.icon, this.color, this.label, {super.key});
+  const _DockIcon(
+    // this.icon,
+    this.imagePath,
+    // this.color,
+    this.label, {
+    super.key,
+  });
 
   @override
   State<_DockIcon> createState() => _DockIconState();
@@ -603,58 +705,35 @@ class _DockIconState extends State<_DockIcon> {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Define base size. macOS icons are usually quite large in the dock.
+    final double size = _isHovered ? 65 : 50;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: Tooltip(
         message: widget.label,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        verticalOffset: 50,
         preferBelow: false,
-        decoration: ShapeDecoration(
-          color: Colors.grey[200]!.withValues(alpha: 0.5),
-          shape: const _TooltipShape(),
-          shadows: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        textStyle: const TextStyle(
-          color: Colors.black87,
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          fontFamily: '.SF Pro Text',
-          decoration: TextDecoration.none,
-        ),
-        waitDuration: const Duration(milliseconds: 10),
+        verticalOffset: 60, // Push tooltip higher so it doesn't overlap
+        // ... (Keep your existing tooltip decoration code) ...
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          width: _isHovered ? 60 : 48,
-          height: _isHovered ? 60 : 48,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic, // Smoother bounce like Mac
+          width: size,
+          height: size,
           margin: EdgeInsets.symmetric(
-            horizontal: _isHovered ? 4 : 6,
-            vertical: _isHovered ? 0 : 10,
+            horizontal: _isHovered ? 4 : 8, // Adjust spacing dynamically
+            vertical: _isHovered ? 0 : 8, // Lift icon up when hovered
           ),
-          decoration: BoxDecoration(
-            color: widget.color,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 5,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Icon(
-            widget.icon,
-            color: Colors.white,
-            size: _isHovered ? 34 : 26,
+          // 2. REMOVE THE DECORATION ENTIRELY
+          // The image itself is the decoration. We don't need a box behind it.
+          child: SvgPicture.asset(
+            // Ensure your asset path ends in .svg
+            widget.imagePath!.replaceAll('.png', '.svg'),
+            width: size,
+            height: size,
+            fit: BoxFit.contain,
           ),
         ),
       ),
@@ -685,21 +764,36 @@ class _TooltipShape extends ShapeBorder {
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    rect = Rect.fromPoints(rect.topLeft, rect.bottomRight - Offset(0, arrowHeight));
-    
+    rect = Rect.fromPoints(
+      rect.topLeft,
+      rect.bottomRight - Offset(0, arrowHeight),
+    );
+
     return Path()
       ..moveTo(rect.left + radius, rect.top)
       ..lineTo(rect.right - radius, rect.top)
-      ..arcToPoint(Offset(rect.right, rect.top + radius), radius: Radius.circular(radius))
+      ..arcToPoint(
+        Offset(rect.right, rect.top + radius),
+        radius: Radius.circular(radius),
+      )
       ..lineTo(rect.right, rect.bottom - radius)
-      ..arcToPoint(Offset(rect.right - radius, rect.bottom), radius: Radius.circular(radius))
+      ..arcToPoint(
+        Offset(rect.right - radius, rect.bottom),
+        radius: Radius.circular(radius),
+      )
       ..lineTo(rect.center.dx + arrowWidth / 2, rect.bottom)
       ..lineTo(rect.center.dx, rect.bottom + arrowHeight)
       ..lineTo(rect.center.dx - arrowWidth / 2, rect.bottom)
       ..lineTo(rect.left + radius, rect.bottom)
-      ..arcToPoint(Offset(rect.left, rect.bottom - radius), radius: Radius.circular(radius))
+      ..arcToPoint(
+        Offset(rect.left, rect.bottom - radius),
+        radius: Radius.circular(radius),
+      )
       ..lineTo(rect.left, rect.top + radius)
-      ..arcToPoint(Offset(rect.left + radius, rect.top), radius: Radius.circular(radius))
+      ..arcToPoint(
+        Offset(rect.left + radius, rect.top),
+        radius: Radius.circular(radius),
+      )
       ..close();
   }
 
