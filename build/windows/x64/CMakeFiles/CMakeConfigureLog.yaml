@@ -26,7 +26,7 @@ events:
       MSBuild version 17.14.19+164abd434 for .NET Framework
       Build started 30-12-2025 11.47.42 AM.
       
-      Project "D:\\TechoChat\\projects\\os_adaptive_web\\build\\windows\\x64\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
+      Project "D:\\TechoChat\\projects\\kevins_tech\\build\\windows\\x64\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
         Creating directory "Debug\\".
         Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
@@ -39,7 +39,7 @@ events:
         CMakeCXXCompilerId.cpp
       Link:
         D:\\Softwares\\visual_studio\\2022\\Preview\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
-        CompilerIdCXX.vcxproj -> D:\\TechoChat\\projects\\os_adaptive_web\\build\\windows\\x64\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe
+        CompilerIdCXX.vcxproj -> D:\\TechoChat\\projects\\kevins_tech\\build\\windows\\x64\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.exe
       PostBuildEvent:
         for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
         :VCEnd
@@ -47,7 +47,7 @@ events:
       FinalizeBuildStatus:
         Deleting file "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
         Touching "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.lastbuildstate".
-      Done Building Project "D:\\TechoChat\\projects\\os_adaptive_web\\build\\windows\\x64\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
+      Done Building Project "D:\\TechoChat\\projects\\kevins_tech\\build\\windows\\x64\\CMakeFiles\\3.31.6-msvc6\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
       
       Build succeeded.
           0 Warning(s)
@@ -61,7 +61,7 @@ events:
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
       
       The CXX compiler identification is MSVC, found in:
-        D:/TechoChat/projects/os_adaptive_web/build/windows/x64/CMakeFiles/3.31.6-msvc6/CompilerIdCXX/CompilerIdCXX.exe
+        D:/TechoChat/projects/kevins_tech/build/windows/x64/CMakeFiles/3.31.6-msvc6/CompilerIdCXX/CompilerIdCXX.exe
       
   -
     kind: "try_compile-v1"
@@ -72,8 +72,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "D:/TechoChat/projects/os_adaptive_web/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf"
-      binary: "D:/TechoChat/projects/os_adaptive_web/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf"
+      source: "D:/TechoChat/projects/kevins_tech/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf"
+      binary: "D:/TechoChat/projects/kevins_tech/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /W3 /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/MDd /Zi /Ob0 /Od /RTC1"
@@ -83,17 +83,17 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'D:/TechoChat/projects/os_adaptive_web/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf'
+        Change Dir: 'D:/TechoChat/projects/kevins_tech/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf'
         
         Run Build Command(s): D:/Softwares/visual_studio/2022/Preview/MSBuild/Current/Bin/amd64/MSBuild.exe cmTC_58767.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.19+164abd434 for .NET Framework
         Build started 30-12-2025 11.47.49 AM.
         
-        Project "D:\\TechoChat\\projects\\os_adaptive_web\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\cmTC_58767.vcxproj" on node 1 (default targets).
+        Project "D:\\TechoChat\\projects\\kevins_tech\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\cmTC_58767.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Creating directory "cmTC_58767.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "D:\\TechoChat\\projects\\os_adaptive_web\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\Debug\\".
+          Creating directory "D:\\TechoChat\\projects\\kevins_tech\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\Debug\\".
           Creating directory "cmTC_58767.dir\\Debug\\cmTC_58767.tlog\\".
         InitializeBuildStatus:
           Creating "cmTC_58767.dir\\Debug\\cmTC_58767.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -105,12 +105,12 @@ events:
           cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_58767.dir\\Debug\\\\" /Fd"cmTC_58767.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "D:\\Softwares\\visual_studio\\2022\\Preview\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          D:\\Softwares\\visual_studio\\2022\\Preview\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\TechoChat\\projects\\os_adaptive_web\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\Debug\\cmTC_58767.exe" /INCREMENTAL /ILK:"cmTC_58767.dir\\Debug\\cmTC_58767.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/TechoChat/projects/os_adaptive_web/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf/Debug/cmTC_58767.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/TechoChat/projects/os_adaptive_web/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf/Debug/cmTC_58767.lib" /MACHINE:X64  /machine:x64 cmTC_58767.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_58767.vcxproj -> D:\\TechoChat\\projects\\os_adaptive_web\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\Debug\\cmTC_58767.exe
+          D:\\Softwares\\visual_studio\\2022\\Preview\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"D:\\TechoChat\\projects\\kevins_tech\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\Debug\\cmTC_58767.exe" /INCREMENTAL /ILK:"cmTC_58767.dir\\Debug\\cmTC_58767.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/TechoChat/projects/kevins_tech/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf/Debug/cmTC_58767.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/TechoChat/projects/kevins_tech/build/windows/x64/CMakeFiles/CMakeScratch/TryCompile-q0xjhf/Debug/cmTC_58767.lib" /MACHINE:X64  /machine:x64 cmTC_58767.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_58767.vcxproj -> D:\\TechoChat\\projects\\kevins_tech\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\Debug\\cmTC_58767.exe
         FinalizeBuildStatus:
           Deleting file "cmTC_58767.dir\\Debug\\cmTC_58767.tlog\\unsuccessfulbuild".
           Touching "cmTC_58767.dir\\Debug\\cmTC_58767.tlog\\cmTC_58767.lastbuildstate".
-        Done Building Project "D:\\TechoChat\\projects\\os_adaptive_web\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\cmTC_58767.vcxproj" (default targets).
+        Done Building Project "D:\\TechoChat\\projects\\kevins_tech\\build\\windows\\x64\\CMakeFiles\\CMakeScratch\\TryCompile-q0xjhf\\cmTC_58767.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)

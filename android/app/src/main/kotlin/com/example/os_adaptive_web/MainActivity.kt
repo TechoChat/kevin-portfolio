@@ -1,4 +1,4 @@
-package com.example.os_adaptive_web
+package com.example.kevins_tech
 
 import io.flutter.embedding.android.FlutterActivity
 
