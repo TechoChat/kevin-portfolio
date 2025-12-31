@@ -6,15 +6,19 @@ import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:macos_ui/macos_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'platforms/android/android_home.dart';
 import 'platforms/ios/ios_home.dart';
 import 'platforms/mac/mac_home.dart';
 import 'platforms/windows/windows_home.dart';
 
-void main() {
+Future<void> main() async {
   // Ensure Flutter bindings are initialized before doing anything else
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
 
   // Safely remove the HTML loader
   if (kIsWeb) {
