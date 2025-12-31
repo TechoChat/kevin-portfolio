@@ -68,7 +68,7 @@ class _PlatformRootState extends State<PlatformRoot> {
     // 1. ANDROID
     if (currentPlatform == TargetPlatform.android) {
       return MaterialApp(
-        title: 'Android Style',
+        title: 'Kevin\'s Tech',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.teal),
         home: AndroidHome(onPlatformSwitch: changePlatform),
@@ -78,7 +78,7 @@ class _PlatformRootState extends State<PlatformRoot> {
     // 2. IOS
     if (currentPlatform == TargetPlatform.iOS) {
       return CupertinoApp(
-        title: 'iOS Style',
+        title: 'Kevin\'s Tech',
         debugShowCheckedModeBanner: false,
         home: IosHome(onPlatformSwitch: changePlatform),
       );
@@ -87,7 +87,7 @@ class _PlatformRootState extends State<PlatformRoot> {
     // 3. MACOS
     if (currentPlatform == TargetPlatform.macOS) {
       return MacosApp(
-        title: 'Mac Style',
+        title: 'Kevin\'s Tech',
         debugShowCheckedModeBanner: false,
         theme: MacosThemeData.light(),
         home: MacHome(onPlatformSwitch: changePlatform),
@@ -96,7 +96,7 @@ class _PlatformRootState extends State<PlatformRoot> {
 
     // 4. WINDOWS (Default Fallback)
     return fluent.FluentApp(
-      title: 'Windows Style',
+      title: 'Kevin\'s Tech',
       debugShowCheckedModeBanner: false,
       theme: fluent.FluentThemeData(accentColor: fluent.Colors.blue),
       home: WindowsHome(onPlatformSwitch: changePlatform),
