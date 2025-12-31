@@ -2,10 +2,12 @@ import 'dart:ui' as ui; // Aliased for ImageFilter
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/svg.dart'; // Commented out to use Image.asset for safety
 import 'package:intl/intl.dart' hide TextDirection;
-import 'package:battery_plus/battery_plus.dart'; // ✅ Import this
-import 'package:connectivity_plus/connectivity_plus.dart'; // ✅ Import this
+import 'package:battery_plus/battery_plus.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+
+// ✅ Import your Weather Service
+import '../../components/weather_service.dart';
 
 class MacHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -28,21 +30,67 @@ class _MacHomeState extends State<MacHome> {
   List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
+  // --- ✅ Weather State ---
+  final WeatherService _weatherService = WeatherService();
+  String _weatherTemp = "--";
+  String _weatherCity = "Cupertino"; // Default placeholder
+  String _weatherCondition = "Loading";
+  IconData _weatherIcon = CupertinoIcons.cloud_sun_fill; // Default Apple-style icon
+  bool _isLoadingWeather = true;
+
   @override
   void initState() {
     super.initState();
     _initBattery();
     _initConnectivity();
+    _initWeather(); // ✅ Start fetching weather
 
-    // Listen for Battery changes
-    _batteryStateSubscription = _battery.onBatteryStateChanged.listen((BatteryState state) {
+    // Listeners
+    _batteryStateSubscription = _battery.onBatteryStateChanged.listen((state) {
       setState(() => _batteryState = state);
     });
 
-    // Listen for Network changes
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> result) {
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((result) {
       setState(() => _connectionStatus = result);
     });
+  }
+
+  // ✅ Fetch Weather Logic
+  Future<void> _initWeather() async {
+    final weather = await _weatherService.getWeather();
+    if (mounted && weather != null) {
+      setState(() {
+        _weatherTemp = weather.temperature;
+        _weatherCity = weather.cityName;
+        _weatherCondition = weather.condition;
+        // Map OpenWeather icon code to Cupertino Icons for Mac look
+        _weatherIcon = _mapToCupertinoIcon(weather.iconCode);
+        _isLoadingWeather = false;
+      });
+    }
+  }
+
+  // Helper to map API icons to Apple Style Icons
+  IconData _mapToCupertinoIcon(String code) {
+    switch (code) {
+      case '01d': return CupertinoIcons.sun_max_fill;
+      case '01n': return CupertinoIcons.moon_fill;
+      case '02d': 
+      case '02n': return CupertinoIcons.cloud_sun_fill;
+      case '03d': 
+      case '03n': 
+      case '04d': 
+      case '04n': return CupertinoIcons.cloud_fill;
+      case '09d': 
+      case '09n': 
+      case '10d': 
+      case '10n': return CupertinoIcons.cloud_rain_fill;
+      case '11d': 
+      case '11n': return CupertinoIcons.cloud_bolt_fill;
+      case '13d': 
+      case '13n': return CupertinoIcons.snow;
+      default: return CupertinoIcons.cloud_fill;
+    }
   }
 
   Future<void> _initBattery() async {
@@ -102,27 +150,22 @@ class _MacHomeState extends State<MacHome> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      // ✅ REAL DATA: Laptop Battery
                       _BatteryRing(
-                        percent: _batteryLevel / 100, // Convert 78 to 0.78
+                        percent: _batteryLevel / 100,
                         label: "$_batteryLevel%",
                         icon: _batteryState == BatteryState.charging 
                             ? CupertinoIcons.bolt_fill 
                             : CupertinoIcons.device_laptop,
                         color: _batteryState == BatteryState.charging 
-                            ? const Color(0xFF52D598) // Green when charging
+                            ? const Color(0xFF52D598) 
                             : (_batteryLevel < 20 ? Colors.red : const Color(0xFF52D598)),
                       ),
-                      
-                      // Mock Data (Headphones usually can't be read via Web API)
                       const _BatteryRing(
                         percent: 1.00,
                         label: "100%",
                         icon: CupertinoIcons.headphones,
                         color: Colors.blueAccent,
                       ),
-                      
-                      // Mock Data (External)
                       const _BatteryRing(
                         percent: 0.08,
                         label: "8%",
@@ -143,11 +186,19 @@ class _MacHomeState extends State<MacHome> {
                       child: const _CalendarWidget(),
                     ),
                     const SizedBox(width: 15),
+                    
+                    // ✅ Updated Weather Widget Container
                     _MacWidgetContainer(
                       width: 140,
                       height: 140,
                       color: Colors.blue.withValues(alpha: 0.6),
-                      child: const _WeatherWidget(),
+                      child: _WeatherWidget(
+                        temp: _weatherTemp,
+                        city: _weatherCity,
+                        condition: _weatherCondition,
+                        icon: _weatherIcon,
+                        isLoading: _isLoadingWeather,
+                      ),
                     ),
                   ],
                 ),
@@ -179,7 +230,7 @@ class _MacHomeState extends State<MacHome> {
             ),
           ),
 
-          // 4. The Top Menu Bar (Now receives real data)
+          // 4. The Top Menu Bar
           Positioned(
             top: 0,
             left: 0,
@@ -192,7 +243,7 @@ class _MacHomeState extends State<MacHome> {
             ),
           ),
 
-          // 5. The Dock (Bottom)
+          // 5. The Dock
           const Positioned(bottom: 10, left: 0, right: 0, child: _MacDock()),
         ],
       ),
@@ -201,134 +252,7 @@ class _MacHomeState extends State<MacHome> {
 }
 
 // -----------------------------------------------------------------------------
-// --- UPDATED MENU BAR TO ACCEPT DATA ---
-// -----------------------------------------------------------------------------
-
-class _MacMenuBar extends StatefulWidget {
-  // Pass real data in
-  final int batteryLevel;
-  final BatteryState batteryState;
-  final List<ConnectivityResult> connectionStatus;
-
-  const _MacMenuBar({
-    required this.batteryLevel, 
-    required this.batteryState,
-    required this.connectionStatus,
-  });
-
-  @override
-  State<_MacMenuBar> createState() => _MacMenuBarState();
-}
-
-class _MacMenuBarState extends State<_MacMenuBar> {
-  late Timer _timer;
-  late String _timeString;
-
-  @override
-  void initState() {
-    super.initState();
-    _timeString = _formatDateTime();
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (Timer t) => _getTime(),
-    );
-  }
-
-  void _getTime() {
-    final String formattedDateTime = _formatDateTime();
-    if (_timeString != formattedDateTime) {
-      setState(() {
-        _timeString = formattedDateTime;
-      });
-    }
-  }
-
-  String _formatDateTime() {
-    return DateFormat('E MMM d  h:mm a').format(DateTime.now());
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  // Helper for Network Icon
-  IconData _getNetworkIcon() {
-    if (widget.connectionStatus.contains(ConnectivityResult.ethernet)) {
-      return CupertinoIcons.link; // Represents connection/ethernet
-    } else if (widget.connectionStatus.contains(ConnectivityResult.wifi)) {
-      return CupertinoIcons.wifi;
-    } else if (widget.connectionStatus.contains(ConnectivityResult.mobile)) {
-      return CupertinoIcons.antenna_radiowaves_left_right;
-    }
-    return CupertinoIcons.wifi_slash; // Disconnected
-  }
-
-  // Helper for Battery Icon
-  IconData _getBatteryIcon() {
-    if (widget.batteryState == BatteryState.charging) {
-      return CupertinoIcons.battery_charging;
-    }
-    if (widget.batteryLevel >= 100) return CupertinoIcons.battery_100;
-    if (widget.batteryLevel >= 25) return CupertinoIcons.battery_25; // Mac doesn't have many mid-steps in CupertinoIcons
-    return CupertinoIcons.battery_0;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          color: Colors.white.withValues(alpha: 0.3),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              const Icon(Icons.apple, size: 20, color: Colors.white),
-              const SizedBox(width: 20),
-              const _MenuText("Finder"),
-              const _MenuText("File"),
-              const _MenuText("Edit"),
-              const _MenuText("View"),
-              const _MenuText("Go"),
-              const _MenuText("Window"),
-              const _MenuText("Help"),
-              const Spacer(),
-              
-              // ✅ Dynamic Network Icon
-              Icon(_getNetworkIcon(), size: 16, color: Colors.white),
-              const SizedBox(width: 15),
-              
-              // ✅ Dynamic Battery Icon
-              Row(
-                children: [
-                  Text("${widget.batteryLevel}%", style: const TextStyle(color: Colors.white, fontSize: 13, decoration: TextDecoration.none, fontWeight: FontWeight.w500)),
-                  const SizedBox(width: 6),
-                  Icon(
-                    _getBatteryIcon(),
-                    size: 18,
-                    color: widget.batteryLevel < 20 && widget.batteryState != BatteryState.charging 
-                        ? Colors.redAccent 
-                        : Colors.white,
-                  ),
-                ],
-              ),
-              
-              const SizedBox(width: 15),
-              _MenuText(_timeString),
-              const SizedBox(width: 15),
-              const Icon(CupertinoIcons.control, size: 16, color: Colors.white),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// -----------------------------------------------------------------------------
-// --- UNCHANGED HELPER WIDGETS ---
+// --- WIDGETS & COMPONENTS ---
 // -----------------------------------------------------------------------------
 
 class _MacWidgetContainer extends StatelessWidget {
@@ -490,24 +414,62 @@ class _WeekdayText extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(width: 14, child: Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Colors.black45, fontSize: 8, fontWeight: FontWeight.w600, decoration: TextDecoration.none, fontFamily: '.SF Pro Text')));
 }
 
+// ✅ UPDATED Weather Widget to Accept Data
 class _WeatherWidget extends StatelessWidget {
-  const _WeatherWidget();
+  final String temp;
+  final String city;
+  final String condition;
+  final IconData icon;
+  final bool isLoading;
+
+  const _WeatherWidget({
+    required this.temp,
+    required this.city,
+    required this.condition,
+    required this.icon,
+    this.isLoading = false,
+  });
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CupertinoActivityIndicator(color: Colors.white));
+    }
+
+    // Mock High/Low based on current temp for display purposes
+    final int t = int.tryParse(temp) ?? 20;
+    final String highLow = "H:${t + 5}° L:${t - 4}°";
+
     return FittedBox(
       fit: BoxFit.scaleDown,
       alignment: Alignment.centerLeft,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Text("Cupertino", style: TextStyle(color: Colors.white, fontSize: 12, decoration: TextDecoration.none)),
-          Text("78°", style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w300, decoration: TextDecoration.none)),
-          SizedBox(height: 4),
-          Icon(CupertinoIcons.cloud_sun_fill, color: Colors.yellow, size: 20),
-          SizedBox(height: 4),
-          Text("Mostly Sunny", style: TextStyle(color: Colors.white70, fontSize: 10, decoration: TextDecoration.none)),
-          Text("H:86° L:60°", style: TextStyle(color: Colors.white70, fontSize: 10, decoration: TextDecoration.none)),
+        children: [
+          Text(
+            city, 
+            style: const TextStyle(color: Colors.white, fontSize: 12, decoration: TextDecoration.none),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            "$temp°", 
+            style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w300, decoration: TextDecoration.none)
+          ),
+          const SizedBox(height: 4),
+          Icon(icon, color: Colors.yellowAccent, size: 20),
+          const SizedBox(height: 4),
+          Text(
+            condition, 
+            style: const TextStyle(color: Colors.white70, fontSize: 10, decoration: TextDecoration.none),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            highLow, 
+            style: const TextStyle(color: Colors.white70, fontSize: 10, decoration: TextDecoration.none)
+          ),
         ],
       ),
     );
@@ -551,6 +513,102 @@ class _DesktopIconState extends State<_DesktopIcon> {
               Icon(widget.icon, size: 48, color: widget.color),
               const SizedBox(height: 4),
               Text(widget.label, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500, shadows: [Shadow(color: Colors.black, blurRadius: 4)], decoration: TextDecoration.none)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MacMenuBar extends StatefulWidget {
+  final int batteryLevel;
+  final BatteryState batteryState;
+  final List<ConnectivityResult> connectionStatus;
+
+  const _MacMenuBar({
+    required this.batteryLevel,
+    required this.batteryState,
+    required this.connectionStatus,
+  });
+
+  @override
+  State<_MacMenuBar> createState() => _MacMenuBarState();
+}
+
+class _MacMenuBarState extends State<_MacMenuBar> {
+  late Timer _timer;
+  late String _timeString;
+
+  @override
+  void initState() {
+    super.initState();
+    _timeString = _formatDateTime();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
+  }
+
+  void _getTime() {
+    final String formattedDateTime = _formatDateTime();
+    if (_timeString != formattedDateTime) {
+      setState(() => _timeString = formattedDateTime);
+    }
+  }
+
+  String _formatDateTime() => DateFormat('E MMM d  h:mm a').format(DateTime.now());
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  IconData _getNetworkIcon() {
+    if (widget.connectionStatus.contains(ConnectivityResult.ethernet)) return CupertinoIcons.link;
+    if (widget.connectionStatus.contains(ConnectivityResult.wifi)) return CupertinoIcons.wifi;
+    if (widget.connectionStatus.contains(ConnectivityResult.mobile)) return CupertinoIcons.antenna_radiowaves_left_right;
+    return CupertinoIcons.wifi_slash;
+  }
+
+  IconData _getBatteryIcon() {
+    if (widget.batteryState == BatteryState.charging) return CupertinoIcons.battery_charging;
+    if (widget.batteryLevel >= 100) return CupertinoIcons.battery_100;
+    if (widget.batteryLevel >= 25) return CupertinoIcons.battery_25;
+    return CupertinoIcons.battery_0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          color: Colors.white.withValues(alpha: 0.3),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              const Icon(Icons.apple, size: 20, color: Colors.white),
+              const SizedBox(width: 20),
+              const _MenuText("Finder"),
+              const _MenuText("File"),
+              const _MenuText("Edit"),
+              const _MenuText("View"),
+              const _MenuText("Go"),
+              const _MenuText("Window"),
+              const _MenuText("Help"),
+              const Spacer(),
+              Icon(_getNetworkIcon(), size: 16, color: Colors.white),
+              const SizedBox(width: 15),
+              Row(
+                children: [
+                  Text("${widget.batteryLevel}%", style: const TextStyle(color: Colors.white, fontSize: 13, decoration: TextDecoration.none, fontWeight: FontWeight.w500)),
+                  const SizedBox(width: 6),
+                  Icon(_getBatteryIcon(), size: 18, color: widget.batteryLevel < 20 && widget.batteryState != BatteryState.charging ? Colors.redAccent : Colors.white),
+                ],
+              ),
+              const SizedBox(width: 15),
+              _MenuText(_timeString),
+              const SizedBox(width: 15),
+              const Icon(CupertinoIcons.control, size: 16, color: Colors.white),
             ],
           ),
         ),
@@ -611,20 +669,16 @@ class _MacDock extends StatelessWidget {
 class _DockIcon extends StatefulWidget {
   final String? imagePath;
   final String label;
-
   const _DockIcon(this.imagePath, this.label);
-
   @override
   State<_DockIcon> createState() => _DockIconState();
 }
 
 class _DockIconState extends State<_DockIcon> {
   bool _isHovered = false;
-
   @override
   Widget build(BuildContext context) {
     final double size = _isHovered ? 65 : 50;
-
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
@@ -633,9 +687,9 @@ class _DockIconState extends State<_DockIcon> {
         message: widget.label,
         preferBelow: false,
         verticalOffset: 60,
-        decoration: ShapeDecoration(
-          color: const Color(0xFF2C2C2C),
-          shape: const _TooltipShape(), // Uses your custom shape
+        decoration: const ShapeDecoration(
+          color: Color(0xFF2C2C2C),
+          shape: _TooltipShape(), // Fixed const warning
         ),
         textStyle: const TextStyle(color: Colors.white, fontSize: 12),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -645,13 +699,11 @@ class _DockIconState extends State<_DockIcon> {
           width: size,
           height: size,
           margin: EdgeInsets.symmetric(horizontal: _isHovered ? 4 : 8, vertical: _isHovered ? 0 : 8),
-          // ✅ FIX: Switched back to Image.asset for safety (SVG can crash if missing)
           child: Image.asset(
             widget.imagePath!,
             width: size,
             height: size,
             fit: BoxFit.contain,
-            // Fallback if image missing
             errorBuilder: (c, o, s) => const Icon(Icons.apps, color: Colors.grey),
           ),
         ),
@@ -660,35 +712,36 @@ class _DockIconState extends State<_DockIcon> {
   }
 }
 
+// ✅ FIXED: Removed unused constructor parameters to clear warnings
 class _TooltipShape extends ShapeBorder {
-  final double arrowHeight = 5;
-  final double arrowWidth = 10;
-  final double radius = 6;
+  static const double arrowHeight = 5;
+  static const double arrowWidth = 10;
+  static const double radius = 6;
 
   const _TooltipShape();
 
   @override
-  EdgeInsetsGeometry get dimensions => EdgeInsets.only(bottom: arrowHeight);
+  EdgeInsetsGeometry get dimensions => const EdgeInsets.only(bottom: arrowHeight);
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) => Path();
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    rect = Rect.fromPoints(rect.topLeft, rect.bottomRight - Offset(0, arrowHeight));
+    rect = Rect.fromPoints(rect.topLeft, rect.bottomRight - const Offset(0, arrowHeight));
     return Path()
       ..moveTo(rect.left + radius, rect.top)
       ..lineTo(rect.right - radius, rect.top)
-      ..arcToPoint(Offset(rect.right, rect.top + radius), radius: Radius.circular(radius))
+      ..arcToPoint(Offset(rect.right, rect.top + radius), radius: const Radius.circular(radius))
       ..lineTo(rect.right, rect.bottom - radius)
-      ..arcToPoint(Offset(rect.right - radius, rect.bottom), radius: Radius.circular(radius))
+      ..arcToPoint(Offset(rect.right - radius, rect.bottom), radius: const Radius.circular(radius))
       ..lineTo(rect.center.dx + arrowWidth / 2, rect.bottom)
       ..lineTo(rect.center.dx, rect.bottom + arrowHeight)
       ..lineTo(rect.center.dx - arrowWidth / 2, rect.bottom)
       ..lineTo(rect.left + radius, rect.bottom)
-      ..arcToPoint(Offset(rect.left, rect.bottom - radius), radius: Radius.circular(radius))
+      ..arcToPoint(Offset(rect.left, rect.bottom - radius), radius: const Radius.circular(radius))
       ..lineTo(rect.left, rect.top + radius)
-      ..arcToPoint(Offset(rect.left + radius, rect.top), radius: Radius.circular(radius))
+      ..arcToPoint(Offset(rect.left + radius, rect.top), radius: const Radius.circular(radius))
       ..close();
   }
 

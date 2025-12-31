@@ -3,6 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'dart:async';
+import 'package:battery_plus/battery_plus.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+
+// ✅ Import your Weather Service
+import '../../components/weather_service.dart';
 
 class IosHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -14,6 +19,73 @@ class IosHome extends StatefulWidget {
 }
 
 class _IosHomeState extends State<IosHome> {
+  // --- Battery State ---
+  final Battery _battery = Battery();
+  BatteryState _batteryState = BatteryState.unknown;
+  int _batteryLevel = 100;
+  StreamSubscription<BatteryState>? _batteryStateSubscription;
+
+  // --- Network State ---
+  final Connectivity _connectivity = Connectivity();
+  List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+
+  // --- Weather State ---
+  final WeatherService _weatherService = WeatherService();
+  String _weatherTemp = "--";
+  String _weatherCity = "Loading...";
+  String _weatherCondition = "Cloudy"; // Default text
+  String _weatherHighLow = "H:-- L:--"; // We don't get H/L from current API easily, so we can mock or hide
+  bool _isLoadingWeather = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initBattery();
+    _initConnectivity();
+    _initWeather();
+
+    // Listeners
+    _batteryStateSubscription = _battery.onBatteryStateChanged.listen((state) => setState(() => _batteryState = state));
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((result) => setState(() => _connectionStatus = result));
+  }
+
+  Future<void> _initWeather() async {
+    final weather = await _weatherService.getWeather();
+    if (mounted && weather != null) {
+      setState(() {
+        _weatherTemp = weather.temperature;
+        _weatherCity = weather.cityName;
+        _weatherCondition = weather.condition;
+        // Mocking High/Low since current API call only gives 'current' temp
+        // You would need the 'One Call API' for daily forecast
+        _weatherHighLow = "H:${(int.parse(weather.temperature) + 5)}° L:${(int.parse(weather.temperature) - 3)}°";
+        _isLoadingWeather = false;
+      });
+    }
+  }
+
+  Future<void> _initBattery() async {
+    try {
+      final level = await _battery.batteryLevel;
+      setState(() => _batteryLevel = level);
+    } catch (_) {}
+  }
+
+  Future<void> _initConnectivity() async {
+    try {
+      final result = await _connectivity.checkConnectivity();
+      setState(() => _connectionStatus = result);
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _batteryStateSubscription?.cancel();
+    _connectivitySubscription?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -41,14 +113,18 @@ class _IosHomeState extends State<IosHome> {
 
           // 2. Main Content
           SafeArea(
-            top: false, // We handle top padding manually for the status bar
+            top: false, 
             bottom: false,
             child: Column(
               children: [
-                // --- STATUS BAR (New) ---
-                const Padding(
-                  padding: EdgeInsets.only(top: 15, left: 24, right: 24, bottom: 10),
-                  child: _IosStatusBar(),
+                // --- STATUS BAR (Dynamic) ---
+                Padding(
+                  padding: const EdgeInsets.only(top: 15, left: 24, right: 24, bottom: 10),
+                  child: _IosStatusBar(
+                    batteryLevel: _batteryLevel,
+                    batteryState: _batteryState,
+                    connectionStatus: _connectionStatus,
+                  ),
                 ),
 
                 // --- TOP WIDGETS ROW ---
@@ -57,20 +133,26 @@ class _IosHomeState extends State<IosHome> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Weather Widget
+                      // ✅ Dynamic Weather Widget
                       _IosWidgetContainer(
                         width: size.width * 0.43,
                         height: size.width * 0.43,
                         color: const Color(0xFF1C6BC8),
-                        child: const _WeatherWidget(),
+                        child: _WeatherWidget(
+                          temp: _weatherTemp,
+                          city: _weatherCity,
+                          condition: _weatherCondition,
+                          highLow: _weatherHighLow,
+                          isLoading: _isLoadingWeather,
+                        ),
                       ),
 
-                      // Map Widget
+                      // Map Widget (Still Static/Mocked for now)
                       _IosWidgetContainer(
                         width: size.width * 0.43,
                         height: size.width * 0.43,
                         color: Colors.white.withValues(alpha: 0.8),
-                        child: const _MapWidget(),
+                        child: _MapWidget(city: _weatherCity), // Pass city name to map too
                       ),
                     ],
                   ),
@@ -197,7 +279,7 @@ class _IosHomeState extends State<IosHome> {
 // --- iOS WIDGET HELPERS ---
 // -----------------------------------------------------------------------------
 
-// 1. App Icon with Overflow Protection
+// 1. App Icon (Unchanged)
 class _AppIcon extends StatelessWidget {
   final String name;
   final Color color;
@@ -217,7 +299,6 @@ class _AppIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ FIX: FittedBox prevents overflow on small screens
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Column(
@@ -262,7 +343,7 @@ class _AppIcon extends StatelessWidget {
   }
 }
 
-// 2. Large Widget Container (Weather/Map)
+// 2. Large Widget Container (Unchanged)
 class _IosWidgetContainer extends StatelessWidget {
   final double width;
   final double height;
@@ -298,35 +379,52 @@ class _IosWidgetContainer extends StatelessWidget {
   }
 }
 
-// 3. Weather Widget Content (Fixed Overflow)
+// 3. ✅ UPDATED Weather Widget Content
 class _WeatherWidget extends StatelessWidget {
-  const _WeatherWidget();
+  final String temp;
+  final String city;
+  final String condition;
+  final String highLow;
+  final bool isLoading;
+
+  const _WeatherWidget({
+    required this.temp,
+    required this.city,
+    required this.condition,
+    required this.highLow,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CupertinoActivityIndicator(color: Colors.white));
+    }
+
     return FittedBox(
       fit: BoxFit.scaleDown,
       alignment: Alignment.centerLeft,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        children: const [
-          Text("San Francisco", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, decoration: TextDecoration.none)),
-          Text("53°", style: TextStyle(color: Colors.white, fontSize: 42, fontWeight: FontWeight.w300, decoration: TextDecoration.none)),
-          SizedBox(height: 15),
-          Icon(CupertinoIcons.cloud_sun_fill, color: Colors.white, size: 24),
-          SizedBox(height: 4),
-          Text("Partly Cloudy", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, decoration: TextDecoration.none)),
-          Text("H:56° L:50°", style: TextStyle(color: Colors.white70, fontSize: 13, decoration: TextDecoration.none)),
+        children: [
+          Text(city, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, decoration: TextDecoration.none)),
+          Text("$temp°", style: const TextStyle(color: Colors.white, fontSize: 42, fontWeight: FontWeight.w300, decoration: TextDecoration.none)),
+          const SizedBox(height: 15),
+          const Icon(CupertinoIcons.cloud_sun_fill, color: Colors.white, size: 24),
+          const SizedBox(height: 4),
+          Text(condition, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, decoration: TextDecoration.none)),
+          Text(highLow, style: const TextStyle(color: Colors.white70, fontSize: 13, decoration: TextDecoration.none)),
         ],
       ),
     );
   }
 }
 
-// 4. Map Widget Content (Fixed Overflow)
+// 4. ✅ UPDATED Map Widget Content
 class _MapWidget extends StatelessWidget {
-  const _MapWidget();
+  final String city;
+  const _MapWidget({required this.city});
 
   @override
   Widget build(BuildContext context) {
@@ -338,7 +436,7 @@ class _MapWidget extends StatelessWidget {
               color: const Color(0xFFE5F0D9), // Map green color
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
+            child: const Center(
               child: Icon(CupertinoIcons.location_solid, color: Colors.blue, size: 30),
             ),
           ),
@@ -352,20 +450,19 @@ class _MapWidget extends StatelessWidget {
               child: const Icon(Icons.person, color: Colors.white, size: 16),
             ),
             const SizedBox(width: 8),
-            // ✅ FIX: Expanded prevents text from overflowing right side
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Marina Green", 
+                children: [
+                  const Text(
+                    "Current Location", 
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black, decoration: TextDecoration.none),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   Text(
-                    "San Francisco", 
-                    style: TextStyle(fontSize: 10, color: Colors.grey, decoration: TextDecoration.none),
+                    city, // Uses the city name from Weather API
+                    style: const TextStyle(fontSize: 10, color: Colors.grey, decoration: TextDecoration.none),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -379,9 +476,17 @@ class _MapWidget extends StatelessWidget {
   }
 }
 
-// 5. iOS Status Bar (Time & Icons only - No fake Dynamic Island)
+// 5. ✅ UPDATED iOS Status Bar (Receives Real Data)
 class _IosStatusBar extends StatefulWidget {
-  const _IosStatusBar();
+  final int batteryLevel;
+  final BatteryState batteryState;
+  final List<ConnectivityResult> connectionStatus;
+
+  const _IosStatusBar({
+    required this.batteryLevel,
+    required this.batteryState,
+    required this.connectionStatus,
+  });
 
   @override
   State<_IosStatusBar> createState() => _IosStatusBarState();
@@ -413,12 +518,33 @@ class _IosStatusBarState extends State<_IosStatusBar> {
     super.dispose();
   }
 
+  // Helpers for icons
+  IconData _getWifiIcon() {
+    if (widget.connectionStatus.contains(ConnectivityResult.wifi)) {
+      return CupertinoIcons.wifi;
+    } else if (widget.connectionStatus.contains(ConnectivityResult.mobile)) {
+      return CupertinoIcons.antenna_radiowaves_left_right; // "5G/LTE" metaphor
+    } else {
+      return CupertinoIcons.wifi_slash;
+    }
+  }
+
+  IconData _getBatteryIcon() {
+    if (widget.batteryState == BatteryState.charging) {
+      return CupertinoIcons.battery_charging;
+    }
+    // Apple icon logic approximates fullness
+    if (widget.batteryLevel >= 100) return CupertinoIcons.battery_100;
+    if (widget.batteryLevel >= 25) return CupertinoIcons.battery_25;
+    return CupertinoIcons.battery_0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 30, // Keep height consistent
+      height: 30,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Push items to edges
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // 1. Time (Left)
@@ -436,12 +562,29 @@ class _IosStatusBarState extends State<_IosStatusBar> {
           // 2. Status Icons (Right)
           Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(CupertinoIcons.bars, color: Colors.white, size: 18), // Signal
-              SizedBox(width: 6),
-              Icon(CupertinoIcons.wifi, color: Colors.white, size: 18), // WiFi
-              SizedBox(width: 6),
-              Icon(CupertinoIcons.battery_full, color: Colors.white, size: 24), // Battery
+            children: [
+              // Signal Bars (Mocked mostly, or tied to connection type)
+              Icon(
+                widget.connectionStatus.contains(ConnectivityResult.none) 
+                    ? CupertinoIcons.bars 
+                    : CupertinoIcons.antenna_radiowaves_left_right, 
+                color: Colors.white, 
+                size: 18
+              ), 
+              const SizedBox(width: 6),
+              
+              // WiFi Icon
+              Icon(_getWifiIcon(), color: Colors.white, size: 18), 
+              const SizedBox(width: 6),
+              
+              // Battery Icon
+              Icon(
+                _getBatteryIcon(), 
+                color: widget.batteryLevel < 20 && widget.batteryState != BatteryState.charging 
+                    ? Colors.red 
+                    : Colors.white, 
+                size: 24
+              ),
             ],
           ),
         ],

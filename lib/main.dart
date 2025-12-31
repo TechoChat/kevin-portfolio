@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:macos_ui/macos_ui.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:universal_html/html.dart' as html;
 
 import 'platforms/android/android_home.dart';
 import 'platforms/ios/ios_home.dart';
@@ -12,6 +13,17 @@ import 'platforms/mac/mac_home.dart';
 import 'platforms/windows/windows_home.dart';
 
 void main() {
+  // Ensure Flutter bindings are initialized before doing anything else
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Safely remove the HTML loader
+  if (kIsWeb) {
+    final loader = html.document.getElementById('loading-indicator');
+    if (loader != null) {
+      loader.remove();
+    }
+  }
+
   runApp(const PlatformRoot());
 }
 
@@ -31,8 +43,8 @@ class _PlatformRootState extends State<PlatformRoot> {
   void initState() {
     super.initState();
     // 2. FORCE a 2-second delay before switching
-    // This ensures the splash screen is visible even on fast internet
-    Future.delayed(const Duration(seconds: 2), () {
+    // We use a simple Timer here which is less likely to block the main thread than Future.delayed in some contexts
+    Timer(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -51,12 +63,15 @@ class _PlatformRootState extends State<PlatformRoot> {
   Widget build(BuildContext context) {
     // 3. Logic to pick the correct Main App Widget
     Widget mainAppWidget;
+    // If override is null, fallback to browser default.
+    // Note: On Web, defaultTargetPlatform often returns Android or iOS if you are on mobile, 
+    // or Windows/Linux/Mac if on desktop. 
     final currentPlatform = _manualOverride ?? defaultTargetPlatform;
 
     if (currentPlatform == TargetPlatform.android) {
       mainAppWidget = MaterialApp(
-        key: const ValueKey('Android'), // Keys help AnimatedSwitcher identify changes
-        title: 'kevin\'s Tech',
+        key: const ValueKey('Android'),
+        title: 'Kevin\'s Tech',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.teal),
         home: AndroidHome(onPlatformSwitch: changePlatform),
@@ -64,22 +79,23 @@ class _PlatformRootState extends State<PlatformRoot> {
     } else if (currentPlatform == TargetPlatform.iOS) {
       mainAppWidget = CupertinoApp(
         key: const ValueKey('iOS'),
-        title: 'kevin\'s Tech',
+        title: 'Kevin\'s Tech',
         debugShowCheckedModeBanner: false,
         home: IosHome(onPlatformSwitch: changePlatform),
       );
     } else if (currentPlatform == TargetPlatform.macOS) {
       mainAppWidget = MacosApp(
         key: const ValueKey('Mac'),
-        title: 'kevin\'s Tech',
+        title: 'Kevin\'s Tech',
         debugShowCheckedModeBanner: false,
         theme: MacosThemeData.light(),
         home: MacHome(onPlatformSwitch: changePlatform),
       );
     } else {
+      // Default to Windows for any other desktop OS (Windows/Linux)
       mainAppWidget = fluent.FluentApp(
         key: const ValueKey('Windows'),
-        title: 'kevin\'s Tech',
+        title: 'Kevin\'s Tech',
         debugShowCheckedModeBanner: false,
         theme: fluent.FluentThemeData(accentColor: fluent.Colors.blue),
         home: WindowsHome(onPlatformSwitch: changePlatform),
@@ -88,16 +104,15 @@ class _PlatformRootState extends State<PlatformRoot> {
 
     // 4. The FADE TRANSITION Logic
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 1500), // Slow, cinematic 1.5s fade
+      duration: const Duration(milliseconds: 1500), 
       switchInCurve: Curves.easeInOut,
       switchOutCurve: Curves.easeInOut,
       transitionBuilder: (Widget child, Animation<double> animation) {
         return FadeTransition(opacity: animation, child: child);
       },
-      // If loading, show Splash. If not, show the Main App we decided above.
       child: _isLoading
           ? const MaterialApp(
-              key: ValueKey('Splash'), // Unique key triggers the animation
+              key: ValueKey('Splash'),
               debugShowCheckedModeBanner: false,
               home: KevinPortfolioSplash(),
             )
@@ -107,7 +122,7 @@ class _PlatformRootState extends State<PlatformRoot> {
 }
 
 // -----------------------------------------------------------------------------
-// --- YOUR EXISTING SPLASH SCREEN CODE BELOW (Unchanged) ---
+// --- SPLASH SCREEN (Optimized) ---
 // -----------------------------------------------------------------------------
 class KevinPortfolioSplash extends StatefulWidget {
   const KevinPortfolioSplash({super.key});
@@ -120,6 +135,7 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   Alignment _alignment = Alignment.topLeft;
+  Timer? _bgTimer; // Keep reference to cancel it
 
   @override
   void initState() {
@@ -133,11 +149,9 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    _startBackgroundAnimation();
-  }
-
-  void _startBackgroundAnimation() {
-    Future.delayed(const Duration(milliseconds: 100), () {
+    // Start background animation
+    // Using a Timer here to ensure we can cancel it on dispose
+    _bgTimer = Timer(const Duration(milliseconds: 100), () {
       if (mounted) {
         setState(() {
           _alignment = _alignment == Alignment.topLeft 
@@ -151,6 +165,7 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
   @override
   void dispose() {
     _pulseController.dispose();
+    _bgTimer?.cancel(); // Cancel timer to prevent memory leaks
     super.dispose();
   }
 
@@ -165,6 +180,7 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
       backgroundColor: Colors.black,
       body: Stack(
         children: [
+          // Animated Background
           AnimatedContainer(
             duration: const Duration(seconds: 5),
             curve: Curves.easeInOut,
@@ -180,12 +196,14 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
               ),
             ),
           ),
+          // Texture Overlay
           Container(
              decoration: BoxDecoration(
                color: Colors.black.withValues(alpha: 0.2),
                backgroundBlendMode: BlendMode.darken,
              ),
           ),
+          // Center Content
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -201,7 +219,7 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
                     letterSpacing: 4.0,
                     fontFamily: 'Roboto', 
                     shadows: [
-                      Shadow(color: Colors.black.withValues(alpha:0.5), blurRadius: 10, offset: const Offset(0, 4)),
+                      Shadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 10, offset: const Offset(0, 4)),
                     ],
                   ),
                 ),
@@ -235,6 +253,7 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
               ],
             ),
           ),
+          // Desktop Hint
           if (isDesktop)
             Positioned(
               top: 30,
@@ -261,6 +280,7 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
                 ),
               ),
             ),
+          // Footer
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(

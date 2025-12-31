@@ -102,25 +102,7 @@
       INITIALIZING...
     </div>
 
+    
     <script src="flutter_bootstrap.js" async></script>
-    <script>
-      // This script removes the HTML text once Flutter is ready
-      window.addEventListener("load", function (ev) {
-        // Download main.dart.js
-        FlutterLoader.load({
-          serviceWorker: {
-            serviceWorkerVersion: serviceWorkerVersion,
-          },
-          onEntrypointLoaded: function (engineInitializer) {
-            engineInitializer.initializeEngine().then(function (appRunner) {
-              // Hide the HTML loader
-              document.querySelector("#loading-indicator").style.display =
-                "none";
-              appRunner.runApp();
-            });
-          },
-        });
-      });
-    </script>
   </body>
 </html>
