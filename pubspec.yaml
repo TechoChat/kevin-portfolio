@@ -39,6 +39,8 @@ dependencies:
   universal_platform: ^1.1.0
   intl: ^0.20.2
   flutter_svg: ^2.2.3
+  battery_plus: ^7.0.0
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:

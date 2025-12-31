@@ -207,7 +207,6 @@ class _AppIcon extends StatelessWidget {
   final Color? iconColor;
 
   const _AppIcon({
-    super.key,
     required this.name,
     required this.color,
     required this.icon,
@@ -271,7 +270,6 @@ class _IosWidgetContainer extends StatelessWidget {
   final Widget child;
 
   const _IosWidgetContainer({
-    super.key,
     required this.width,
     required this.height,
     required this.color,
@@ -302,7 +300,7 @@ class _IosWidgetContainer extends StatelessWidget {
 
 // 3. Weather Widget Content (Fixed Overflow)
 class _WeatherWidget extends StatelessWidget {
-  const _WeatherWidget({super.key});
+  const _WeatherWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +326,7 @@ class _WeatherWidget extends StatelessWidget {
 
 // 4. Map Widget Content (Fixed Overflow)
 class _MapWidget extends StatelessWidget {
-  const _MapWidget({super.key});
+  const _MapWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -383,7 +381,7 @@ class _MapWidget extends StatelessWidget {
 
 // 5. iOS Status Bar (Time & Icons only - No fake Dynamic Island)
 class _IosStatusBar extends StatefulWidget {
-  const _IosStatusBar({super.key});
+  const _IosStatusBar();
 
   @override
   State<_IosStatusBar> createState() => _IosStatusBarState();
@@ -443,7 +441,7 @@ class _IosStatusBarState extends State<_IosStatusBar> {
               SizedBox(width: 6),
               Icon(CupertinoIcons.wifi, color: Colors.white, size: 18), // WiFi
               SizedBox(width: 6),
-              Icon(CupertinoIcons.battery_25, color: Colors.white, size: 24), // Battery
+              Icon(CupertinoIcons.battery_full, color: Colors.white, size: 24), // Battery
             ],
           ),
         ],

@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:battery_plus/battery_plus.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class WindowsHome extends StatefulWidget {
   // ✅ FIX 1: Change type back to accept a TargetPlatform input
@@ -53,25 +55,25 @@ class _WindowsHomeState extends State<WindowsHome> {
                 DesktopIcon(
                   iconPath: "assets/img/windows/icons/computer.png",
                   label: "This PC",
-                  onTap: () => print("This PC"),
+                  onTap: () => {}, //print("This PC"),
                 ),
 
                 DesktopIcon(
                   iconPath: "assets/img/windows/icons/network.png",
                   label: "Network",
-                  onTap: () => print("Network"),
+                  onTap: () => {}, //print("Network"),
                 ),
 
                 DesktopIcon(
                   iconPath: "assets/img/windows/icons/explorer.png",
                   label: "File Explorer",
-                  onTap: () => print("Explorer"),
+                  onTap: () => {}, //print("Explorer"),
                 ),
 
                 DesktopIcon(
                   iconPath: "assets/img/windows/icons/adobe.png",
                   label: "Adobe Acrobat",
-                  onTap: () => print("Adobe"),
+                  onTap: () => {}, //print("Adobe"),
                 ),
 
                 const SizedBox(height: 20), // Separate the Mac button slightly
@@ -110,15 +112,103 @@ class _WindowsHomeState extends State<WindowsHome> {
   }
 }
 
-class WindowsTaskbar extends StatelessWidget {
-  // 1. Define the callback variable
+// ✅ UPDATED: Changed to StatefulWidget to handle Battery logic
+class WindowsTaskbar extends StatefulWidget {
   final VoidCallback onStartMenuTap;
 
   const WindowsTaskbar({
     super.key,
-    // 2. Add it to the constructor
     required this.onStartMenuTap,
   });
+
+  @override
+  State<WindowsTaskbar> createState() => _WindowsTaskbarState();
+}
+
+class _WindowsTaskbarState extends State<WindowsTaskbar> {
+  // --- Battery State ---
+  final Battery _battery = Battery();
+  BatteryState _batteryState = BatteryState.unknown;
+  int _batteryLevel = 100;
+  StreamSubscription<BatteryState>? _batteryStateSubscription;
+
+  // --- Network State ---
+  final Connectivity _connectivity = Connectivity();
+  List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _initBattery();
+    _initConnectivity();
+
+    // Listen for Battery changes
+    _batteryStateSubscription = _battery.onBatteryStateChanged.listen((BatteryState state) {
+      setState(() => _batteryState = state);
+    });
+
+    // Listen for Network changes
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> result) {
+      setState(() => _connectionStatus = result);
+    });
+  }
+
+  // Initial Battery Check
+  Future<void> _initBattery() async {
+    try {
+      final level = await _battery.batteryLevel;
+      setState(() => _batteryLevel = level);
+    } catch (e) {
+      //print("Battery Error: $e");
+    }
+  }
+
+  // Initial Network Check
+  Future<void> _initConnectivity() async {
+    try {
+      final result = await _connectivity.checkConnectivity();
+      setState(() => _connectionStatus = result);
+    } catch (e) {
+      //print("Connectivity Error: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _batteryStateSubscription?.cancel();
+    _connectivitySubscription?.cancel();
+    super.dispose();
+  }
+
+  // --- Helper: Get Battery Icon ---
+  IconData _getBatteryIcon() {
+    if (_batteryState == BatteryState.charging) return Icons.battery_charging_full;
+    if (_batteryLevel >= 95) return Icons.battery_full;
+    if (_batteryLevel >= 80) return Icons.battery_6_bar;
+    if (_batteryLevel >= 60) return Icons.battery_5_bar;
+    if (_batteryLevel >= 40) return Icons.battery_4_bar;
+    if (_batteryLevel >= 20) return Icons.battery_2_bar;
+    return Icons.battery_alert;
+  }
+
+  // --- Helper: Get Network Icon ---
+  IconData _getNetworkIcon() {
+    // Check Ethernet first (LAN connection)
+    if (_connectionStatus.contains(ConnectivityResult.ethernet)) {
+      return Icons.settings_ethernet; // Represents a LAN cable/port
+    } 
+    // Check Wi-Fi
+    else if (_connectionStatus.contains(ConnectivityResult.wifi)) {
+      return Icons.wifi;
+    } 
+    // Check Mobile Data
+    else if (_connectionStatus.contains(ConnectivityResult.mobile)) {
+      return Icons.signal_cellular_4_bar; 
+    }
+    // No Internet (Windows uses a globe icon for disconnected)
+    return Icons.public_off; 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,37 +218,60 @@ class WindowsTaskbar extends StatelessWidget {
       child: Row(
         children: [
           const Spacer(),
+
+          // Start & Search
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               _TaskbarIcon(
                 icon: Icons.window,
                 color: Colors.blueAccent,
-                // 3. Connect the variable to the button
-                onTap: onStartMenuTap,
+                onTap: widget.onStartMenuTap,
               ),
               const SizedBox(width: 8),
               _TaskbarIcon(
                 icon: Icons.search,
                 color: Colors.white,
-                onTap: () {
-                  print("Search Clicked");
-                },
+                onTap: () => {}, //print("Search Clicked"),
               ),
             ],
           ),
+
           const Spacer(),
-          // System Tray & Clock
+
+          // System Tray
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(Icons.expand_less, color: Colors.white70, size: 20),
               const SizedBox(width: 12),
-              const Icon(Icons.wifi, color: Colors.white, size: 20),
+
+              // ✅ DYNAMIC NETWORK ICON
+              Tooltip(
+                message: _connectionStatus.contains(ConnectivityResult.none) 
+                    ? "Not Connected" 
+                    : "Connected",
+                child: Icon(
+                  _getNetworkIcon(), 
+                  color: Colors.white, 
+                  size: 20
+                ),
+              ),
+              
               const SizedBox(width: 12),
               const Icon(Icons.volume_up, color: Colors.white, size: 20),
               const SizedBox(width: 12),
-              const Icon(Icons.battery_std, color: Colors.white, size: 20),
+
+              // ✅ DYNAMIC BATTERY ICON
+              Tooltip(
+                message: "$_batteryLevel% ${_batteryState == BatteryState.charging ? '(Charging)' : ''}",
+                child: Icon(
+                  _getBatteryIcon(), 
+                  color: Colors.white, 
+                  size: 20
+                ),
+              ),
+
               const SizedBox(width: 16),
               const WindowsClock(),
               const SizedBox(width: 10),
