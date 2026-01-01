@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class WeatherModel {
   final String temperature;
@@ -19,7 +18,7 @@ class WeatherModel {
 
 class WeatherService {
   // 🔴 REPLACE THIS WITH YOUR OPENWEATHER API KEY
-  static final String _apiKey = dotenv.env['openWeatherApiKey'] ?? ''; 
+  static const String _apiKey = String.fromEnvironment('OPEN_WEATHER_API_KEY');
   
   static const String _weatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
   static const String _locationUrl = 'https://ipwho.is/'; // Free IP Geolocation API

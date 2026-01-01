@@ -43,7 +43,6 @@ dependencies:
   connectivity_plus: ^7.0.0
   http: ^1.6.0
   universal_html: ^2.3.0
-  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
