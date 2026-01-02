@@ -1,10 +1,12 @@
 import 'dart:ui' as ui; // For ImageFilter
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' hide TextDirection;
 import 'dart:async';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:kevins_tech/platforms/ios/ios_status_bar.dart';
+import 'package:kevins_tech/platforms/ios/ios_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ✅ Import your Weather Service
 import '../../components/weather_service.dart';
@@ -35,7 +37,8 @@ class _IosHomeState extends State<IosHome> {
   String _weatherTemp = "--";
   String _weatherCity = "Loading...";
   String _weatherCondition = "Cloudy"; // Default text
-  String _weatherHighLow = "H:-- L:--"; // We don't get H/L from current API easily, so we can mock or hide
+  String _weatherHighLow =
+      "H:-- L:--"; // We don't get H/L from current API easily, so we can mock or hide
   bool _isLoadingWeather = true;
 
   @override
@@ -46,8 +49,12 @@ class _IosHomeState extends State<IosHome> {
     _initWeather();
 
     // Listeners
-    _batteryStateSubscription = _battery.onBatteryStateChanged.listen((state) => setState(() => _batteryState = state));
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((result) => setState(() => _connectionStatus = result));
+    _batteryStateSubscription = _battery.onBatteryStateChanged.listen(
+      (state) => setState(() => _batteryState = state),
+    );
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+      (result) => setState(() => _connectionStatus = result),
+    );
   }
 
   Future<void> _initWeather() async {
@@ -59,7 +66,8 @@ class _IosHomeState extends State<IosHome> {
         _weatherCondition = weather.condition;
         // Mocking High/Low since current API call only gives 'current' temp
         // You would need the 'One Call API' for daily forecast
-        _weatherHighLow = "H:${(int.parse(weather.temperature) + 5)}° L:${(int.parse(weather.temperature) - 3)}°";
+        _weatherHighLow =
+            "H:${(int.parse(weather.temperature) + 5)}° L:${(int.parse(weather.temperature) - 3)}°";
         _isLoadingWeather = false;
       });
     }
@@ -113,14 +121,19 @@ class _IosHomeState extends State<IosHome> {
 
           // 2. Main Content
           SafeArea(
-            top: false, 
+            top: false,
             bottom: false,
             child: Column(
               children: [
                 // --- STATUS BAR (Dynamic) ---
                 Padding(
-                  padding: const EdgeInsets.only(top: 15, left: 24, right: 24, bottom: 10),
-                  child: _IosStatusBar(
+                  padding: const EdgeInsets.only(
+                    top: 15,
+                    left: 24,
+                    right: 24,
+                    bottom: 10,
+                  ),
+                  child: IosStatusBar(
                     batteryLevel: _batteryLevel,
                     batteryState: _batteryState,
                     connectionStatus: _connectionStatus,
@@ -134,11 +147,11 @@ class _IosHomeState extends State<IosHome> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // ✅ Dynamic Weather Widget
-                      _IosWidgetContainer(
+                      IosWidgetContainer(
                         width: size.width * 0.43,
                         height: size.width * 0.43,
                         color: const Color(0xFF1C6BC8),
-                        child: _WeatherWidget(
+                        child: WeatherWidget(
                           temp: _weatherTemp,
                           city: _weatherCity,
                           condition: _weatherCondition,
@@ -148,11 +161,13 @@ class _IosHomeState extends State<IosHome> {
                       ),
 
                       // Map Widget (Still Static/Mocked for now)
-                      _IosWidgetContainer(
+                      IosWidgetContainer(
                         width: size.width * 0.43,
                         height: size.width * 0.43,
                         color: Colors.white.withValues(alpha: 0.8),
-                        child: _MapWidget(city: _weatherCity), // Pass city name to map too
+                        child: MapWidget(
+                          city: _weatherCity,
+                        ), // Pass city name to map too
                       ),
                     ],
                   ),
@@ -170,29 +185,113 @@ class _IosHomeState extends State<IosHome> {
                     childAspectRatio: 0.75,
                     physics: const BouncingScrollPhysics(),
                     children: [
-                      _AppIcon(name: "FaceTime", color: Colors.green, icon: CupertinoIcons.videocam_fill),
-                      _AppIcon(name: "Calendar", color: Colors.white, icon: CupertinoIcons.calendar, isWhite: true),
-                      _AppIcon(name: "Photos", color: Colors.white, icon: CupertinoIcons.photo_on_rectangle, isWhite: true),
-                      _AppIcon(name: "Camera", color: Colors.grey, icon: CupertinoIcons.camera_fill),
+                      AppIcon(
+                        name: "FaceTime",
+                        color: Colors.green,
+                        icon: CupertinoIcons.videocam_fill,
+                      ),
+                      AppIcon(
+                        name: "Calendar",
+                        color: Colors.white,
+                        icon: CupertinoIcons.calendar,
+                        isWhite: true,
+                      ),
+                      AppIcon(
+                        name: "Photos",
+                        color: Colors.white,
+                        icon: CupertinoIcons.photo_on_rectangle,
+                        isWhite: true,
+                      ),
+                      AppIcon(
+                        name: "Camera",
+                        color: Colors.grey,
+                        icon: CupertinoIcons.camera_fill,
+                      ),
 
-                      _AppIcon(name: "Mail", color: Colors.blue, icon: CupertinoIcons.mail_solid),
-                      _AppIcon(name: "Notes", color: Colors.yellow.shade100, icon: CupertinoIcons.doc_text_fill, iconColor: Colors.orange),
-                      _AppIcon(name: "Reminders", color: Colors.white, icon: CupertinoIcons.list_bullet, isWhite: true),
-                      _AppIcon(name: "Clock", color: Colors.white, icon: CupertinoIcons.clock, isWhite: true),
+                      AppIcon(
+                        name: "Mail",
+                        color: Colors.blue,
+                        icon: CupertinoIcons.mail_solid,
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          const url =
+                              'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(
+                              Uri.parse(url),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          }
+                        },
+                        child: AppIcon(
+                          name: "Acrobat",
+                          color: Colors.yellow.shade100,
+                          icon: CupertinoIcons.doc_text_fill,
+                          iconColor: Colors.orange,
+                        ),
+                      ),
 
-                      _AppIcon(name: "News", color: Colors.pink, icon: CupertinoIcons.news),
-                      _AppIcon(name: "TV", color: Colors.black, icon: CupertinoIcons.tv),
-                      _AppIcon(name: "Podcasts", color: Colors.purple, icon: CupertinoIcons.mic_fill),
-                      _AppIcon(name: "App Store", color: Colors.blueAccent, icon: CupertinoIcons.app_badge_fill),
+                      AppIcon(
+                        name: "Reminders",
+                        color: Colors.white,
+                        icon: CupertinoIcons.list_bullet,
+                        isWhite: true,
+                      ),
+                      AppIcon(
+                        name: "Clock",
+                        color: Colors.white,
+                        icon: CupertinoIcons.clock,
+                        isWhite: true,
+                      ),
 
-                      _AppIcon(name: "Maps", color: Colors.greenAccent, icon: CupertinoIcons.location_fill),
-                      _AppIcon(name: "Health", color: Colors.white, icon: CupertinoIcons.heart_fill, iconColor: Colors.red),
-                      _AppIcon(name: "Wallet", color: Colors.black87, icon: CupertinoIcons.creditcard_fill),
-                      _AppIcon(name: "Settings", color: Colors.grey, icon: CupertinoIcons.settings),
+                      AppIcon(
+                        name: "News",
+                        color: Colors.pink,
+                        icon: CupertinoIcons.news,
+                      ),
+                      AppIcon(
+                        name: "TV",
+                        color: Colors.black,
+                        icon: CupertinoIcons.tv,
+                      ),
+                      AppIcon(
+                        name: "Podcasts",
+                        color: Colors.purple,
+                        icon: CupertinoIcons.mic_fill,
+                      ),
+                      AppIcon(
+                        name: "App Store",
+                        color: Colors.blueAccent,
+                        icon: CupertinoIcons.app_badge_fill,
+                      ),
+
+                      AppIcon(
+                        name: "Maps",
+                        color: Colors.greenAccent,
+                        icon: CupertinoIcons.location_fill,
+                      ),
+                      AppIcon(
+                        name: "Health",
+                        color: Colors.white,
+                        icon: CupertinoIcons.heart_fill,
+                        iconColor: Colors.red,
+                      ),
+                      AppIcon(
+                        name: "Wallet",
+                        color: Colors.black87,
+                        icon: CupertinoIcons.creditcard_fill,
+                      ),
+                      AppIcon(
+                        name: "Settings",
+                        color: Colors.grey,
+                        icon: CupertinoIcons.settings,
+                      ),
 
                       // Switch Button
                       GestureDetector(
-                        onTap: () => widget.onPlatformSwitch(TargetPlatform.android),
+                        onTap: () =>
+                            widget.onPlatformSwitch(TargetPlatform.android),
                         child: Column(
                           children: [
                             Container(
@@ -202,7 +301,11 @@ class _IosHomeState extends State<IosHome> {
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: const Icon(Icons.android, color: Colors.green, size: 35),
+                              child: const Icon(
+                                Icons.android,
+                                color: Colors.green,
+                                size: 35,
+                              ),
                             ),
                             const SizedBox(height: 5),
                             const Text(
@@ -222,18 +325,30 @@ class _IosHomeState extends State<IosHome> {
 
                 // --- SEARCH PILL ---
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
-                      Icon(CupertinoIcons.search, color: Colors.white, size: 16),
+                      Icon(
+                        CupertinoIcons.search,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                       SizedBox(width: 6),
-                      Text("Search", style: TextStyle(color: Colors.white, fontSize: 14)),
+                      Text(
+                        "Search",
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
                     ],
                   ),
                 ),
@@ -255,10 +370,30 @@ class _IosHomeState extends State<IosHome> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _AppIcon(name: "", color: Colors.green, icon: CupertinoIcons.phone_fill, showLabel: false),
-                            _AppIcon(name: "", color: Colors.blue, icon: CupertinoIcons.compass, showLabel: false),
-                            _AppIcon(name: "", color: Colors.green, icon: CupertinoIcons.chat_bubble_fill, showLabel: false),
-                            _AppIcon(name: "", color: Colors.red, icon: CupertinoIcons.music_note_2, showLabel: false),
+                            AppIcon(
+                              name: "",
+                              color: Colors.green,
+                              icon: CupertinoIcons.phone_fill,
+                              showLabel: false,
+                            ),
+                            AppIcon(
+                              name: "",
+                              color: Colors.blue,
+                              icon: CupertinoIcons.compass,
+                              showLabel: false,
+                            ),
+                            AppIcon(
+                              name: "",
+                              color: Colors.green,
+                              icon: CupertinoIcons.chat_bubble_fill,
+                              showLabel: false,
+                            ),
+                            AppIcon(
+                              name: "",
+                              color: Colors.red,
+                              icon: CupertinoIcons.music_note_2,
+                              showLabel: false,
+                            ),
                           ],
                         ),
                       ),
@@ -268,324 +403,6 @@ class _IosHomeState extends State<IosHome> {
                 const SizedBox(height: 20),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// -----------------------------------------------------------------------------
-// --- iOS WIDGET HELPERS ---
-// -----------------------------------------------------------------------------
-
-// 1. App Icon (Unchanged)
-class _AppIcon extends StatelessWidget {
-  final String name;
-  final Color color;
-  final IconData icon;
-  final bool showLabel;
-  final bool isWhite;
-  final Color? iconColor;
-
-  const _AppIcon({
-    required this.name,
-    required this.color,
-    required this.icon,
-    this.showLabel = true,
-    this.isWhite = false,
-    this.iconColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(14),
-              border: isWhite ? Border.all(color: Colors.black12, width: 1) : null,
-              gradient: !isWhite ? LinearGradient(
-                colors: [color, color.withValues(alpha: 0.8)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ) : null,
-            ),
-            child: Icon(
-              icon,
-              size: 32,
-              color: iconColor ?? (isWhite ? Colors.black : Colors.white),
-            ),
-          ),
-          if (showLabel) ...[
-            const SizedBox(height: 5),
-            Text(
-              name,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                decoration: TextDecoration.none,
-                fontFamily: '.SF Pro Text',
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-// 2. Large Widget Container (Unchanged)
-class _IosWidgetContainer extends StatelessWidget {
-  final double width;
-  final double height;
-  final Color color;
-  final Widget child;
-
-  const _IosWidgetContainer({
-    required this.width,
-    required this.height,
-    required this.color,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-}
-
-// 3. ✅ UPDATED Weather Widget Content
-class _WeatherWidget extends StatelessWidget {
-  final String temp;
-  final String city;
-  final String condition;
-  final String highLow;
-  final bool isLoading;
-
-  const _WeatherWidget({
-    required this.temp,
-    required this.city,
-    required this.condition,
-    required this.highLow,
-    this.isLoading = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CupertinoActivityIndicator(color: Colors.white));
-    }
-
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.centerLeft,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(city, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, decoration: TextDecoration.none)),
-          Text("$temp°", style: const TextStyle(color: Colors.white, fontSize: 42, fontWeight: FontWeight.w300, decoration: TextDecoration.none)),
-          const SizedBox(height: 15),
-          const Icon(CupertinoIcons.cloud_sun_fill, color: Colors.white, size: 24),
-          const SizedBox(height: 4),
-          Text(condition, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, decoration: TextDecoration.none)),
-          Text(highLow, style: const TextStyle(color: Colors.white70, fontSize: 13, decoration: TextDecoration.none)),
-        ],
-      ),
-    );
-  }
-}
-
-// 4. ✅ UPDATED Map Widget Content
-class _MapWidget extends StatelessWidget {
-  final String city;
-  const _MapWidget({required this.city});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFFE5F0D9), // Map green color
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Center(
-              child: Icon(CupertinoIcons.location_solid, color: Colors.blue, size: 30),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
-              child: const Icon(Icons.person, color: Colors.white, size: 16),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Current Location", 
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black, decoration: TextDecoration.none),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  Text(
-                    city, // Uses the city name from Weather API
-                    style: const TextStyle(fontSize: 10, color: Colors.grey, decoration: TextDecoration.none),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        )
-      ],
-    );
-  }
-}
-
-// 5. ✅ UPDATED iOS Status Bar (Receives Real Data)
-class _IosStatusBar extends StatefulWidget {
-  final int batteryLevel;
-  final BatteryState batteryState;
-  final List<ConnectivityResult> connectionStatus;
-
-  const _IosStatusBar({
-    required this.batteryLevel,
-    required this.batteryState,
-    required this.connectionStatus,
-  });
-
-  @override
-  State<_IosStatusBar> createState() => _IosStatusBarState();
-}
-
-class _IosStatusBarState extends State<_IosStatusBar> {
-  late Timer _timer;
-  late String _timeString;
-
-  @override
-  void initState() {
-    super.initState();
-    _timeString = _formatTime();
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateTime());
-  }
-
-  void _updateTime() {
-    final String formatted = _formatTime();
-    if (_timeString != formatted) {
-      setState(() => _timeString = formatted);
-    }
-  }
-
-  String _formatTime() => DateFormat('h:mm').format(DateTime.now());
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  // Helpers for icons
-  IconData _getWifiIcon() {
-    if (widget.connectionStatus.contains(ConnectivityResult.wifi)) {
-      return CupertinoIcons.wifi;
-    } else if (widget.connectionStatus.contains(ConnectivityResult.mobile)) {
-      return CupertinoIcons.antenna_radiowaves_left_right; // "5G/LTE" metaphor
-    } else {
-      return CupertinoIcons.wifi_slash;
-    }
-  }
-
-  IconData _getBatteryIcon() {
-    if (widget.batteryState == BatteryState.charging) {
-      return CupertinoIcons.battery_charging;
-    }
-    // Apple icon logic approximates fullness
-    if (widget.batteryLevel >= 100) return CupertinoIcons.battery_100;
-    if (widget.batteryLevel >= 25) return CupertinoIcons.battery_25;
-    return CupertinoIcons.battery_0;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 30,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // 1. Time (Left)
-          Text(
-            _timeString,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              fontFamily: '.SF Pro Text',
-              decoration: TextDecoration.none,
-            ),
-          ),
-
-          // 2. Status Icons (Right)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Signal Bars (Mocked mostly, or tied to connection type)
-              Icon(
-                widget.connectionStatus.contains(ConnectivityResult.none) 
-                    ? CupertinoIcons.bars 
-                    : CupertinoIcons.antenna_radiowaves_left_right, 
-                color: Colors.white, 
-                size: 18
-              ), 
-              const SizedBox(width: 6),
-              
-              // WiFi Icon
-              Icon(_getWifiIcon(), color: Colors.white, size: 18), 
-              const SizedBox(width: 6),
-              
-              // Battery Icon
-              Icon(
-                _getBatteryIcon(), 
-                color: widget.batteryLevel < 20 && widget.batteryState != BatteryState.charging 
-                    ? Colors.red 
-                    : Colors.white, 
-                size: 24
-              ),
-            ],
           ),
         ],
       ),

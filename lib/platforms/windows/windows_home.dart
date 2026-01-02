@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:kevins_tech/platforms/windows/windows_taskbar.dart';
 import 'package:kevins_tech/platforms/windows/windows_start_menu.dart';
 import 'package:kevins_tech/platforms/windows/windows_icon.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WindowsHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
 
-  const WindowsHome({
-    super.key,
-    required this.onPlatformSwitch,
-  });
+  const WindowsHome({super.key, required this.onPlatformSwitch});
 
   @override
   State<WindowsHome> createState() => _WindowsHomeState();
@@ -67,7 +65,16 @@ class _WindowsHomeState extends State<WindowsHome> {
                 DesktopIcon(
                   iconPath: "assets/img/windows/icons/adobe.png",
                   label: "Adobe Acrobat",
-                  onTap: () {},
+                  onTap: () async {
+                    const url =
+                        'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(
+                        Uri.parse(url),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
                 ),
                 const SizedBox(height: 20),
                 DesktopIcon(
@@ -85,18 +92,18 @@ class _WindowsHomeState extends State<WindowsHome> {
             bottom: 48,
             left: 0,
             right: 0,
-            // We use Visibility to hide it. 
+            // We use Visibility to hide it.
             // maintainState: true keeps the menu loaded so it opens instantly.
             child: Visibility(
               visible: _isStartMenuOpen,
-              maintainState: true, 
+              maintainState: true,
               maintainAnimation: true,
               child: const Center(child: WindowsStartMenu()),
             ),
           ),
 
           // 4. Taskbar
-          // Because the Start Menu above is never removed (only hidden), 
+          // Because the Start Menu above is never removed (only hidden),
           // this Taskbar is ALWAYS the 4th item. Flutter will never rebuild it.
           Positioned(
             bottom: 0,
@@ -110,5 +117,3 @@ class _WindowsHomeState extends State<WindowsHome> {
     );
   }
 }
-
-
