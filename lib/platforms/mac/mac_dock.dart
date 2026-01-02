@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MacDock extends StatelessWidget {
   const MacDock({super.key});
@@ -61,15 +62,21 @@ class _DockIcon extends StatefulWidget {
   final String? imagePath;
   final String label;
   const _DockIcon(this.imagePath, this.label);
+  
   @override
   State<_DockIcon> createState() => _DockIconState();
 }
 
 class _DockIconState extends State<_DockIcon> {
   bool _isHovered = false;
+
   @override
   Widget build(BuildContext context) {
     final double size = _isHovered ? 65 : 50;
+    
+    // Check if the file is an SVG to use the correct widget
+    final isSvg = widget.imagePath?.toLowerCase().endsWith('.svg') ?? false;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
@@ -80,7 +87,7 @@ class _DockIconState extends State<_DockIcon> {
         verticalOffset: 60,
         decoration: const ShapeDecoration(
           color: Color(0xFF2C2C2C),
-          shape: _TooltipShape(), // Fixed const warning
+          shape: _TooltipShape(),
         ),
         textStyle: const TextStyle(color: Colors.white, fontSize: 12),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -89,14 +96,27 @@ class _DockIconState extends State<_DockIcon> {
           curve: Curves.easeOutCubic,
           width: size,
           height: size,
-          margin: EdgeInsets.symmetric(horizontal: _isHovered ? 4 : 8, vertical: _isHovered ? 0 : 8),
-          child: Image.asset(
-            widget.imagePath!,
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
-            errorBuilder: (c, o, s) => const Icon(Icons.apps, color: Colors.grey),
+          margin: EdgeInsets.symmetric(
+            horizontal: _isHovered ? 4 : 8, 
+            vertical: _isHovered ? 0 : 8
           ),
+          // ✅ FIX: Conditionally render SVG or Standard Image
+          child: isSvg 
+            ? SvgPicture.asset(
+                widget.imagePath!,
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+                // Optional: Helper to debug if path is wrong
+                placeholderBuilder: (BuildContext context) => const Icon(Icons.error, color: Colors.red),
+              )
+            : Image.asset(
+                widget.imagePath!,
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+                errorBuilder: (c, o, s) => const Icon(Icons.apps, color: Colors.grey),
+              ),
         ),
       ),
     );
