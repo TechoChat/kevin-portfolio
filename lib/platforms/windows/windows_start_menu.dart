@@ -1,6 +1,7 @@
-import 'dart:ui'; // Required for ImageFilter (Blur effect)
+import 'dart:ui'; 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 class WindowsStartMenu extends StatelessWidget {
   final VoidCallback onOpenTerminal;
@@ -18,7 +19,7 @@ class WindowsStartMenu extends StatelessWidget {
   Future<void> _launchURL(String url) async {
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      onClose(); // Close menu after clicking
+      onClose(); 
     }
   }
 
@@ -32,20 +33,30 @@ class WindowsStartMenu extends StatelessWidget {
     onClose();
   }
 
+  Future<void> _sharePortfolio(BuildContext context) async {
+    const String text = "Check out Kevin Shah's Portfolio!";
+    const String url = "https://www.kevinstech.co/";
+    
+    onClose();
+
+    try {
+      await Share.share("$text\n$url");
+    } catch (e) {
+      debugPrint("Error sharing: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      // ✅ GLASS EFFECT: Blur behind the menu
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
         child: Container(
-          // ✅ UPDATED: Reduced width from 640 -> 540 for a more compact, realistic look
           width: 540,
-          height: 560, // Slight height adjustment to maintain aspect ratio
+          height: 560,
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            // ✅ TRANSPARENCY: More see-through (0.85 -> 0.75)
             color: const Color(0xFF1C1C1C).withValues(alpha: 0.75),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
@@ -60,13 +71,9 @@ class WindowsStartMenu extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ==========================================================
-              // 1. TOP SECTION: Search & Pinned Apps
-              // ==========================================================
-
-              // --- Search Bar ---
+              // 1. TOP SECTION: Search
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 16), // Tighter padding
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
                 child: TextField(
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
@@ -84,7 +91,7 @@ class WindowsStartMenu extends StatelessWidget {
                 ),
               ),
 
-              // --- Pinned Header ---
+              // Pinned Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 0),
                 child: Row(
@@ -109,12 +116,12 @@ class WindowsStartMenu extends StatelessWidget {
                 ),
               ),
 
-              // --- Pinned Apps Grid ---
+              // Pinned Apps Grid
               Container(
-                height: 100, // Compact
+                height: 100,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround, // Distributes icons evenly
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _StartMenuApp(
@@ -129,15 +136,17 @@ class WindowsStartMenu extends StatelessWidget {
                       color: const Color(0xFF0077b5),
                       onTap: () => _launchURL("https://www.linkedin.com/in/techochat/"),
                     ),
+                    
+                    // ✅ UPDATED: Terminal (Using Image Asset)
                     _StartMenuApp(
-                      icon: Icons.terminal,
+                      assetPath: "assets/img/windows/icons/terminal.png",
                       name: "Terminal",
-                      color: Colors.black,
                       onTap: () {
                         onClose();
                         onOpenTerminal();
                       },
                     ),
+
                     _StartMenuApp(
                       icon: Icons.folder_special,
                       name: "Projects",
@@ -147,26 +156,25 @@ class WindowsStartMenu extends StatelessWidget {
                         onOpenProjects();
                       },
                     ),
+
+                    // ✅ UPDATED: Mail App (Using Image Asset)
                     _StartMenuApp(
-                      icon: Icons.picture_as_pdf,
-                      name: "Resume",
-                      color: Colors.redAccent,
-                      onTap: () => _launchURL("https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing"),
+                      assetPath: "assets/img/windows/icons/email.png",
+                      name: "Mail",
+                      onTap: _launchMail,
                     ),
                   ],
                 ),
               ),
 
-              // ==========================================================
-              // 2. BOTTOM SECTION: Contact Card (Pic 1 Style)
-              // ==========================================================
+              // 2. BOTTOM SECTION: Contact Card
               Expanded(
                 child: Container(
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF252525).withValues(alpha: 0.5), // Subtle card
+                    color: const Color(0xFF252525).withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                   ),
@@ -207,14 +215,12 @@ class WindowsStartMenu extends StatelessWidget {
                 ),
               ),
 
-              // ==========================================================
               // 3. FOOTER: User Profile
-              // ==========================================================
               Container(
                 height: 64,
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF101010), // Solid dark footer
+                  color: Color(0xFF101010),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(12),
                     bottomRight: Radius.circular(12),
@@ -222,7 +228,6 @@ class WindowsStartMenu extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    // ✅ FIXED AVATAR
                     Container(
                       height: 40,
                       width: 40,
@@ -263,15 +268,17 @@ class WindowsStartMenu extends StatelessWidget {
 
                     const Spacer(),
 
-                    _FooterAction(icon: Icons.phone, onTap: () {}),
+                    _FooterAction(icon: Icons.phone, onTap: () {_launchURL( "tel:+610485516100");}),
                     const SizedBox(width: 8),
                     _FooterAction(icon: Icons.email, onTap: _launchMail),
                     const SizedBox(width: 8),
                     _FooterAction(icon: Icons.language, onTap: () => _launchURL("https://github.com/TechoChat")),
                     const SizedBox(width: 8),
+                    
                     IconButton(
-                      icon: const Icon(Icons.power_settings_new, color: Colors.redAccent, size: 18),
-                      onPressed: () {},
+                      icon: const Icon(Icons.ios_share, color: Colors.white70, size: 18),
+                      tooltip: "Share Portfolio",
+                      onPressed: () => _sharePortfolio(context),
                     ),
                   ],
                 ),
@@ -285,19 +292,22 @@ class WindowsStartMenu extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// HELPER WIDGETS (Unchanged)
+// HELPER WIDGETS
 // -----------------------------------------------------------------------------
 
+// ✅ UPDATED: Supports 'assetPath' for PNG images
 class _StartMenuApp extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;     // Made nullable
+  final String? assetPath;  // Added for PNG support
   final String name;
-  final Color color;
+  final Color? color;       // Made nullable
   final VoidCallback? onTap;
 
   const _StartMenuApp({
-    required this.icon,
+    this.icon,
+    this.assetPath,
     required this.name,
-    required this.color,
+    this.color,
     this.onTap,
   });
 
@@ -316,13 +326,18 @@ class _StartMenuApp extends StatelessWidget {
               height: 32,
               width: 32,
               decoration: BoxDecoration(
-                color: color,
+                // Use the provided color, or transparent if using an image
+                color: assetPath != null ? Colors.transparent : (color ?? Colors.grey),
                 borderRadius: BorderRadius.circular(6),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2))
-                ],
+                boxShadow: assetPath != null 
+                  ? [] // No shadow box for PNGs (they usually have their own depth)
+                  : [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2))],
               ),
-              child: Icon(icon, color: Colors.white, size: 20),
+              child: assetPath != null
+                  // Render Image
+                  ? Image.asset(assetPath!, width: 20, height: 20, fit: BoxFit.contain)
+                  // Render Icon
+                  : Icon(icon, color: Colors.white, size: 20),
             ),
             const SizedBox(height: 6),
             Text(
@@ -360,7 +375,7 @@ class _ContactRow extends StatelessWidget {
       crossAxisAlignment: isMultiLine ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
         SizedBox(
-          width: 80, // Narrower label width
+          width: 80,
           child: Text(
             label,
             style: const TextStyle(
@@ -377,7 +392,7 @@ class _ContactRow extends StatelessWidget {
               value,
               style: TextStyle(
                 color: isLink ? Colors.blueAccent : Colors.white,
-                fontSize: 12, // Compact font size
+                fontSize: 12,
                 height: 1.3,
                 decoration: isLink ? TextDecoration.underline : TextDecoration.none,
               ),

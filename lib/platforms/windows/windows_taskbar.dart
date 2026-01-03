@@ -30,7 +30,7 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
   List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
-  // --- ✅ Weather State ---
+  // --- Weather State ---
   final WeatherService _weatherService = WeatherService();
   String _weatherTemp = "--";
   String _weatherCondition = "Loading";
@@ -42,7 +42,7 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
     super.initState();
     _initBattery();
     _initConnectivity();
-    _initWeather(); // Start fetching
+    _initWeather();
 
     _batteryStateSubscription = _battery.onBatteryStateChanged.listen((
       BatteryState state,
@@ -57,7 +57,6 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
     });
   }
 
-  // ✅ Fetch Weather Logic
   Future<void> _initWeather() async {
     final weather = await _weatherService.getWeather();
     if (mounted && weather != null) {
@@ -103,7 +102,6 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
       barrierLabel: "Close",
       pageBuilder: (context, _, _) => const WindowsBrowser(),
       transitionDuration: const Duration(milliseconds: 200),
-      // Simple scale animation to look like a window opening
       transitionBuilder: (context, anim, _, child) {
         return Transform.scale(
           scale: anim.value,
@@ -166,8 +164,7 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          // ✅ 1. LEFT SIDE: Weather Widget
-          // We wrap it in a container with a fixed width or just let it sit there.
+          // 1. LEFT SIDE: Weather Widget
           if (!_isLoadingWeather)
             _TaskbarWeather(
               temp: _weatherTemp,
@@ -177,7 +174,6 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
 
           const Spacer(),
 
-          // 2. CENTER: Start Button, Search & Outlook
           // 2. CENTER: Start Button, Search, Terminal & Outlook
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -195,17 +191,17 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
               ),
               const SizedBox(width: 8),
 
-              // ✅ NEW: Terminal Icon
+              // ✅ UPDATED: Terminal Image Icon
               _TaskbarIcon(
-                icon: Icons.terminal, // or Icons.code
-                color: Colors.grey, // Classic terminal grey
+                assetPath: "assets/img/windows/icons/terminal.png",
                 onTap: _openTerminalWindow,
               ),
 
               const SizedBox(width: 8),
+              
+              // ✅ UPDATED: Email Image Icon
               _TaskbarIcon(
-                icon: Icons.email_outlined,
-                color: const Color(0xFF0078D4),
+                assetPath: "assets/img/windows/icons/email.png",
                 onTap: _openMail,
               ),
             ],
@@ -249,7 +245,7 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
 }
 
 // -----------------------------------------------------------------------------
-// ✅ NEW WIDGET: Windows 11 Style Weather Widget (Left Taskbar)
+// Weather Widget
 // -----------------------------------------------------------------------------
 class _TaskbarWeather extends StatefulWidget {
   final String temp;
@@ -275,7 +271,7 @@ class _TaskbarWeatherState extends State<_TaskbarWeather> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: Container(
-        height: 40, // Matches taskbar height mostly
+        height: 40,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         margin: const EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
@@ -288,11 +284,8 @@ class _TaskbarWeatherState extends State<_TaskbarWeather> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Weather Icon (Sun/Cloud)
             Icon(widget.icon, color: Colors.orangeAccent, size: 24),
             const SizedBox(width: 8),
-
-            // Text Column (Temp & Condition)
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,7 +301,7 @@ class _TaskbarWeatherState extends State<_TaskbarWeather> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  widget.condition, // e.g., "Sunny"
+                  widget.condition,
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 10,
@@ -325,17 +318,19 @@ class _TaskbarWeatherState extends State<_TaskbarWeather> {
 }
 
 // -----------------------------------------------------------------------------
-// --- UNCHANGED HELPERS ---
+// ✅ UPDATED HELPER: _TaskbarIcon (Supports both IconData and Images)
 // -----------------------------------------------------------------------------
 
 class _TaskbarIcon extends StatefulWidget {
-  final IconData icon;
-  final Color color;
+  final IconData? icon;      // Optional Icon
+  final String? assetPath;   // Optional Image Path
+  final Color? color;        // Optional Color (for Icons)
   final VoidCallback onTap;
 
   const _TaskbarIcon({
-    required this.icon,
-    required this.color,
+    this.icon,
+    this.assetPath,
+    this.color,
     required this.onTap,
   });
 
@@ -356,19 +351,37 @@ class _TaskbarIconState extends State<_TaskbarIcon> {
         child: Container(
           width: 40,
           height: 40,
+          // Center content
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: _isHovered
                 ? Colors.white.withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(4),
           ),
-          child: Icon(widget.icon, color: widget.color, size: 26),
+          child: widget.assetPath != null
+              // If assetPath is provided, use Image
+              ? Image.asset(
+                  widget.assetPath!,
+                  width: 26,
+                  height: 26,
+                  fit: BoxFit.contain,
+                )
+              // Otherwise, use Icon
+              : Icon(
+                  widget.icon,
+                  color: widget.color ?? Colors.white,
+                  size: 26,
+                ),
         ),
       ),
     );
   }
 }
 
+// -----------------------------------------------------------------------------
+// Clock
+// -----------------------------------------------------------------------------
 class WindowsClock extends StatefulWidget {
   const WindowsClock({super.key});
 
@@ -426,10 +439,7 @@ class _WindowsClockState extends State<WindowsClock> {
 }
 
 // -----------------------------------------------------------------------------
-// ✅ NEW: Windows Style Browser Window (Dialog)
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// ✅ UPDATED: Windows Browser with Maximize, Minimize & Reload
+// Browser Window
 // -----------------------------------------------------------------------------
 class WindowsBrowser extends StatefulWidget {
   const WindowsBrowser({super.key});
@@ -440,18 +450,16 @@ class WindowsBrowser extends StatefulWidget {
 
 class _WindowsBrowserState extends State<WindowsBrowser> {
   final TextEditingController _searchController = TextEditingController();
-  final FocusNode _urlFocusNode = FocusNode(); // ✅ Track focus state
+  final FocusNode _urlFocusNode = FocusNode();
 
-  // State for Window UI
   bool _isMaximized = false;
-  bool _isUrlFocused = false; // ✅ Track if address bar is active
+  bool _isUrlFocused = false;
   String? _currentUrl;
   Key _key = UniqueKey();
 
   @override
   void initState() {
     super.initState();
-    // Listen to focus changes to update the border color
     _urlFocusNode.addListener(() {
       setState(() {
         _isUrlFocused = _urlFocusNode.hasFocus;
@@ -480,7 +488,6 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
       _searchController.text = url;
       _key = UniqueKey();
     });
-    // Unfocus after searching to hide the cursor/keyboard
     _urlFocusNode.unfocus();
   }
 
@@ -533,7 +540,7 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
           ),
           child: Column(
             children: [
-              // --- 1. Browser Title/Address Bar ---
+              // Browser Title/Address Bar
               Container(
                 height: 45,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -547,7 +554,6 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
                     WindowControl(icon: Icons.refresh, onTap: _reloadPage),
                     const SizedBox(width: 8),
 
-                    // ✅ Address Bar (Updated with Focus & Cursor Color)
                     Expanded(
                       child: Container(
                         height: 30,
@@ -556,7 +562,6 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
                           color: const Color(0xFF1A1A1A),
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(
-                            // Show blue border when clicked, otherwise subtle white
                             color: _isUrlFocused
                                 ? Colors.blueAccent
                                 : Colors.white12,
@@ -565,8 +570,8 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
                         ),
                         child: TextField(
                           controller: _searchController,
-                          focusNode: _urlFocusNode, // Hook up the focus node
-                          cursorColor: Colors.white, // ✅ Cursor is now White!
+                          focusNode: _urlFocusNode,
+                          cursorColor: Colors.white,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 13,
@@ -588,7 +593,6 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
                     ),
                     const SizedBox(width: 8),
 
-                    // Window Actions
                     WindowControl(
                       icon: Icons.minimize,
                       onTap: () => Navigator.of(context).pop(),
@@ -608,7 +612,7 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
                 ),
               ),
 
-              // --- 2. Browser Body ---
+              // Browser Body
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.vertical(
@@ -625,8 +629,6 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
       ),
     );
   }
-
-  // --- Helpers ---
 
   Widget _buildHomeScreen() {
     return Container(
@@ -649,7 +651,7 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
             width: 500,
             child: TextField(
               controller: _searchController,
-              cursorColor: Colors.white, // ✅ Added here too
+              cursorColor: Colors.white,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 filled: true,
@@ -673,7 +675,6 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
   Widget _buildWebView() {
     final viewId = 'iframe-view-${_currentUrl.hashCode}';
 
-    // Use 'try-catch' purely to ignore "re-registration" errors during hot reload
     try {
       ui_web.platformViewRegistry.registerViewFactory(viewId, (int viewId) {
         final iframe = html.IFrameElement();
