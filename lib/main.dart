@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui'; // Required for ImageFilter
+import 'dart:ui_web' as ui_web; // For web-specific UI features
 import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
@@ -13,6 +14,21 @@ import 'platforms/mac/mac_home.dart';
 import 'platforms/windows/windows_home.dart';
 
 void main() async {
+  // We register a factory that CREATES the iframe.
+  // To update it, we will just interact with the DOM elements or 
+  // let the widget rebuild.
+  
+  // Actually, for a robust 'Search' demo, let's make the factory 
+  // return a container that we can manipulate, or keep it simple:
+  
+  ui_web.platformViewRegistry.registerViewFactory(
+    'iframe-view',
+    (int viewId) => html.IFrameElement()
+      ..style.height = '100%'
+      ..style.width = '100%'
+      ..style.border = 'none',
+  );
+  
   // Ensure Flutter bindings are initialized before doing anything else
   WidgetsFlutterBinding.ensureInitialized();
 
