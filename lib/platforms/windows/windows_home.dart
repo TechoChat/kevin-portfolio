@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kevins_tech/platforms/windows/file_explorer_window.dart';
 import 'package:kevins_tech/platforms/windows/windows_taskbar.dart';
@@ -16,8 +17,39 @@ class WindowsHome extends StatefulWidget {
 }
 
 class _WindowsHomeState extends State<WindowsHome> {
-  // ✅ 1. Initialize as false to ensure it starts closed
   bool _isStartMenuOpen = false;
+
+  // --- Scrolling Text Variables ---
+  late PageController _pageController;
+  Timer? _timer;
+  final List<String> _words = ["Passion", "Care", "Love", "Flutter"];
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the controller
+    _pageController = PageController(initialPage: 0);
+
+    // Timer: Scrolls every 2 seconds
+    _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
+      if (_pageController.hasClients) {
+        _currentPage++;
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 600), // Slightly slower smooth scroll
+          curve: Curves.easeOutQuart, // Smoother landing
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   void _toggleStartMenu() {
     setState(() {
@@ -25,7 +57,7 @@ class _WindowsHomeState extends State<WindowsHome> {
     });
   }
 
-  // --- Window Openers ---
+  // --- Window Openers (Same as before) ---
   void _openProjects() {
     _openGenericWindow(
       title: "Projects",
@@ -161,7 +193,6 @@ class _WindowsHomeState extends State<WindowsHome> {
           Positioned.fill(
             child: GestureDetector(
               onTap: () {
-                // ✅ Fix: Close menu if clicking anywhere on desktop
                 if (_isStartMenuOpen) setState(() => _isStartMenuOpen = false);
               },
               child: Image.asset(
@@ -230,16 +261,72 @@ class _WindowsHomeState extends State<WindowsHome> {
             ),
           ),
 
-          // 3. Start Menu (Conditionally Rendered & Aligned)
-          // ✅ Fix: Using 'if' ensures it's gone when closed.
-          // ✅ Fix: 'Align' ensures it doesn't stretch to full width.
+          // 3. "Made with..." Small Animated Capsule
+          Positioned(
+            bottom: 60, // Sits just above taskbar
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                // ✅ Reduced padding for a tighter look
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const FlutterLogo(size: 14),
+                    const SizedBox(width: 6),
+                    const Text(
+                      "Made with ",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontFamily: "Segoe UI",
+                      ),
+                    ),
+                    // ✅ FIXED: Tighter height and no-gap text style
+                    SizedBox(
+                      height: 18, // Tight container height to force words close
+                      width: 50,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        scrollDirection: Axis.vertical,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return Container(
+                            alignment: Alignment.centerLeft, // Aligns text to left
+                            child: Text(
+                              _words[index % _words.length],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: "Segoe UI",
+                                height: 1.0, // ✅ CRITICAL: Removes vertical font padding
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // 4. Start Menu
           if (_isStartMenuOpen)
             Positioned(
-              bottom: 48, // Sits right on top of taskbar
+              bottom: 48,
               left: 0,
               right: 0,
               child: Align(
-                alignment: Alignment.bottomCenter, // Centers horizontally
+                alignment: Alignment.bottomCenter,
                 child: WindowsStartMenu(
                   onOpenTerminal: _openTerminalWindow,
                   onOpenProjects: _openProjects,
@@ -248,7 +335,7 @@ class _WindowsHomeState extends State<WindowsHome> {
               ),
             ),
 
-          // 4. Taskbar (Always on top)
+          // 5. Taskbar
           Positioned(
             bottom: 0,
             left: 0,

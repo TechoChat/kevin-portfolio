@@ -38,10 +38,11 @@ class WindowsStartMenu extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       // ✅ GLASS EFFECT: Blur behind the menu
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0), 
+        filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
         child: Container(
-          width: 640,
-          height: 540, // ✅ Reduced height to fit content tightly
+          // ✅ UPDATED: Reduced width from 640 -> 540 for a more compact, realistic look
+          width: 540,
+          height: 560, // Slight height adjustment to maintain aspect ratio
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
             // ✅ TRANSPARENCY: More see-through (0.85 -> 0.75)
@@ -62,10 +63,10 @@ class WindowsStartMenu extends StatelessWidget {
               // ==========================================================
               // 1. TOP SECTION: Search & Pinned Apps
               // ==========================================================
-              
+
               // --- Search Bar ---
               Padding(
-                padding: const EdgeInsets.fromLTRB(32, 24, 32, 16),
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 16), // Tighter padding
                 child: TextField(
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
@@ -85,7 +86,7 @@ class WindowsStartMenu extends StatelessWidget {
 
               // --- Pinned Header ---
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 0),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -111,9 +112,9 @@ class WindowsStartMenu extends StatelessWidget {
               // --- Pinned Apps Grid ---
               Container(
                 height: 100, // Compact
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround, // Distributes icons evenly
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _StartMenuApp(
@@ -128,7 +129,6 @@ class WindowsStartMenu extends StatelessWidget {
                       color: const Color(0xFF0077b5),
                       onTap: () => _launchURL("https://www.linkedin.com/in/techochat/"),
                     ),
-                    // ✅ FUNCTIONAL: Opens Terminal & Closes Menu
                     _StartMenuApp(
                       icon: Icons.terminal,
                       name: "Terminal",
@@ -138,7 +138,6 @@ class WindowsStartMenu extends StatelessWidget {
                         onOpenTerminal();
                       },
                     ),
-                    // ✅ FUNCTIONAL: Opens Projects & Closes Menu
                     _StartMenuApp(
                       icon: Icons.folder_special,
                       name: "Projects",
@@ -164,7 +163,7 @@ class WindowsStartMenu extends StatelessWidget {
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFF252525).withValues(alpha: 0.5), // Subtle card
@@ -174,35 +173,35 @@ class WindowsStartMenu extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                       _ContactRow(label: "Phone", value: "+61 0485 516 100"),
-                       const Divider(color: Colors.white10, height: 16),
-                       
-                       _ContactRow(
-                         label: "Email", 
-                         value: "kevinstech0@gmail.com", 
-                         isLink: true,
-                         onTap: _launchMail
-                       ),
-                       const Divider(color: Colors.white10, height: 16),
-                       
-                       _ContactRow(
-                         label: "website", 
-                         value: "https://www.kevinstech.co/",
-                       ),
-                       const Divider(color: Colors.white10, height: 16),
+                      const _ContactRow(label: "Phone", value: "+61 0485 516 100"),
+                      const Divider(color: Colors.white10, height: 12),
 
-                       _ContactRow(
-                         label: "Experience", 
-                         value: "3+ years in Software Development\n1+ year in AI/ML Research",
-                         isMultiLine: true
-                       ),
-                       const Divider(color: Colors.white10, height: 16),
+                      _ContactRow(
+                          label: "Email",
+                          value: "kevinstech0@gmail.com",
+                          isLink: true,
+                          onTap: _launchMail
+                      ),
+                      const Divider(color: Colors.white10, height: 12),
 
-                       _ContactRow(
-                         label: "Skills", 
-                         value: "Flutter, Dart, Python, AI/ML (RAG)\nIoT, Embedded Systems, Cloud",
-                         isMultiLine: true
-                       ),
+                      const _ContactRow(
+                        label: "website",
+                        value: "https://www.kevinstech.co/",
+                      ),
+                      const Divider(color: Colors.white10, height: 12),
+
+                      const _ContactRow(
+                          label: "Experience",
+                          value: "3+ years in Software Development\n1+ year in AI/ML Research",
+                          isMultiLine: true
+                      ),
+                      const Divider(color: Colors.white10, height: 12),
+
+                      const _ContactRow(
+                          label: "Skills",
+                          value: "Flutter, Dart, Python, AI/ML (RAG)\nIoT, Embedded Systems, Cloud",
+                          isMultiLine: true
+                      ),
                     ],
                   ),
                 ),
@@ -213,7 +212,7 @@ class WindowsStartMenu extends StatelessWidget {
               // ==========================================================
               Container(
                 height: 64,
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 decoration: const BoxDecoration(
                   color: Color(0xFF101010), // Solid dark footer
                   borderRadius: BorderRadius.only(
@@ -223,7 +222,7 @@ class WindowsStartMenu extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    // ✅ FIXED AVATAR: Clean circle with border
+                    // ✅ FIXED AVATAR
                     Container(
                       height: 40,
                       width: 40,
@@ -231,15 +230,14 @@ class WindowsStartMenu extends StatelessWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white24, width: 2),
                         image: const DecorationImage(
-                          image: AssetImage("assets/img/KevinShah.png"), 
+                          image: AssetImage("assets/img/KevinShah.png"),
                           fit: BoxFit.cover,
-                          // Adjust alignment if the head is cut off
-                          alignment: Alignment.topCenter, 
+                          alignment: Alignment.topCenter,
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,10 +260,10 @@ class WindowsStartMenu extends StatelessWidget {
                         ),
                       ],
                     ),
-                    
+
                     const Spacer(),
-                    
-                    _FooterAction(icon: Icons.phone, onTap: () {}), 
+
+                    _FooterAction(icon: Icons.phone, onTap: () {}),
                     const SizedBox(width: 8),
                     _FooterAction(icon: Icons.email, onTap: _launchMail),
                     const SizedBox(width: 8),
@@ -273,7 +271,7 @@ class WindowsStartMenu extends StatelessWidget {
                     const SizedBox(width: 8),
                     IconButton(
                       icon: const Icon(Icons.power_settings_new, color: Colors.redAccent, size: 18),
-                      onPressed: () {}, 
+                      onPressed: () {},
                     ),
                   ],
                 ),
@@ -287,7 +285,7 @@ class WindowsStartMenu extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// HELPER WIDGETS
+// HELPER WIDGETS (Unchanged)
 // -----------------------------------------------------------------------------
 
 class _StartMenuApp extends StatelessWidget {
