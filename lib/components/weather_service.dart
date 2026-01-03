@@ -43,7 +43,7 @@ class WeatherService {
 
       final double lat = locationData['latitude'];
       final double lon = locationData['longitude'];
-      final String city = locationData['city'];
+      // final String city = locationData['city'];
 
       // 2. Get Weather for that Location
       final weatherResponse = await http.get(Uri.parse(
@@ -56,7 +56,7 @@ class WeatherService {
           temperature: data['main']['temp'].round().toString(),
           condition: data['weather'][0]['main'],
           iconCode: data['weather'][0]['icon'],
-          cityName: city,
+          cityName: data['name'], // This comes from OpenWeatherMap's response
         );
       } else {
         //print("Weather API Error: ${weatherResponse.statusCode}");

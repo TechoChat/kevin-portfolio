@@ -212,7 +212,8 @@ class _AndroidHomeState extends State<AndroidHome> {
                         ),
                         GestureDetector(
                           onTap: () async {
-                            const url = 'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
+                            const url =
+                                'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
                             if (await canLaunchUrl(Uri.parse(url))) {
                               await launchUrl(
                                 Uri.parse(url),
@@ -468,8 +469,9 @@ class _AndroidStatusBarState extends State<AndroidStatusBar> {
   }
 
   IconData _getBatteryIcon() {
-    if (_batteryState == BatteryState.charging)
+    if (_batteryState == BatteryState.charging) {
       return Icons.battery_charging_full;
+    }
     if (_batteryLevel >= 95) return Icons.battery_full;
     if (_batteryLevel >= 80) return Icons.battery_6_bar;
     if (_batteryLevel >= 60) return Icons.battery_5_bar;
@@ -480,8 +482,9 @@ class _AndroidStatusBarState extends State<AndroidStatusBar> {
 
   IconData _getNetworkIcon() {
     if (_connectionStatus.contains(ConnectivityResult.wifi)) return Icons.wifi;
-    if (_connectionStatus.contains(ConnectivityResult.mobile))
+    if (_connectionStatus.contains(ConnectivityResult.mobile)) {
       return Icons.signal_cellular_alt;
+    }
     return Icons.signal_cellular_connected_no_internet_4_bar;
   }
 
