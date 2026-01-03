@@ -137,8 +137,9 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
   }
 
   IconData _getBatteryIcon() {
-    if (_batteryState == BatteryState.charging)
+    if (_batteryState == BatteryState.charging) {
       return Icons.battery_charging_full;
+    }
     if (_batteryLevel >= 95) return Icons.battery_full;
     if (_batteryLevel >= 80) return Icons.battery_6_bar;
     if (_batteryLevel >= 60) return Icons.battery_5_bar;
@@ -148,11 +149,13 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
   }
 
   IconData _getNetworkIcon() {
-    if (_connectionStatus.contains(ConnectivityResult.ethernet))
+    if (_connectionStatus.contains(ConnectivityResult.ethernet)) {
       return Icons.settings_ethernet;
+    }
     if (_connectionStatus.contains(ConnectivityResult.wifi)) return Icons.wifi;
-    if (_connectionStatus.contains(ConnectivityResult.mobile))
+    if (_connectionStatus.contains(ConnectivityResult.mobile)) {
       return Icons.signal_cellular_4_bar;
+    }
     return Icons.public_off;
   }
 
@@ -190,16 +193,16 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
                 color: Colors.white,
                 onTap: _openSearchWindow,
               ),
-              const SizedBox(width: 8), 
-              
+              const SizedBox(width: 8),
+
               // ✅ NEW: Terminal Icon
               _TaskbarIcon(
                 icon: Icons.terminal, // or Icons.code
-                color: Colors.grey,   // Classic terminal grey
+                color: Colors.grey, // Classic terminal grey
                 onTap: _openTerminalWindow,
               ),
-              
-              const SizedBox(width: 8), 
+
+              const SizedBox(width: 8),
               _TaskbarIcon(
                 icon: Icons.email_outlined,
                 color: const Color(0xFF0078D4),
@@ -478,7 +481,7 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
       _key = UniqueKey();
     });
     // Unfocus after searching to hide the cursor/keyboard
-    _urlFocusNode.unfocus(); 
+    _urlFocusNode.unfocus();
   }
 
   void _goHome() {
@@ -514,7 +517,9 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
           height: _isMaximized ? size.height : 600,
           decoration: BoxDecoration(
             color: const Color(0xFF202020),
-            borderRadius: _isMaximized ? BorderRadius.zero : BorderRadius.circular(8),
+            borderRadius: _isMaximized
+                ? BorderRadius.zero
+                : BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.5),
@@ -552,7 +557,9 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(
                             // Show blue border when clicked, otherwise subtle white
-                            color: _isUrlFocused ? Colors.blueAccent : Colors.white12, 
+                            color: _isUrlFocused
+                                ? Colors.blueAccent
+                                : Colors.white12,
                             width: 1.5,
                           ),
                         ),
@@ -560,10 +567,17 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
                           controller: _searchController,
                           focusNode: _urlFocusNode, // Hook up the focus node
                           cursorColor: Colors.white, // ✅ Cursor is now White!
-                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
-                            icon: Icon(Icons.lock_outline, color: Colors.green, size: 14),
+                            icon: Icon(
+                              Icons.lock_outline,
+                              color: Colors.green,
+                              size: 14,
+                            ),
                             hintText: "Search Google or type a URL",
                             hintStyle: TextStyle(color: Colors.white24),
                             contentPadding: EdgeInsets.only(bottom: 14),
@@ -580,7 +594,9 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
                       onTap: () => Navigator.of(context).pop(),
                     ),
                     WindowControl(
-                      icon: _isMaximized ? Icons.filter_none : Icons.crop_square,
+                      icon: _isMaximized
+                          ? Icons.filter_none
+                          : Icons.crop_square,
                       onTap: _toggleMaximize,
                     ),
                     WindowControl(
@@ -611,7 +627,7 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
   }
 
   // --- Helpers ---
-  
+
   Widget _buildHomeScreen() {
     return Container(
       color: const Color(0xFF202020),
@@ -656,29 +672,19 @@ class _WindowsBrowserState extends State<WindowsBrowser> {
 
   Widget _buildWebView() {
     final viewId = 'iframe-view-${_currentUrl.hashCode}';
-    
+
     // Use 'try-catch' purely to ignore "re-registration" errors during hot reload
     try {
-      ui_web.platformViewRegistry.registerViewFactory(
-        viewId,
-        (int viewId) {
-          final iframe = html.IFrameElement();
-          iframe.src = _currentUrl!;
-          iframe.style.height = '100%';
-          iframe.style.width = '100%';
-          iframe.style.border = 'none';
-          return iframe;
-        },
-      );
+      ui_web.platformViewRegistry.registerViewFactory(viewId, (int viewId) {
+        final iframe = html.IFrameElement();
+        iframe.src = _currentUrl!;
+        iframe.style.height = '100%';
+        iframe.style.width = '100%';
+        iframe.style.border = 'none';
+        return iframe;
+      });
     } catch (_) {}
 
-    return HtmlElementView(
-      key: _key,
-      viewType: viewId,
-    );
+    return HtmlElementView(key: _key, viewType: viewId);
   }
 }
-
-
-
-

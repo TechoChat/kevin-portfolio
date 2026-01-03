@@ -186,14 +186,14 @@ class WindowsStartMenu extends StatelessWidget {
                        const Divider(color: Colors.white10, height: 16),
                        
                        _ContactRow(
-                         label: "Location", 
-                         value: "Adelaide, South Australia",
+                         label: "website", 
+                         value: "https://www.kevinstech.co/",
                        ),
                        const Divider(color: Colors.white10, height: 16),
 
                        _ContactRow(
                          label: "Experience", 
-                         value: "Embedded Firmware Dev (DSPWorks)\nBackend Dev (Wizard Infosys)",
+                         value: "3+ years in Software Development\n1+ year in AI/ML Research",
                          isMultiLine: true
                        ),
                        const Divider(color: Colors.white10, height: 16),

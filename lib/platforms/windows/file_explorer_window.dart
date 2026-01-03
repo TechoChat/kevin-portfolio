@@ -36,7 +36,7 @@ class _FileExplorerWindowState extends State<FileExplorerWindow> {
           decoration: BoxDecoration(
             color: const Color(0xFF202020), // Dark theme explorer
             borderRadius: _isMaximized ? BorderRadius.zero : BorderRadius.circular(8),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 20)],
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 20)],
             border: Border.all(color: Colors.white24, width: 1),
           ),
           child: Column(
@@ -183,7 +183,7 @@ class _SidebarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent,
+      color: isSelected ? Colors.white.withValues(alpha: 0.1) : Colors.transparent,
       child: Row(
         children: [
           Icon(icon, color: isSelected ? Colors.blueAccent : Colors.white54, size: 16),
@@ -255,7 +255,7 @@ class _HoverContainerState extends State<HoverContainer> {
       onExit: (_) => setState(() => _hover = false),
       child: Container(
         decoration: BoxDecoration(
-          color: _hover ? Colors.white.withOpacity(0.1) : Colors.transparent,
+          color: _hover ? Colors.white.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: _hover ? Colors.white12 : Colors.transparent),
         ),

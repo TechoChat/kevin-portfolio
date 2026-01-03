@@ -290,7 +290,7 @@ class _WindowsTerminalState extends State<WindowsTerminal> {
           decoration: BoxDecoration(
             color: const Color(0xFF0C0C0C),
             borderRadius: _isMaximized ? BorderRadius.zero : BorderRadius.circular(6),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 30)],
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 30)],
             border: Border.all(color: Colors.white12),
           ),
           child: Column(
@@ -321,7 +321,7 @@ class _WindowsTerminalState extends State<WindowsTerminal> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   width: double.infinity,
-                  color: const Color(0xFF0C0C0C).withOpacity(0.95),
+                  color: const Color(0xFF0C0C0C).withValues(alpha: 0.95),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
