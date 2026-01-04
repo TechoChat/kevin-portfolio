@@ -28,17 +28,15 @@ class _WindowsHomeState extends State<WindowsHome> {
   @override
   void initState() {
     super.initState();
-    // Initialize the controller
     _pageController = PageController(initialPage: 0);
 
-    // Timer: Scrolls every 2 seconds
     _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
       if (_pageController.hasClients) {
         _currentPage++;
         _pageController.animateToPage(
           _currentPage,
-          duration: const Duration(milliseconds: 600), // Slightly slower smooth scroll
-          curve: Curves.easeOutQuart, // Smoother landing
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutQuart,
         );
       }
     });
@@ -57,7 +55,7 @@ class _WindowsHomeState extends State<WindowsHome> {
     });
   }
 
-  // --- Window Openers (Same as before) ---
+  // --- Window Openers ---
   void _openProjects() {
     _openGenericWindow(
       title: "Projects",
@@ -202,62 +200,79 @@ class _WindowsHomeState extends State<WindowsHome> {
             ),
           ),
 
-          // 2. Desktop Icons
+          // 2. Desktop Icons (Responsive Grid)
+          // ✅ FIX: Using LayoutBuilder to force height constraint
           Positioned(
             top: 10,
             left: 10,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DesktopIcon(
-                  iconPath: "assets/img/windows/icons/computer.png",
-                  label: "This PC",
-                  onTap: _openThisPC,
-                ),
-                DesktopIcon(
-                  iconPath: "assets/img/windows/icons/network.png",
-                  label: "Network",
-                  onTap: _openNetwork,
-                ),
-                DesktopIcon(
-                  iconPath: "assets/img/windows/icons/explorer.png",
-                  label: "File Explorer",
-                  onTap: _openProjects,
-                ),
-                DesktopIcon(
-                  iconPath: "assets/img/windows/icons/folder.png",
-                  label: "Projects",
-                  onTap: _openProjects,
-                ),
-                const SizedBox(height: 10),
-                DesktopIcon(
-                  iconPath: "assets/img/windows/icons/github.png",
-                  label: "GitHub",
-                  onTap: () => launchUrl(Uri.parse("https://github.com/TechoChat")),
-                ),
-                DesktopIcon(
-                  iconPath: "assets/img/windows/icons/linkedin.png",
-                  label: "LinkedIn",
-                  onTap: () => launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/")),
-                ),
-                const SizedBox(height: 20),
-                DesktopIcon(
-                  iconPath: "assets/img/windows/icons/adobe.png",
-                  label: "Resume.pdf",
-                  onTap: () async {
-                    const url = 'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
-                    if (await canLaunchUrl(Uri.parse(url))) {
-                      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                    }
-                  },
-                ),
-                const SizedBox(height: 20),
-                DesktopIcon(
-                  iconPath: "assets/img/windows/icons/macos.png",
-                  label: "Move to Mac",
-                  onTap: () => widget.onPlatformSwitch(TargetPlatform.macOS),
-                ),
-              ],
+            bottom: 80, // Space for Taskbar + Footer
+            right: 0,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SizedBox(
+                  height: constraints.maxHeight, // Force Wrap to know its vertical limit
+                  child: Wrap(
+                    direction: Axis.vertical, // Fill Top-to-Bottom
+                    alignment: WrapAlignment.start,
+                    runAlignment: WrapAlignment.start, 
+                    spacing: 0,     // Vertical gap (DesktopIcon has built-in margin)
+                    runSpacing: 10, // Horizontal gap between columns
+                    children: [
+                      DesktopIcon(
+                        iconPath: "assets/img/windows/icons/computer.png",
+                        label: "This PC",
+                        onTap: _openThisPC,
+                      ),
+                      DesktopIcon(
+                        iconPath: "assets/img/windows/icons/network.png",
+                        label: "Network",
+                        onTap: _openNetwork,
+                      ),
+                      DesktopIcon(
+                        iconPath: "assets/img/windows/icons/explorer.png",
+                        label: "File Explorer",
+                        onTap: _openProjects,
+                      ),
+                      DesktopIcon(
+                        iconPath: "assets/img/windows/icons/folder.png",
+                        label: "Projects",
+                        onTap: _openProjects,
+                      ),
+                      // Spacer isn't needed in Wrap usually, but adding small box for visual separation
+                      const SizedBox(height: 10, width: 85), 
+                      
+                      DesktopIcon(
+                        iconPath: "assets/img/windows/icons/github.png",
+                        label: "GitHub",
+                        onTap: () => launchUrl(Uri.parse("https://github.com/TechoChat")),
+                      ),
+                      DesktopIcon(
+                        iconPath: "assets/img/windows/icons/linkedin.png",
+                        label: "LinkedIn",
+                        onTap: () => launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/")),
+                      ),
+                      
+                      const SizedBox(height: 10, width: 85), 
+                      
+                      DesktopIcon(
+                        iconPath: "assets/img/windows/icons/adobe.png",
+                        label: "Resume.pdf",
+                        onTap: () async {
+                          const url = 'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                          }
+                        },
+                      ),
+                      DesktopIcon(
+                        iconPath: "assets/img/windows/icons/macos.png",
+                        label: "Move to Mac",
+                        onTap: () => widget.onPlatformSwitch(TargetPlatform.macOS),
+                      ),
+                    ],
+                  ),
+                );
+              }
             ),
           ),
 
@@ -268,7 +283,6 @@ class _WindowsHomeState extends State<WindowsHome> {
             right: 0,
             child: Center(
               child: Container(
-                // ✅ Reduced padding for a tighter look
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.3),
@@ -288,9 +302,8 @@ class _WindowsHomeState extends State<WindowsHome> {
                         fontFamily: "Segoe UI",
                       ),
                     ),
-                    // ✅ FIXED: Tighter height and no-gap text style
                     SizedBox(
-                      height: 18, // Tight container height to force words close
+                      height: 18, 
                       width: 50,
                       child: PageView.builder(
                         controller: _pageController,
@@ -298,7 +311,7 @@ class _WindowsHomeState extends State<WindowsHome> {
                         physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           return Container(
-                            alignment: Alignment.centerLeft, // Aligns text to left
+                            alignment: Alignment.centerLeft, 
                             child: Text(
                               _words[index % _words.length],
                               style: const TextStyle(
@@ -306,7 +319,7 @@ class _WindowsHomeState extends State<WindowsHome> {
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: "Segoe UI",
-                                height: 1.0, // ✅ CRITICAL: Removes vertical font padding
+                                height: 1.0, 
                               ),
                             ),
                           );
