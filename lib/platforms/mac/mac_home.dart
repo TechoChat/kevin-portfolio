@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:ui'; // Required for ImageFilter (Blur)
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart'; // ✅ Make sure flutter_svg is in pubspec.yaml
 import 'package:battery_plus/battery_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:kevins_tech/platforms/mac/mac_dock.dart';
@@ -35,14 +37,16 @@ class _MacHomeState extends State<MacHome> {
   List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
-  // --- ✅ Weather State ---
+  // --- Weather State ---
   final WeatherService _weatherService = WeatherService();
   String _weatherTemp = "--";
-  String _weatherCity = "Cupertino"; // Default placeholder
+  String _weatherCity = "Cupertino";
   String _weatherCondition = "Loading";
-  IconData _weatherIcon = CupertinoIcons.cloud_sun_fill; // Default Apple-style icon
+  IconData _weatherIcon = CupertinoIcons.cloud_sun_fill;
   bool _isLoadingWeather = true;
 
+  // --- app Openers ---
+  
   void _openFinder() {
     _openMacWindow(const MacFinder());
   }
@@ -51,12 +55,12 @@ class _MacHomeState extends State<MacHome> {
     _openMacWindow(const MacTerminal());
   }
 
-  void _openSafari() async {
-    const url = 'https://www.google.com'; // Or your website
+  Future<void> _launchSafari() async {
+    const url = 'https://www.google.com';
     if (await canLaunchUrl(Uri.parse(url))) await launchUrl(Uri.parse(url));
   }
 
-  void _openMail() async {
+  Future<void> _launchMail() async {
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'kevinstech0@gmail.com',
@@ -64,15 +68,18 @@ class _MacHomeState extends State<MacHome> {
     await launchUrl(emailLaunchUri);
   }
   
-  void _openMaps() async {
+  Future<void> _launchMaps() async {
       await launchUrl(Uri.parse("https://maps.google.com"));
   }
 
-  void _openPhotos() {
-     // You can create a simple Gallery Window here if you like, or just a placeholder
-     _openMacWindow(
-        const Center(child: Text("Photos App Placeholder", style: TextStyle(color: Colors.white)))
-     );
+  // ✅ UPDATED: GitHub (Replaces Photos)
+  Future<void> _launchGitHub() async {
+      await launchUrl(Uri.parse("https://github.com/TechoChat"));
+  }
+
+  // ✅ NEW: LinkedIn (Replaces Messages)
+  Future<void> _launchLinkedIn() async {
+      await launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/"));
   }
 
   void _openMacWindow(Widget child) {
@@ -84,15 +91,104 @@ class _MacHomeState extends State<MacHome> {
       transitionDuration: const Duration(milliseconds: 200),
       transitionBuilder: (context, anim, _, child) {
         return Transform.scale(
-          scale: 0.95 + (0.05 * anim.value), // Subtle pop effect
+          scale: 0.95 + (0.05 * anim.value),
           child: Opacity(opacity: anim.value, child: child),
         );
       },
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // ✅ NEW: Launchpad Implementation
+  // ---------------------------------------------------------------------------
   void _openLaunchpad() {
-    // Optional: Implement Launchpad overlay here
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Dismiss",
+      pageBuilder: (context, anim, secAnim) {
+        return Stack(
+          children: [
+            // 1. Blurred Background
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(), // Tap background to close
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.3), // Dark tint
+                  ),
+                ),
+              ),
+            ),
+
+            // 2. App Grid
+            Center(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                padding: const EdgeInsets.all(40),
+                child: GridView.count(
+                  crossAxisCount: 7, // 7 apps per row (Standard Mac Layout)
+                  mainAxisSpacing: 30,
+                  crossAxisSpacing: 30,
+                  children: [
+                    _LaunchpadItem(
+                      label: "Finder",
+                      svgPath: "assets/img/mac/icons/finder.svg",
+                      color: Colors.blueAccent,
+                      onTap: () { Navigator.pop(context); _openFinder(); },
+                    ),
+                    _LaunchpadItem(
+                      label: "Safari",
+                      icon: CupertinoIcons.compass, // System Icon
+                      color: Colors.blue,
+                      onTap: () { Navigator.pop(context); _launchSafari(); },
+                    ),
+                    _LaunchpadItem(
+                      label: "Mail",
+                      icon: CupertinoIcons.mail_solid, // System Icon
+                      color: Colors.blueAccent,
+                      onTap: () { Navigator.pop(context); _launchMail(); },
+                    ),
+                    _LaunchpadItem(
+                      label: "Terminal",
+                      // adding terminal image as SVG
+                      svgPath: "assets/img/mac/icons/terminal.svg",
+                      color: Colors.grey[800]!,
+                      onTap: () { Navigator.pop(context); _openTerminal(); },
+                    ),
+                    _LaunchpadItem(
+                      label: "Maps",
+                      icon: CupertinoIcons.map_fill, // System Icon
+                      color: Colors.greenAccent,
+                      onTap: () { Navigator.pop(context); _launchMaps(); },
+                    ),
+                    
+                    // ✅ SVG Icon: GitHub
+                    _LaunchpadItem(
+                      label: "GitHub",
+                      svgPath: "assets/img/mac/icons/github.svg",
+                      onTap: () { Navigator.pop(context); _launchGitHub(); },
+                    ),
+
+                    // ✅ SVG Icon: LinkedIn
+                    _LaunchpadItem(
+                      label: "LinkedIn",
+                      svgPath: "assets/img/mac/icons/linkedin.svg",
+                      onTap: () { Navigator.pop(context); _launchLinkedIn(); },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+      transitionBuilder: (context, anim, _, child) {
+        return FadeTransition(opacity: anim, child: child);
+      },
+    );
   }
 
   @override
@@ -100,9 +196,8 @@ class _MacHomeState extends State<MacHome> {
     super.initState();
     _initBattery();
     _initConnectivity();
-    _initWeather(); // ✅ Start fetching weather
+    _initWeather();
 
-    // Listeners
     _batteryStateSubscription = _battery.onBatteryStateChanged.listen((state) {
       setState(() => _batteryState = state);
     });
@@ -112,7 +207,6 @@ class _MacHomeState extends State<MacHome> {
     });
   }
 
-  // ✅ Fetch Weather Logic
   Future<void> _initWeather() async {
     final weather = await _weatherService.getWeather();
     if (mounted && weather != null) {
@@ -120,32 +214,18 @@ class _MacHomeState extends State<MacHome> {
         _weatherTemp = weather.temperature;
         _weatherCity = weather.cityName;
         _weatherCondition = weather.condition;
-        // Map OpenWeather icon code to Cupertino Icons for Mac look
         _weatherIcon = _mapToCupertinoIcon(weather.iconCode);
         _isLoadingWeather = false;
       });
     }
   }
 
-  // Helper to map API icons to Apple Style Icons
   IconData _mapToCupertinoIcon(String code) {
     switch (code) {
       case '01d': return CupertinoIcons.sun_max_fill;
       case '01n': return CupertinoIcons.moon_fill;
       case '02d': 
       case '02n': return CupertinoIcons.cloud_sun_fill;
-      case '03d': 
-      case '03n': 
-      case '04d': 
-      case '04n': return CupertinoIcons.cloud_fill;
-      case '09d': 
-      case '09n': 
-      case '10d': 
-      case '10n': return CupertinoIcons.cloud_rain_fill;
-      case '11d': 
-      case '11n': return CupertinoIcons.cloud_bolt_fill;
-      case '13d': 
-      case '13n': return CupertinoIcons.snow;
       default: return CupertinoIcons.cloud_fill;
     }
   }
@@ -181,15 +261,6 @@ class _MacHomeState extends State<MacHome> {
             child: Image.asset(
               'assets/img/mac/macOS-Light.jpg',
               fit: BoxFit.cover,
-              errorBuilder: (c, e, s) => Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF2E004F), Color(0xFF8B00A0)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-              ),
             ),
           ),
 
@@ -200,7 +271,7 @@ class _MacHomeState extends State<MacHome> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Battery/Status Widget
+                // Battery Widget
                 MacWidgetContainer(
                   width: 300,
                   height: 140,
@@ -210,12 +281,8 @@ class _MacHomeState extends State<MacHome> {
                       BatteryRing(
                         percent: _batteryLevel / 100,
                         label: "$_batteryLevel%",
-                        icon: _batteryState == BatteryState.charging 
-                            ? CupertinoIcons.bolt_fill 
-                            : CupertinoIcons.device_laptop,
-                        color: _batteryState == BatteryState.charging 
-                            ? const Color(0xFF52D598) 
-                            : (_batteryLevel < 20 ? Colors.red : const Color(0xFF52D598)),
+                        icon: _batteryState == BatteryState.charging ? CupertinoIcons.bolt_fill : CupertinoIcons.device_laptop,
+                        color: _batteryState == BatteryState.charging ? const Color(0xFF52D598) : Colors.blueAccent,
                       ),
                       const BatteryRing(
                         percent: 1.00,
@@ -223,17 +290,11 @@ class _MacHomeState extends State<MacHome> {
                         icon: CupertinoIcons.headphones,
                         color: Colors.blueAccent,
                       ),
-                      const BatteryRing(
-                        percent: 0.08,
-                        label: "8%",
-                        icon: CupertinoIcons.battery_25,
-                        color: Colors.red,
-                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 15),
-                // Calendar & Weather Row
+                // Calendar & Weather
                 Row(
                   children: [
                     MacWidgetContainer(
@@ -243,8 +304,6 @@ class _MacHomeState extends State<MacHome> {
                       child: const CalendarWidget(),
                     ),
                     const SizedBox(width: 15),
-                    
-                    // ✅ Updated Weather Widget Container
                     MacWidgetContainer(
                       width: 140,
                       height: 140,
@@ -263,7 +322,7 @@ class _MacHomeState extends State<MacHome> {
             ),
           ),
 
-          // 3. Desktop Icons ("Move to Windows")
+          // 3. Desktop Icons
           Positioned(
             top: 40,
             right: 20,
@@ -287,12 +346,9 @@ class _MacHomeState extends State<MacHome> {
             ),
           ),
 
-          // 4. The Top Menu Bar
+          // 4. Menu Bar
           Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 28,
+            top: 0, left: 0, right: 0, height: 28,
             child: MacMenuBar(
               batteryLevel: _batteryLevel,
               batteryState: _batteryState,
@@ -300,16 +356,18 @@ class _MacHomeState extends State<MacHome> {
             ),
           ),
 
-          // 5. The Dock
+          // 5. Dock (Updated with GitHub & LinkedIn)
           Positioned(
             bottom: 10, left: 0, right: 0, 
             child: MacDock(
+              onOpenLaunchpad: _openLaunchpad, // ✅ Added Launchpad Trigger
               onOpenFinder: _openFinder,
               onOpenTerminal: _openTerminal,
-              onOpenSafari: _openSafari,
-              onOpenMail: _openMail,
-              onOpenMaps: _openMaps,
-              onOpenPhotos: _openPhotos,
+              onOpenSafari: _launchSafari,
+              onOpenMail: _launchMail,
+              onOpenMaps: _launchMaps,
+              onOpenGitHub: _launchGitHub,   // ✅ Replaced Photos
+              onOpenLinkedIn: _launchLinkedIn, // ✅ Replaced Messages (Ensure MacDock accepts this)
             ),
           ),
         ],
@@ -318,15 +376,23 @@ class _MacHomeState extends State<MacHome> {
   }
 }
 
-
-// Helper for Finder Icons
-class _MacFileItem extends StatelessWidget {
+// -----------------------------------------------------------------------------
+// ✅ NEW: Launchpad Icon Item (Supports SVG or Flutter Icon)
+// -----------------------------------------------------------------------------
+class _LaunchpadItem extends StatelessWidget {
   final String label;
-  final IconData icon;
-  final Color color;
+  final IconData? icon;
+  final String? svgPath;
+  final Color? color;
   final VoidCallback onTap;
 
-  const _MacFileItem({required this.label, required this.icon, required this.color, required this.onTap});
+  const _LaunchpadItem({
+    required this.label,
+    this.icon,
+    this.svgPath,
+    this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -335,9 +401,35 @@ class _MacFileItem extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 50, color: color),
-          const SizedBox(height: 5),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Container(
+            height: 64,
+            width: 64,
+            decoration: BoxDecoration(
+              // If it's a system icon, give it a background squircle
+              color: svgPath == null ? (color ?? Colors.blue) : Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: svgPath != null
+                ? SvgPicture.asset(svgPath!, fit: BoxFit.contain) // ✅ Render SVG
+                : Icon(icon, size: 36, color: Colors.white), // ✅ Render System Icon
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              decoration: TextDecoration.none,
+            ),
+          ),
         ],
       ),
     );

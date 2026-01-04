@@ -4,20 +4,24 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class MacDock extends StatelessWidget {
   final VoidCallback onOpenFinder;
+  final VoidCallback onOpenLaunchpad; // ✅ Added Launchpad Callback
   final VoidCallback onOpenTerminal;
   final VoidCallback onOpenSafari;
   final VoidCallback onOpenMail;
   final VoidCallback onOpenMaps;
-  final VoidCallback onOpenPhotos;
+  final VoidCallback onOpenGitHub;    // ✅ Added GitHub Callback
+  final VoidCallback onOpenLinkedIn;  // ✅ Added LinkedIn Callback
 
   const MacDock({
     super.key,
     required this.onOpenFinder,
+    required this.onOpenLaunchpad,
     required this.onOpenTerminal,
     required this.onOpenSafari,
     required this.onOpenMail,
     required this.onOpenMaps,
-    required this.onOpenPhotos,
+    required this.onOpenGitHub,
+    required this.onOpenLinkedIn,
   });
 
   @override
@@ -33,18 +37,15 @@ class MacDock extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                // ✅ FIXED: More opaque milky white for visibility
-                color: Colors.white.withOpacity(0.3), 
+                color: Colors.white.withValues(alpha: 0.3), 
                 borderRadius: BorderRadius.circular(24),
-                // ✅ FIXED: Explicit white border for the "glass edge" look
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.4), 
+                  color: Colors.white.withValues(alpha: 0.4), 
                   width: 1.5
                 ),
-                // ✅ FIXED: Deep shadow to lift it off the wallpaper
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 25,
                     spreadRadius: -5,
                     offset: const Offset(0, 15),
@@ -56,18 +57,29 @@ class MacDock extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   GestureDetector(onTap: onOpenFinder, child: const _DockIcon("assets/img/mac/icons/finder.svg", "Finder")),
-                  const _DockIcon("assets/img/mac/icons/launchpad.svg", "Launchpad"),
+                  
+                  // ✅ Wired up Launchpad
+                  GestureDetector(onTap: onOpenLaunchpad, child: const _DockIcon("assets/img/mac/icons/launchpad.svg", "Launchpad")),
+                  
                   GestureDetector(onTap: onOpenSafari, child: const _DockIcon("assets/img/mac/icons/safari.svg", "Safari")),
-                  const _DockIcon("assets/img/mac/icons/messages.svg", "Messages"),
+                  
+                  // ✅ Replaced Messages with LinkedIn
+                  GestureDetector(onTap: onOpenLinkedIn, child: const _DockIcon("assets/img/mac/icons/linkedin.svg", "LinkedIn")),
+                  
                   GestureDetector(onTap: onOpenMail, child: const _DockIcon("assets/img/mac/icons/mail.svg", "Mail")),
                   GestureDetector(onTap: onOpenMaps, child: const _DockIcon("assets/img/mac/icons/maps.svg", "Maps")),
-                  GestureDetector(onTap: onOpenPhotos, child: const _DockIcon("assets/img/mac/icons/photos.svg", "Photos")),
+                  
+                  // ✅ Replaced Photos with GitHub
+                  GestureDetector(onTap: onOpenGitHub, child: const _DockIcon("assets/img/mac/icons/github.svg", "GitHub")),
+                  
                   GestureDetector(onTap: onOpenTerminal, child: const _DockIcon("assets/img/mac/icons/terminal.svg", "Terminal")),
                   const _DockIcon("assets/img/mac/icons/settings.svg", "Settings"),
+                  
                   const SizedBox(width: 12),
                   // Divider Line
-                  Container(width: 1.5, height: 45, color: Colors.white.withOpacity(0.4), margin: const EdgeInsets.only(bottom: 5)),
+                  Container(width: 1.5, height: 45, color: Colors.white.withValues(alpha: 0.4), margin: const EdgeInsets.only(bottom: 5)),
                   const SizedBox(width: 12),
+                  
                   const _DockIcon("assets/img/mac/icons/bin.svg", "Bin"),
                 ],
               ),
