@@ -7,6 +7,9 @@ import 'package:kevins_tech/platforms/mac/mac_dock.dart';
 import 'package:kevins_tech/platforms/mac/mac_menu_bar.dart';
 import 'package:kevins_tech/platforms/mac/mac_widget.dart';
 import 'package:kevins_tech/platforms/mac/desktop_icon.dart';
+import 'package:kevins_tech/platforms/mac/mac_finder.dart';
+import 'package:kevins_tech/platforms/mac/mac_terminal.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ✅ Import your Weather Service
 import '../../components/weather_service.dart';
@@ -39,6 +42,58 @@ class _MacHomeState extends State<MacHome> {
   String _weatherCondition = "Loading";
   IconData _weatherIcon = CupertinoIcons.cloud_sun_fill; // Default Apple-style icon
   bool _isLoadingWeather = true;
+
+  void _openFinder() {
+    _openMacWindow(const MacFinder());
+  }
+
+  void _openTerminal() {
+    _openMacWindow(const MacTerminal());
+  }
+
+  void _openSafari() async {
+    const url = 'https://www.google.com'; // Or your website
+    if (await canLaunchUrl(Uri.parse(url))) await launchUrl(Uri.parse(url));
+  }
+
+  void _openMail() async {
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'kevinstech0@gmail.com',
+    );
+    await launchUrl(emailLaunchUri);
+  }
+  
+  void _openMaps() async {
+      await launchUrl(Uri.parse("https://maps.google.com"));
+  }
+
+  void _openPhotos() {
+     // You can create a simple Gallery Window here if you like, or just a placeholder
+     _openMacWindow(
+        const Center(child: Text("Photos App Placeholder", style: TextStyle(color: Colors.white)))
+     );
+  }
+
+  void _openMacWindow(Widget child) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Close",
+      pageBuilder: (context, _, _) => child,
+      transitionDuration: const Duration(milliseconds: 200),
+      transitionBuilder: (context, anim, _, child) {
+        return Transform.scale(
+          scale: 0.95 + (0.05 * anim.value), // Subtle pop effect
+          child: Opacity(opacity: anim.value, child: child),
+        );
+      },
+    );
+  }
+
+  void _openLaunchpad() {
+    // Optional: Implement Launchpad overlay here
+  }
 
   @override
   void initState() {
@@ -246,10 +301,45 @@ class _MacHomeState extends State<MacHome> {
           ),
 
           // 5. The Dock
-          const Positioned(bottom: 10, left: 0, right: 0, child: MacDock()),
+          Positioned(
+            bottom: 10, left: 0, right: 0, 
+            child: MacDock(
+              onOpenFinder: _openFinder,
+              onOpenTerminal: _openTerminal,
+              onOpenSafari: _openSafari,
+              onOpenMail: _openMail,
+              onOpenMaps: _openMaps,
+              onOpenPhotos: _openPhotos,
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
+
+// Helper for Finder Icons
+class _MacFileItem extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _MacFileItem({required this.label, required this.icon, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 50, color: color),
+          const SizedBox(height: 5),
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
