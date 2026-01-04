@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -111,7 +110,7 @@ class _AndroidHomeState extends State<AndroidHome>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final double drawerHeight = size.height; // Full screen drawer
+    // final double drawerHeight = size.height; // Full screen drawer
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
@@ -965,8 +964,9 @@ class _TypewriterTextState extends State<TypewriterText> {
     super.initState();
     _timer = Timer.periodic(widget.speed, (timer) {
       if (_charIndex < widget.text.length) {
-        if (mounted)
+        if (mounted){
           setState(() => _displayedText += widget.text[_charIndex++]);
+        }
       } else {
         _timer.cancel();
       }
@@ -1149,8 +1149,9 @@ class _GoogleSearchPageState extends State<GoogleSearchPage> {
   Future<void> _launchGoogleSearch(String query) async {
     if (query.trim().isEmpty) return;
     final Uri url = Uri.https('www.google.com', '/search', {'q': query});
-    if (await canLaunchUrl(url))
+    if (await canLaunchUrl(url)){
       await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
   }
 
   @override

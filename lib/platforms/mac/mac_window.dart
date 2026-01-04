@@ -39,14 +39,14 @@ class _MacWindowState extends State<MacWindow> {
           width: currentWidth,
           height: currentHeight,
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E).withOpacity(0.85),
+            color: const Color(0xFF1E1E1E).withValues(alpha: 0.85),
             borderRadius: BorderRadius.circular(borderRadius),
             border: _isMaximized 
                 ? null 
-                : Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+                : Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 50,
                 spreadRadius: 10,
               )
@@ -180,13 +180,13 @@ class _MacWindowButton extends StatelessWidget {
           shape: BoxShape.circle,
           // Subtle border for authentic look
           border: Border.all(
-            color: borderColor.withOpacity(0.5), 
+            color: borderColor.withValues(alpha: 0.5), 
             width: 0.5
           ),
         ),
         alignment: Alignment.center,
         child: showIcon 
-            ? Icon(icon, size: iconSize, color: Colors.black.withOpacity(0.6)) 
+            ? Icon(icon, size: iconSize, color: Colors.black.withValues(alpha: 0.6)) 
             : null,
       ),
     );
