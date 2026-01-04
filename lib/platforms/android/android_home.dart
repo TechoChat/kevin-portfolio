@@ -18,7 +18,8 @@ class AndroidHome extends StatefulWidget {
   State<AndroidHome> createState() => _AndroidHomeState();
 }
 
-class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStateMixin {
+class _AndroidHomeState extends State<AndroidHome>
+    with SingleTickerProviderStateMixin {
   late Timer _clockTimer;
   DateTime _currentTime = DateTime.now();
 
@@ -47,7 +48,8 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
     Navigator.of(context).push(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 300),
-        pageBuilder: (context, animation, secondaryAnimation) => const GoogleSearchPage(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const GoogleSearchPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -63,7 +65,9 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
         transitionsBuilder: (context, anim, secAnim, child) {
           return SlideTransition(
             position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-                .animate(CurvedAnimation(parent: anim, curve: Curves.easeOutQuart)),
+                .animate(
+                  CurvedAnimation(parent: anim, curve: Curves.easeOutQuart),
+                ),
             child: child,
           );
         },
@@ -156,14 +160,17 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                         ),
                       ),
                     ),
-                    
+
                     // Main Content
                     SafeArea(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             child: AndroidStatusBar(iconColor: Colors.white),
                           ),
                           // "At A Glance"
@@ -175,19 +182,45 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                                 Text(
                                   DateFormat('E, MMM d').format(_currentTime),
                                   style: const TextStyle(
-                                    color: Colors.white, fontSize: 26, fontWeight: FontWeight.w400, fontFamily: 'Roboto',
-                                    shadows: [Shadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 1))],
+                                    color: Colors.white,
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'Roboto',
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black38,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
                                     if (_isLoadingWeather)
-                                      const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                      const SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
                                     else
-                                      Icon(_weatherIcon, color: Colors.white, size: 16),
+                                      Icon(
+                                        _weatherIcon,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
                                     const SizedBox(width: 8),
-                                    Text("$_weatherTemp°C in $_weatherCity", style: const TextStyle(color: Colors.white, fontSize: 14)),
+                                    Text(
+                                      "$_weatherTemp°C in $_weatherCity",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -199,26 +232,96 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                             height: 290,
                             child: GridView.count(
                               crossAxisCount: 4,
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               mainAxisSpacing: 20,
                               crossAxisSpacing: 10,
                               childAspectRatio: 0.75,
                               physics: const NeverScrollableScrollPhysics(),
                               children: [
-                                GestureDetector(onTap: () => _launchUrl("mailto:kevinstech0@gmail.com"), child: const _AndroidAppIcon(name: "Gmail", asset: "gmail", bgColor: Colors.white)),
-                                GestureDetector(onTap: () => _launchUrl("http://maps.google.com"), child: const _AndroidAppIcon(name: "Maps", asset: "maps", bgColor: Colors.white)),
-                                GestureDetector(onTap: () => _launchUrl("https://github.com/TechoChat"), child: const _AndroidAppIcon(name: "github", asset: "github", bgColor: Colors.white)),
-                                GestureDetector(onTap: () => _launchUrl("https://youtube.com"), child: const _AndroidAppIcon(name: "YouTube", asset: "youtube", bgColor: Colors.white)),
-                                GestureDetector(onTap: () => _launchUrl("https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing"), child: const _AndroidAppIcon(name: "Acrobat", asset: "pdf", bgColor: Colors.white)),
-                                const _AndroidAppIcon(name: "Settings", asset: "settings", bgColor: Colors.grey),
                                 GestureDetector(
-                                  onTap: () => widget.onPlatformSwitch(TargetPlatform.iOS),
+                                  onTap: () => _launchUrl(
+                                    "mailto:kevinstech0@gmail.com",
+                                  ),
+                                  child: const _AndroidAppIcon(
+                                    name: "Gmail",
+                                    asset: "gmail",
+                                    bgColor: Colors.white,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () =>
+                                      _launchUrl("http://maps.google.com"),
+                                  child: const _AndroidAppIcon(
+                                    name: "Maps",
+                                    asset: "maps",
+                                    bgColor: Colors.white,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => _launchUrl(
+                                    "https://github.com/TechoChat",
+                                  ),
+                                  child: const _AndroidAppIcon(
+                                    name: "github",
+                                    asset: "github",
+                                    bgColor: Colors.white,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () =>
+                                      _launchUrl("https://youtube.com"),
+                                  child: const _AndroidAppIcon(
+                                    name: "YouTube",
+                                    asset: "youtube",
+                                    bgColor: Colors.white,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => _launchUrl(
+                                    "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
+                                  ),
+                                  child: const _AndroidAppIcon(
+                                    name: "Acrobat",
+                                    asset: "pdf",
+                                    bgColor: Colors.white,
+                                  ),
+                                ),
+                                const _AndroidAppIcon(
+                                  name: "Settings",
+                                  asset: "settings",
+                                  bgColor: Colors.grey,
+                                ),
+                                GestureDetector(
+                                  onTap: () => widget.onPlatformSwitch(
+                                    TargetPlatform.iOS,
+                                  ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Container(width: 52, height: 52, decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle), child: const Icon(Icons.apple, color: Colors.white, size: 28)),
+                                      Container(
+                                        width: 52,
+                                        height: 52,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.black,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.apple,
+                                          color: Colors.white,
+                                          size: 28,
+                                        ),
+                                      ),
                                       const SizedBox(height: 6),
-                                      const Text("Move to iOS", style: TextStyle(color: Colors.white, fontSize: 12), maxLines: 1),
+                                      const Text(
+                                        "Move to iOS",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                        maxLines: 1,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -232,12 +335,46 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    GestureDetector(onTap: () => _launchUrl("tel:+610485516100"), child: const _AndroidAppIcon(name: "", asset: "phone", showLabel: false, bgColor: Color(0xFFE8F0FE))),
-                                    GestureDetector(onTap: () => _launchUrl("https://linkedin.com/in/techochat"), child: const _AndroidAppIcon(name: "", asset: "linkedin", showLabel: false, bgColor: Color(0xFFE8F0FE))),
-                                    GestureDetector(onTap: () => _launchUrl("https://google.com"), child: const _AndroidAppIcon(name: "", asset: "chrome", showLabel: false, bgColor: Colors.transparent)),
-                                    const _AndroidAppIcon(name: "", asset: "camera", showLabel: false, bgColor: Color(0xFFEFEFEF)),
+                                    GestureDetector(
+                                      onTap: () =>
+                                          _launchUrl("tel:+610485516100"),
+                                      child: const _AndroidAppIcon(
+                                        name: "",
+                                        asset: "phone",
+                                        showLabel: false,
+                                        bgColor: Color(0xFFE8F0FE),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () => _launchUrl(
+                                        "https://linkedin.com/in/techochat",
+                                      ),
+                                      child: const _AndroidAppIcon(
+                                        name: "",
+                                        asset: "linkedin",
+                                        showLabel: false,
+                                        bgColor: Color(0xFFE8F0FE),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () =>
+                                          _launchUrl("https://google.com"),
+                                      child: const _AndroidAppIcon(
+                                        name: "",
+                                        asset: "chrome",
+                                        showLabel: false,
+                                        bgColor: Colors.transparent,
+                                      ),
+                                    ),
+                                    const _AndroidAppIcon(
+                                      name: "",
+                                      asset: "camera",
+                                      showLabel: false,
+                                      bgColor: Color(0xFFEFEFEF),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 24),
@@ -249,16 +386,40 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                                       color: Colors.transparent,
                                       child: Container(
                                         height: 52,
-                                        decoration: BoxDecoration(color: const Color(0xFFF0F1F5), borderRadius: BorderRadius.circular(30)),
-                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF0F1F5),
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
                                         child: Row(
                                           children: [
-                                            Image.asset('assets/img/android/icons/google_g.webp', width: 26),
+                                            Image.asset(
+                                              'assets/img/android/icons/google_g.webp',
+                                              width: 26,
+                                            ),
                                             const SizedBox(width: 14),
-                                            Expanded(child: Text("Search...", style: TextStyle(color: Colors.grey[600], fontSize: 18))),
-                                            Image.asset('assets/img/android/icons/google_mic.png', width: 24),
+                                            Expanded(
+                                              child: Text(
+                                                "Search...",
+                                                style: TextStyle(
+                                                  color: Colors.grey[600],
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ),
+                                            Image.asset(
+                                              'assets/img/android/icons/google_mic.png',
+                                              width: 24,
+                                            ),
                                             const SizedBox(width: 18),
-                                            Image.asset('assets/img/android/icons/google_lens.png', width: 24),
+                                            Image.asset(
+                                              'assets/img/android/icons/google_lens.png',
+                                              width: 24,
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -266,7 +427,14 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                                   ),
                                 ),
                                 const SizedBox(height: 24),
-                                Container(width: 48, height: 4, decoration: BoxDecoration(color: Colors.grey[400], borderRadius: BorderRadius.circular(2))),
+                                Container(
+                                  width: 48,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[400],
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
                                 const SizedBox(height: 8),
                               ],
                             ),
@@ -297,7 +465,9 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                   }
                 },
                 child: Container(
-                  color: Colors.white.withValues(alpha: 0.95), // Solid background
+                  color: Colors.white.withValues(
+                    alpha: 0.95,
+                  ), // Solid background
                   child: SafeArea(
                     child: Column(
                       children: [
@@ -307,18 +477,23 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                           child: TextField(
                             decoration: InputDecoration(
                               hintText: "Search apps...",
-                              prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                              prefixIcon: const Icon(
+                                Icons.search,
+                                color: Colors.grey,
+                              ),
                               filled: true,
                               fillColor: const Color(0xFFF0F1F5),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
                                 borderSide: BorderSide.none,
                               ),
-                              contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 0,
+                              ),
                             ),
                           ),
                         ),
-                        
+
                         // All Apps Grid
                         Expanded(
                           child: GridView.count(
@@ -330,15 +505,47 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                             // Ensure clicks work, but scrolling still passes gestures if needed
                             physics: const BouncingScrollPhysics(),
                             children: [
-                              _buildDrawerItem("Gmail", "gmail", "mailto:kevinstech0@gmail.com"),
-                              _buildDrawerItem("Maps", "maps", "http://maps.google.com"),
-                              _buildDrawerItem("Photos", "photos", "https://github.com/TechoChat"),
-                              _buildDrawerItem("YouTube", "youtube", "https://youtube.com"),
-                              _buildDrawerItem("Acrobat", "pdf", "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing"),
-                              _buildDrawerItem("Chrome", "chrome", "https://google.com"),
-                              _buildDrawerItem("Phone", "phone", "tel:+610485516100"),
-                              _buildDrawerItem("LinkedIn", "messages", "https://linkedin.com/in/techochat"),
-                              
+                              _buildDrawerItem(
+                                "Gmail",
+                                "gmail",
+                                "mailto:kevinstech0@gmail.com",
+                              ),
+                              _buildDrawerItem(
+                                "Maps",
+                                "maps",
+                                "http://maps.google.com",
+                              ),
+                              _buildDrawerItem(
+                                "github",
+                                "github",
+                                "https://github.com/TechoChat",
+                              ),
+                              _buildDrawerItem(
+                                "YouTube",
+                                "youtube",
+                                "https://youtube.com",
+                              ),
+                              _buildDrawerItem(
+                                "Acrobat",
+                                "pdf",
+                                "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
+                              ),
+                              _buildDrawerItem(
+                                "Chrome",
+                                "chrome",
+                                "https://google.com",
+                              ),
+                              _buildDrawerItem(
+                                "Phone",
+                                "phone",
+                                "tel:+610485516100",
+                              ),
+                              _buildDrawerItem(
+                                "LinkedIn",
+                                "linkedin",
+                                "https://linkedin.com/in/techochat",
+                              ),
+
                               // ✅ TERMINAL APP
                               GestureDetector(
                                 onTap: () {
@@ -347,12 +554,12 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                                 },
                                 child: const _AndroidAppIcon(
                                   name: "Terminal",
-                                  asset: "terminal", 
+                                  asset: "terminal",
                                   bgColor: Colors.black,
-                                  isTerminal: true, 
+                                  isTerminal: true,
                                 ),
                               ),
-                              
+
                               _buildDrawerItem("Settings", "settings", ""),
                             ],
                           ),
@@ -375,7 +582,12 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
         _toggleDrawer(false);
         if (url.isNotEmpty) _launchUrl(url);
       },
-      child: _AndroidAppIcon(name: name, asset: asset, bgColor: Colors.white),
+      child: _AndroidAppIcon(
+        name: name,
+        asset: asset,
+        bgColor: Colors.white,
+        showLabel: true,
+      ),
     );
   }
 }
@@ -395,7 +607,7 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   final List<Widget> _consoleOutput = [];
-  bool _isBooting = true; 
+  bool _isBooting = true;
 
   @override
   void initState() {
@@ -405,7 +617,7 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
 
   Future<void> _runBootSequence() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     const bootLogs = [
       "[0.000000] Linux version 5.15.0-kevin-os (gcc version 11.2.0)",
       "[0.234120] CPU: ARMv8 Processor [410fd034] revision 4",
@@ -422,31 +634,56 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
     for (String log in bootLogs) {
       await Future.delayed(Duration(milliseconds: 50 + (log.length * 2)));
       if (!mounted) return;
-      
+
       setState(() {
         _consoleOutput.add(
-          Text(log, style: const TextStyle(color: Colors.grey, fontFamily: 'monospace', fontSize: 13))
+          Text(
+            log,
+            style: const TextStyle(
+              color: Colors.grey,
+              fontFamily: 'monospace',
+              fontSize: 13,
+            ),
+          ),
         );
       });
       _scrollToBottom();
     }
 
     setState(() => _isBooting = false);
-    Future.delayed(const Duration(milliseconds: 100), () => _focusNode.requestFocus());
+    Future.delayed(
+      const Duration(milliseconds: 100),
+      () => _focusNode.requestFocus(),
+    );
   }
 
   void _handleCommand(String input) {
     if (input.trim().isEmpty) return;
-    
+
     setState(() {
       // Echo user command
       _consoleOutput.add(
         RichText(
-          text: TextSpan(children: [
-             const TextSpan(text: "kevin@mobile:~\$ ", style: TextStyle(color: Color(0xFF00FF00), fontWeight: FontWeight.bold, fontFamily: 'monospace')),
-             TextSpan(text: input, style: const TextStyle(color: Colors.white, fontFamily: 'monospace')),
-          ])
-        )
+          text: TextSpan(
+            children: [
+              const TextSpan(
+                text: "kevin@mobile:~\$ ",
+                style: TextStyle(
+                  color: Color(0xFF00FF00),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'monospace',
+                ),
+              ),
+              TextSpan(
+                text: input,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ],
+          ),
+        ),
       );
 
       final command = input.toLowerCase().trim();
@@ -458,27 +695,45 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
         case 'about':
           _addAnimatedResponse(_asciiAbout, Colors.yellowAccent);
           _addAnimatedSection("BIO", [
-             "Kevin Shah - Masters in AI & ML Student",
-             "Passionate about Agentic AI, RAG, and Embedded Systems.",
-             "Origins: Gujarat, India 🇮🇳 -> Now: Adelaide, SA 🇦🇺"
+            "Kevin Shah - Masters in AI & ML Student",
+            "Passionate about Agentic AI, RAG, and Embedded Systems.",
+            "Origins: Gujarat, India 🇮🇳 -> Now: Adelaide, SA 🇦🇺",
           ]);
           break;
         case 'experience':
           _addAnimatedResponse(_asciiExp, Colors.yellowAccent);
-          _addAnimatedSection("DSPWORKS", ["Embedded Firmware Developer", "Optimized hardware-software integration."]);
-          _addAnimatedSection("WIZARD INFOSYS", ["Backend Web Developer", "Built AI-powered WordPress automation."]);
+          _addAnimatedSection("DSPWORKS", [
+            "Embedded Firmware Developer",
+            "Optimized hardware-software integration.",
+          ]);
+          _addAnimatedSection("WIZARD INFOSYS", [
+            "Backend Web Developer",
+            "Built AI-powered WordPress automation.",
+          ]);
           break;
         case 'skills':
           _addAnimatedResponse(_asciiSkills, Colors.yellowAccent);
-          _addAnimatedSection("TECH STACK", ["Flutter, Dart, Python, C++", "RAG Pipelines, Agentic Systems", "IoT & Embedded Security"]);
+          _addAnimatedSection("TECH STACK", [
+            "Flutter, Dart, Python, C++",
+            "RAG Pipelines, Agentic Systems",
+            "IoT & Embedded Security",
+          ]);
           break;
         case 'education':
-           _addAnimatedResponse(_asciiEdu, Colors.yellowAccent);
-           _addAnimatedSection("MASTERS IN AI & ML", ["University of Adelaide, Australia"]);
-           _addAnimatedSection("BACHELOR OF COMPUTER SCIENCE", ["Babaria Institute of Technology"]);
-           break;
+          _addAnimatedResponse(_asciiEdu, Colors.yellowAccent);
+          _addAnimatedSection("MASTERS IN AI & ML", [
+            "University of Adelaide, Australia",
+          ]);
+          _addAnimatedSection("BACHELOR OF COMPUTER SCIENCE", [
+            "Babaria Institute of Technology",
+          ]);
+          break;
         case 'contact':
-          _addAnimatedSection("CONTACT", ["Email: kevinstech0@gmail.com", "LinkedIn: /in/techochat", "GitHub: /TechoChat"]);
+          _addAnimatedSection("CONTACT", [
+            "Email: kevinstech0@gmail.com",
+            "LinkedIn: /in/techochat",
+            "GitHub: /TechoChat",
+          ]);
           break;
         case 'clear':
           _consoleOutput.clear();
@@ -487,10 +742,13 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
           Navigator.of(context).pop();
           break;
         default:
-          _addAnimatedResponse("Command '$command' not found. Try 'help'.", Colors.redAccent);
+          _addAnimatedResponse(
+            "Command '$command' not found. Try 'help'.",
+            Colors.redAccent,
+          );
       }
-      
-      _consoleOutput.add(const SizedBox(height: 10)); 
+
+      _consoleOutput.add(const SizedBox(height: 10));
     });
 
     _inputController.clear();
@@ -502,9 +760,14 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
   void _addAnimatedResponse(String text, Color color) {
     _consoleOutput.add(
       TypewriterText(
-        text: text, 
-        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontFamily: 'monospace', height: 1.2),
-      )
+        text: text,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'monospace',
+          height: 1.2,
+        ),
+      ),
     );
   }
 
@@ -512,18 +775,26 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
   void _addAnimatedSection(String title, List<String> lines) {
     _consoleOutput.add(
       TypewriterText(
-        text: "➜ $title", 
+        text: "➜ $title",
         speed: const Duration(milliseconds: 10),
-        style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
-      )
+        style: const TextStyle(
+          color: Colors.cyanAccent,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'monospace',
+        ),
+      ),
     );
     String fullContent = lines.map((l) => "  $l").join("\n");
     _consoleOutput.add(
       TypewriterText(
-        text: fullContent, 
+        text: fullContent,
         speed: const Duration(milliseconds: 5),
-        style: const TextStyle(color: Colors.white, fontFamily: 'monospace', height: 1.2),
-      )
+        style: const TextStyle(
+          color: Colors.white,
+          fontFamily: 'monospace',
+          height: 1.2,
+        ),
+      ),
     );
   }
 
@@ -548,14 +819,25 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
               color: const Color(0xFF202020),
               child: Row(
                 children: [
-                  const Icon(Icons.terminal, color: Colors.greenAccent, size: 20),
+                  const Icon(
+                    Icons.terminal,
+                    color: Colors.greenAccent,
+                    size: 20,
+                  ),
                   const SizedBox(width: 10),
-                  const Text("KevinOS Mobile", style: TextStyle(color: Colors.white, fontFamily: 'monospace', fontWeight: FontWeight.bold)),
+                  const Text(
+                    "KevinOS Mobile",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.redAccent),
                     onPressed: () => Navigator.pop(context),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -576,14 +858,27 @@ class _AndroidTerminalState extends State<AndroidTerminal> {
                     if (!_isBooting)
                       Row(
                         children: [
-                          const Text("kevin@mobile:~\$ ", style: TextStyle(color: Color(0xFF00FF00), fontFamily: 'monospace', fontWeight: FontWeight.bold)),
+                          const Text(
+                            "kevin@mobile:~\$ ",
+                            style: TextStyle(
+                              color: Color(0xFF00FF00),
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           Expanded(
                             child: TextField(
                               controller: _inputController,
                               focusNode: _focusNode,
                               onSubmitted: _handleCommand,
-                              style: const TextStyle(color: Colors.white, fontFamily: 'monospace'),
-                              decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'monospace',
+                              ),
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                              ),
                               cursorColor: Colors.greenAccent,
                             ),
                           ),
@@ -648,7 +943,12 @@ class TypewriterText extends StatefulWidget {
   final String text;
   final TextStyle style;
   final Duration speed;
-  const TypewriterText({super.key, required this.text, required this.style, this.speed = const Duration(milliseconds: 15)});
+  const TypewriterText({
+    super.key,
+    required this.text,
+    required this.style,
+    this.speed = const Duration(milliseconds: 15),
+  });
   @override
   State<TypewriterText> createState() => _TypewriterTextState();
 }
@@ -663,7 +963,8 @@ class _TypewriterTextState extends State<TypewriterText> {
     super.initState();
     _timer = Timer.periodic(widget.speed, (timer) {
       if (_charIndex < widget.text.length) {
-        if (mounted) setState(() => _displayedText += widget.text[_charIndex++]);
+        if (mounted)
+          setState(() => _displayedText += widget.text[_charIndex++]);
       } else {
         _timer.cancel();
       }
@@ -671,8 +972,11 @@ class _TypewriterTextState extends State<TypewriterText> {
   }
 
   @override
-  void dispose() { _timer.cancel(); super.dispose(); }
-  
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Text(_displayedText, style: widget.style);
@@ -688,8 +992,16 @@ class _AndroidAppIcon extends StatelessWidget {
   final bool showLabel;
   final Color bgColor;
   final bool isTerminal;
+  final bool app_drawwer;
 
-  const _AndroidAppIcon({required this.name, required this.asset, this.showLabel = true, this.bgColor = Colors.transparent, this.isTerminal = false});
+  const _AndroidAppIcon({
+    required this.name,
+    required this.asset,
+    this.showLabel = true,
+    this.bgColor = Colors.transparent,
+    this.isTerminal = false,
+    this.app_drawwer = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -703,16 +1015,48 @@ class _AndroidAppIcon extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: bgColor,
-            boxShadow: bgColor != Colors.transparent ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2))] : [],
+            boxShadow: bgColor != Colors.transparent
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : [],
           ),
-          padding: bgColor != Colors.transparent ? const EdgeInsets.all(10) : EdgeInsets.zero,
+          padding: bgColor != Colors.transparent
+              ? const EdgeInsets.all(10)
+              : EdgeInsets.zero,
           child: isTerminal
-             ? const Icon(Icons.terminal, color: Colors.greenAccent, size: 28)
-             : Image.asset('assets/img/android/icons/$asset.png', fit: BoxFit.contain, errorBuilder: (c,e,s) => const Icon(Icons.android, color: Colors.green)),
+              ? const Icon(Icons.terminal, color: Colors.greenAccent, size: 28)
+              : Image.asset(
+                  'assets/img/android/icons/$asset.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (c, e, s) =>
+                      const Icon(Icons.android, color: Colors.green),
+                ),
         ),
         if (showLabel) ...[
           const SizedBox(height: 6),
-          Flexible(child: Text(name, style: const TextStyle(color: Colors.white, fontSize: 12, fontFamily: 'Roboto'), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis)),
+          Flexible(
+            child: Text(
+              name,
+              style: app_drawwer ? TextStyle(
+                // app_drwawwer then black else white
+                color: Colors.black,
+                fontSize: 12,
+                fontFamily: 'Roboto',
+              ): TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontFamily: 'Roboto',
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ],
     );
@@ -738,24 +1082,55 @@ class _AndroidStatusBarState extends State<AndroidStatusBar> {
   void initState() {
     super.initState();
     _initBattery();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() => _time = DateTime.now()));
-    _battery.onBatteryStateChanged.listen((state) {}); 
-    _connectivity.onConnectivityChanged.listen((res) => setState(() => _connectionStatus = res));
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(() => _time = DateTime.now()),
+    );
+    _battery.onBatteryStateChanged.listen((state) {});
+    _connectivity.onConnectivityChanged.listen(
+      (res) => setState(() => _connectionStatus = res),
+    );
   }
-  Future<void> _initBattery() async { try { final l = await _battery.batteryLevel; setState(() => _batteryLevel = l); } catch (_) {} }
+
+  Future<void> _initBattery() async {
+    try {
+      final l = await _battery.batteryLevel;
+      setState(() => _batteryLevel = l);
+    } catch (_) {}
+  }
+
   @override
-  void dispose() { _timer.cancel(); super.dispose(); }
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(DateFormat('h:mm a').format(_time), style: TextStyle(color: widget.iconColor, fontSize: 14, fontWeight: FontWeight.w600)),
-        Row(children: [
-          Icon(_connectionStatus.contains(ConnectivityResult.wifi) ? Icons.wifi : Icons.signal_cellular_alt, color: widget.iconColor, size: 18),
-          const SizedBox(width: 8),
-          Icon(Icons.battery_full, color: widget.iconColor, size: 18),
-        ]),
+        Text(
+          DateFormat('h:mm a').format(_time),
+          style: TextStyle(
+            color: widget.iconColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Row(
+          children: [
+            Icon(
+              _connectionStatus.contains(ConnectivityResult.wifi)
+                  ? Icons.wifi
+                  : Icons.signal_cellular_alt,
+              color: widget.iconColor,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Icon(Icons.battery_full, color: widget.iconColor, size: 18),
+          ],
+        ),
       ],
     );
   }
@@ -772,8 +1147,10 @@ class _GoogleSearchPageState extends State<GoogleSearchPage> {
   Future<void> _launchGoogleSearch(String query) async {
     if (query.trim().isEmpty) return;
     final Uri url = Uri.https('www.google.com', '/search', {'q': query});
-    if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
+    if (await canLaunchUrl(url))
+      await launchUrl(url, mode: LaunchMode.externalApplication);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -781,18 +1158,40 @@ class _GoogleSearchPageState extends State<GoogleSearchPage> {
       body: SafeArea(
         child: Column(
           children: [
-             const Padding(padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), child: AndroidStatusBar(iconColor: Colors.black)),
-             Container(
-               margin: const EdgeInsets.symmetric(horizontal: 16),
-               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
-               child: Row(
-                 children: [
-                   IconButton(icon: const Icon(Icons.arrow_back, color: Colors.grey), onPressed: () => Navigator.pop(context)),
-                   Expanded(child: TextField(controller: _controller, autofocus: true, decoration: const InputDecoration(hintText: "Search Google...", border: InputBorder.none), onSubmitted: _launchGoogleSearch)),
-                   IconButton(icon: const Icon(Icons.close, color: Colors.grey), onPressed: () => _controller.clear()),
-                 ],
-               ),
-             )
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: AndroidStatusBar(iconColor: Colors.black),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.grey),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        hintText: "Search Google...",
+                        border: InputBorder.none,
+                      ),
+                      onSubmitted: _launchGoogleSearch,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.grey),
+                    onPressed: () => _controller.clear(),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
