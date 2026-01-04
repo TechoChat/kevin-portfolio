@@ -555,8 +555,9 @@ class _AndroidHomeState extends State<AndroidHome>
                                 child: const _AndroidAppIcon(
                                   name: "Terminal",
                                   asset: "terminal",
-                                  bgColor: Colors.black,
+                                  bgColor: Colors.white,
                                   isTerminal: true,
+                                  appDrawer: true,
                                 ),
                               ),
 
@@ -587,7 +588,7 @@ class _AndroidHomeState extends State<AndroidHome>
         asset: asset,
         bgColor: Colors.white,
         showLabel: true,
-        app_drawwer: true,
+        appDrawer: true,
       ),
     );
   }
@@ -993,7 +994,7 @@ class _AndroidAppIcon extends StatelessWidget {
   final bool showLabel;
   final Color bgColor;
   final bool isTerminal;
-  final bool app_drawwer;
+  final bool appDrawer;
 
   const _AndroidAppIcon({
     required this.name,
@@ -1001,7 +1002,7 @@ class _AndroidAppIcon extends StatelessWidget {
     this.showLabel = true,
     this.bgColor = Colors.transparent,
     this.isTerminal = false,
-    this.app_drawwer = false,
+    this.appDrawer = false,
   });
 
   @override
@@ -1043,7 +1044,7 @@ class _AndroidAppIcon extends StatelessWidget {
           Flexible(
             child: Text(
               name,
-              style: app_drawwer ? TextStyle(
+              style: appDrawer ? TextStyle(
                 // app_drwawwer then black else white
                 color: Colors.black,
                 fontSize: 12,
