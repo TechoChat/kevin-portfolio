@@ -587,6 +587,7 @@ class _AndroidHomeState extends State<AndroidHome>
         asset: asset,
         bgColor: Colors.white,
         showLabel: true,
+        app_drawwer: true,
       ),
     );
   }
