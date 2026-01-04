@@ -207,7 +207,7 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                               children: [
                                 GestureDetector(onTap: () => _launchUrl("mailto:kevinstech0@gmail.com"), child: const _AndroidAppIcon(name: "Gmail", asset: "gmail", bgColor: Colors.white)),
                                 GestureDetector(onTap: () => _launchUrl("http://maps.google.com"), child: const _AndroidAppIcon(name: "Maps", asset: "maps", bgColor: Colors.white)),
-                                GestureDetector(onTap: () => _launchUrl("https://github.com/TechoChat"), child: const _AndroidAppIcon(name: "Photos", asset: "photos", bgColor: Colors.white)),
+                                GestureDetector(onTap: () => _launchUrl("https://github.com/TechoChat"), child: const _AndroidAppIcon(name: "github", asset: "github", bgColor: Colors.white)),
                                 GestureDetector(onTap: () => _launchUrl("https://youtube.com"), child: const _AndroidAppIcon(name: "YouTube", asset: "youtube", bgColor: Colors.white)),
                                 GestureDetector(onTap: () => _launchUrl("https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing"), child: const _AndroidAppIcon(name: "Acrobat", asset: "pdf", bgColor: Colors.white)),
                                 const _AndroidAppIcon(name: "Settings", asset: "settings", bgColor: Colors.grey),
@@ -235,7 +235,7 @@ class _AndroidHomeState extends State<AndroidHome> with SingleTickerProviderStat
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     GestureDetector(onTap: () => _launchUrl("tel:+610485516100"), child: const _AndroidAppIcon(name: "", asset: "phone", showLabel: false, bgColor: Color(0xFFE8F0FE))),
-                                    GestureDetector(onTap: () => _launchUrl("https://linkedin.com/in/techochat"), child: const _AndroidAppIcon(name: "", asset: "messages", showLabel: false, bgColor: Color(0xFFE8F0FE))),
+                                    GestureDetector(onTap: () => _launchUrl("https://linkedin.com/in/techochat"), child: const _AndroidAppIcon(name: "", asset: "linkedin", showLabel: false, bgColor: Color(0xFFE8F0FE))),
                                     GestureDetector(onTap: () => _launchUrl("https://google.com"), child: const _AndroidAppIcon(name: "", asset: "chrome", showLabel: false, bgColor: Colors.transparent)),
                                     const _AndroidAppIcon(name: "", asset: "camera", showLabel: false, bgColor: Color(0xFFEFEFEF)),
                                   ],
