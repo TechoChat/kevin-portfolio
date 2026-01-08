@@ -4,13 +4,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class MacDock extends StatelessWidget {
   final VoidCallback onOpenFinder;
-  final VoidCallback onOpenLaunchpad; // ✅ Added Launchpad Callback
+  final VoidCallback onOpenLaunchpad;
   final VoidCallback onOpenTerminal;
   final VoidCallback onOpenSafari;
   final VoidCallback onOpenMail;
-  final VoidCallback onOpenMaps;
-  final VoidCallback onOpenGitHub; // ✅ Added GitHub Callback
-  final VoidCallback onOpenLinkedIn; // ✅ Added LinkedIn Callback
+  final VoidCallback onOpenContact; // ✅ Added Contact Callback
 
   const MacDock({
     super.key,
@@ -19,9 +17,7 @@ class MacDock extends StatelessWidget {
     required this.onOpenTerminal,
     required this.onOpenSafari,
     required this.onOpenMail,
-    required this.onOpenMaps,
-    required this.onOpenGitHub,
-    required this.onOpenLinkedIn,
+    required this.onOpenContact,
   });
 
   @override
@@ -64,7 +60,7 @@ class MacDock extends StatelessWidget {
                     ),
                   ),
 
-                  // ✅ Wired up Launchpad
+                  // Launchpad
                   GestureDetector(
                     onTap: onOpenLaunchpad,
                     child: const _DockIcon(
@@ -81,37 +77,11 @@ class MacDock extends StatelessWidget {
                     ),
                   ),
 
-                  // ✅ Replaced Messages with LinkedIn
-                  GestureDetector(
-                    onTap: onOpenLinkedIn,
-                    child: const _DockIcon(
-                      "assets/img/mac/icons/linkedin.svg",
-                      "LinkedIn",
-                      useSquircle: true,
-                    ),
-                  ),
-
                   GestureDetector(
                     onTap: onOpenMail,
                     child: const _DockIcon(
                       "assets/img/mac/icons/mail.svg",
                       "Mail",
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: onOpenMaps,
-                    child: const _DockIcon(
-                      "assets/img/mac/icons/maps.svg",
-                      "Maps",
-                    ),
-                  ),
-
-                  // ✅ Replaced Photos with GitHub
-                  GestureDetector(
-                    onTap: onOpenGitHub,
-                    child: const _DockIcon(
-                      "assets/img/mac/icons/github.svg",
-                      "GitHub",
                     ),
                   ),
 
@@ -122,22 +92,21 @@ class MacDock extends StatelessWidget {
                       "Terminal",
                     ),
                   ),
+
+                  // Contact App (Replaces others)
+                  GestureDetector(
+                    onTap: onOpenContact,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/contacts.svg",
+                      "Contact",
+                      useSquircle: true,
+                    ),
+                  ),
+
                   const _DockIcon(
                     "assets/img/mac/icons/settings.svg",
                     "Settings",
                   ),
-
-                  const SizedBox(width: 12),
-                  // Divider Line
-                  Container(
-                    width: 1.5,
-                    height: 45,
-                    color: Colors.white.withValues(alpha: 0.4),
-                    margin: const EdgeInsets.only(bottom: 5),
-                  ),
-                  const SizedBox(width: 12),
-
-                  const _DockIcon("assets/img/mac/icons/bin.svg", "Bin"),
                 ],
               ),
             ),

@@ -16,6 +16,7 @@ import '../../components/made_with_flutter.dart';
 import 'apps/ios_safari.dart';
 import 'apps/ios_settings.dart';
 import 'apps/ios_terminal.dart';
+import 'apps/ios_contact.dart';
 import 'ios_app_library.dart';
 
 class IosHome extends StatefulWidget {
@@ -353,10 +354,12 @@ class _IosHomeState extends State<IosHome> {
                                     children: [
                                       AppIcon(
                                         name: "",
-                                        color: Colors.green,
-                                        icon: CupertinoIcons.phone_fill,
+                                        color: Colors.grey,
+                                        icon: CupertinoIcons
+                                            .person_crop_circle_fill,
                                         showLabel: false,
-                                        onTap: () {},
+                                        onTap: () =>
+                                            _openApp(const IosContact()),
                                       ),
                                       AppIcon(
                                         name: "",

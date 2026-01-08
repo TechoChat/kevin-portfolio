@@ -12,6 +12,8 @@ import 'package:kevins_tech/platforms/mac/desktop_icon.dart';
 import 'package:kevins_tech/platforms/mac/mac_finder.dart';
 import 'package:kevins_tech/platforms/mac/mac_terminal.dart';
 import 'apps/mac_safari.dart';
+import 'apps/mac_contact.dart';
+import 'apps/mac_about_me.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // ✅ Import your Weather Service
@@ -73,12 +75,26 @@ class _MacHomeState extends State<MacHome> {
     await launchUrl(Uri.parse("https://maps.google.com"));
   }
 
-  // ✅ UPDATED: GitHub (Replaces Photos)
+  // ✅ Contact App
+  void _openContact() {
+    _openMacWindow(
+      MacContact(
+        onOpenAboutMe: () {
+          Navigator.pop(context); // Close Contact Window
+          Future.delayed(const Duration(milliseconds: 100), () {
+            _openMacWindow(const MacAboutMe()); // Open About Me Window
+          });
+        },
+      ),
+    );
+  }
+
+  // ✅ UPDATED: GitHub (Launchpad Only now)
   Future<void> _launchGitHub() async {
     await launchUrl(Uri.parse("https://github.com/TechoChat"));
   }
 
-  // ✅ NEW: LinkedIn (Replaces Messages)
+  // ✅ NEW: LinkedIn (Launchpad Only now)
   Future<void> _launchLinkedIn() async {
     await launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/"));
   }
@@ -198,6 +214,17 @@ class _MacHomeState extends State<MacHome> {
                       onTap: () {
                         Navigator.pop(context);
                         _launchLinkedIn();
+                      },
+                    ),
+
+                    // ✅ Contact App
+                    _LaunchpadItem(
+                      label: "Contact",
+                      icon: CupertinoIcons.person_crop_circle,
+                      color: Colors.orangeAccent,
+                      onTap: () {
+                        Navigator.pop(context);
+                        _openContact();
                       },
                     ),
                   ],
@@ -412,10 +439,7 @@ class _MacHomeState extends State<MacHome> {
               onOpenTerminal: _openTerminal,
               onOpenSafari: _launchSafari,
               onOpenMail: _launchMail,
-              onOpenMaps: _launchMaps,
-              onOpenGitHub: _launchGitHub, // ✅ Replaced Photos
-              onOpenLinkedIn:
-                  _launchLinkedIn, // ✅ Replaced Messages (Ensure MacDock accepts this)
+              onOpenContact: _openContact,
             ),
           ),
         ],

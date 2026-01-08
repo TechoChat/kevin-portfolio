@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../components/weather_service.dart';
 import 'apps/android_chrome.dart';
 import '../../components/made_with_flutter.dart';
+import 'apps/android_contact.dart';
 
 class AndroidHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -342,13 +343,21 @@ class _AndroidHomeState extends State<AndroidHome>
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
                                     GestureDetector(
-                                      onTap: () =>
-                                          _launchUrl("tel:+610485516100"),
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const AndroidContact(),
+                                        ),
+                                      ),
                                       child: const _AndroidAppIcon(
                                         name: "",
-                                        asset: "phone",
+                                        asset:
+                                            "google_contacts", // Fallback to icon if asset missing
+                                        iconData: Icons
+                                            .person, // Use IconData as fallback or primary
                                         showLabel: false,
                                         bgColor: Color(0xFFE8F0FE),
+                                        // iconColor: Colors.blue,
                                       ),
                                     ),
                                     GestureDetector(
@@ -552,10 +561,23 @@ class _AndroidHomeState extends State<AndroidHome>
                                   appDrawer: true,
                                 ),
                               ),
-                              _buildDrawerItem(
-                                "Phone",
-                                "phone",
-                                "tel:+610485516100",
+                              GestureDetector(
+                                onTap: () {
+                                  _toggleDrawer(false);
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const AndroidContact(),
+                                    ),
+                                  );
+                                },
+                                child: const _AndroidAppIcon(
+                                  name: "Contacts",
+                                  asset: "google_contacts",
+                                  iconData: Icons.person,
+                                  bgColor: Colors.white,
+                                  showLabel: true,
+                                  appDrawer: true,
+                                ),
                               ),
                               _buildDrawerItem(
                                 "LinkedIn",
@@ -1013,6 +1035,7 @@ class _AndroidAppIcon extends StatelessWidget {
   final Color bgColor;
   final bool isTerminal;
   final bool appDrawer;
+  final IconData? iconData;
 
   const _AndroidAppIcon({
     required this.name,
@@ -1021,6 +1044,7 @@ class _AndroidAppIcon extends StatelessWidget {
     this.bgColor = Colors.transparent,
     this.isTerminal = false,
     this.appDrawer = false,
+    this.iconData,
   });
 
   @override
@@ -1045,17 +1069,25 @@ class _AndroidAppIcon extends StatelessWidget {
                   ]
                 : [],
           ),
-          padding: bgColor != Colors.transparent
+          padding: (bgColor != Colors.transparent && iconData == null)
               ? const EdgeInsets.all(10)
               : EdgeInsets.zero,
-          child: isTerminal
-              ? const Icon(Icons.terminal, color: Colors.greenAccent, size: 28)
-              : Image.asset(
-                  'assets/img/android/icons/$asset.png',
-                  fit: BoxFit.contain,
-                  errorBuilder: (c, e, s) =>
-                      const Icon(Icons.android, color: Colors.green),
-                ),
+          child: iconData != null
+              ? Center(
+                  child: Icon(iconData, color: Colors.blue.shade700, size: 28),
+                )
+              : (isTerminal
+                    ? const Icon(
+                        Icons.terminal,
+                        color: Colors.greenAccent,
+                        size: 28,
+                      )
+                    : Image.asset(
+                        'assets/img/android/icons/$asset.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (c, e, s) =>
+                            const Icon(Icons.android, color: Colors.green),
+                      )),
         ),
         if (showLabel) ...[
           const SizedBox(height: 6),
