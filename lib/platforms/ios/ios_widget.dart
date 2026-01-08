@@ -13,6 +13,7 @@ class AppIcon extends StatelessWidget {
   final bool showLabel;
   final bool isWhite;
   final Color? iconColor;
+  final VoidCallback? onTap;
 
   const AppIcon({
     required this.name,
@@ -21,50 +22,58 @@ class AppIcon extends StatelessWidget {
     this.showLabel = true,
     this.isWhite = false,
     this.iconColor,
+    this.onTap,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(14),
-              border: isWhite ? Border.all(color: Colors.black12, width: 1) : null,
-              gradient: !isWhite ? LinearGradient(
-                colors: [color, color.withValues(alpha: 0.8)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ) : null,
-            ),
-            child: Icon(
-              icon,
-              size: 32,
-              color: iconColor ?? (isWhite ? Colors.black : Colors.white),
-            ),
-          ),
-          if (showLabel) ...[
-            const SizedBox(height: 5),
-            Text(
-              name,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                decoration: TextDecoration.none,
-                fontFamily: '.SF Pro Text',
+    return GestureDetector(
+      onTap: onTap,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(14),
+                border: isWhite
+                    ? Border.all(color: Colors.black12, width: 1)
+                    : null,
+                gradient: !isWhite
+                    ? LinearGradient(
+                        colors: [color, color.withValues(alpha: 0.8)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      )
+                    : null,
               ),
-              textAlign: TextAlign.center,
+              child: Icon(
+                icon,
+                size: 32,
+                color: iconColor ?? (isWhite ? Colors.black : Colors.white),
+              ),
             ),
+            if (showLabel) ...[
+              const SizedBox(height: 5),
+              Text(
+                name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  decoration: TextDecoration.none,
+                  fontFamily: '.SF Pro Text',
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -127,7 +136,9 @@ class WeatherWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CupertinoActivityIndicator(color: Colors.white));
+      return const Center(
+        child: CupertinoActivityIndicator(color: Colors.white),
+      );
     }
 
     return FittedBox(
@@ -137,13 +148,48 @@ class WeatherWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(city, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, decoration: TextDecoration.none)),
-          Text("$temp°", style: const TextStyle(color: Colors.white, fontSize: 42, fontWeight: FontWeight.w300, decoration: TextDecoration.none)),
+          Text(
+            city,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          Text(
+            "$temp°",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 42,
+              fontWeight: FontWeight.w300,
+              decoration: TextDecoration.none,
+            ),
+          ),
           const SizedBox(height: 15),
-          const Icon(CupertinoIcons.cloud_sun_fill, color: Colors.white, size: 24),
+          const Icon(
+            CupertinoIcons.cloud_sun_fill,
+            color: Colors.white,
+            size: 24,
+          ),
           const SizedBox(height: 4),
-          Text(condition, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, decoration: TextDecoration.none)),
-          Text(highLow, style: const TextStyle(color: Colors.white70, fontSize: 13, decoration: TextDecoration.none)),
+          Text(
+            condition,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          Text(
+            highLow,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              decoration: TextDecoration.none,
+            ),
+          ),
         ],
       ),
     );
@@ -166,7 +212,11 @@ class MapWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
-              child: Icon(CupertinoIcons.location_solid, color: Colors.blue, size: 30),
+              child: Icon(
+                CupertinoIcons.location_solid,
+                color: Colors.blue,
+                size: 30,
+              ),
             ),
           ),
         ),
@@ -175,7 +225,10 @@ class MapWidget extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                color: Colors.grey,
+                shape: BoxShape.circle,
+              ),
               child: const Icon(Icons.person, color: Colors.white, size: 16),
             ),
             const SizedBox(width: 8),
@@ -184,14 +237,23 @@ class MapWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Current Location", 
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black, decoration: TextDecoration.none),
+                    "Current Location",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: Colors.black,
+                      decoration: TextDecoration.none,
+                    ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   Text(
                     city, // Uses the city name from Weather API
-                    style: const TextStyle(fontSize: 10, color: Colors.grey, decoration: TextDecoration.none),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                      decoration: TextDecoration.none,
+                    ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -199,7 +261,7 @@ class MapWidget extends StatelessWidget {
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }

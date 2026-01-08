@@ -10,6 +10,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 // ✅ Import your Weather Service
 import '../../components/weather_service.dart';
+import 'apps/ios_app_store.dart';
+import 'apps/ios_photos.dart';
+import 'apps/ios_safari.dart';
+import 'apps/ios_settings.dart';
+import 'apps/ios_terminal.dart';
 
 class IosHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -92,6 +97,17 @@ class _IosHomeState extends State<IosHome> {
     _batteryStateSubscription?.cancel();
     _connectivitySubscription?.cancel();
     super.dispose();
+  }
+
+  void _openApp(Widget app) {
+    Navigator.of(context).push(CupertinoPageRoute(builder: (context) => app));
+  }
+
+  Future<void> _launchURL(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 
   @override
@@ -189,18 +205,21 @@ class _IosHomeState extends State<IosHome> {
                         name: "FaceTime",
                         color: Colors.green,
                         icon: CupertinoIcons.videocam_fill,
+                        onTap: () {}, // No action yet
                       ),
                       AppIcon(
                         name: "Calendar",
                         color: Colors.white,
                         icon: CupertinoIcons.calendar,
                         isWhite: true,
+                        // Shows dynamic date in icon usually, keeping static for now
                       ),
                       AppIcon(
                         name: "Photos",
                         color: Colors.white,
                         icon: CupertinoIcons.photo_on_rectangle,
                         isWhite: true,
+                        onTap: () => _openApp(const IosPhotos()),
                       ),
                       AppIcon(
                         name: "Camera",
@@ -212,6 +231,7 @@ class _IosHomeState extends State<IosHome> {
                         name: "Mail",
                         color: Colors.blue,
                         icon: CupertinoIcons.mail_solid,
+                        onTap: () => _launchURL("mailto:contact@techo.chat"),
                       ),
                       GestureDetector(
                         onTap: () async {
@@ -251,9 +271,10 @@ class _IosHomeState extends State<IosHome> {
                         icon: CupertinoIcons.news,
                       ),
                       AppIcon(
-                        name: "TV",
+                        name: "Terminal",
                         color: Colors.black,
-                        icon: CupertinoIcons.tv,
+                        icon: CupertinoIcons.command,
+                        onTap: () => _openApp(const IosTerminal()),
                       ),
                       AppIcon(
                         name: "Podcasts",
@@ -264,12 +285,14 @@ class _IosHomeState extends State<IosHome> {
                         name: "App Store",
                         color: Colors.blueAccent,
                         icon: CupertinoIcons.app_badge_fill,
+                        onTap: () => _openApp(const IosAppStore()),
                       ),
 
                       AppIcon(
                         name: "Maps",
                         color: Colors.greenAccent,
                         icon: CupertinoIcons.location_fill,
+                        onTap: () => _launchURL("https://maps.google.com"),
                       ),
                       AppIcon(
                         name: "Health",
@@ -281,11 +304,19 @@ class _IosHomeState extends State<IosHome> {
                         name: "Wallet",
                         color: Colors.black87,
                         icon: CupertinoIcons.creditcard_fill,
+                        onTap: () => _launchURL(
+                          "https://www.linkedin.com/in/techochat/",
+                        ),
                       ),
                       AppIcon(
                         name: "Settings",
                         color: Colors.grey,
                         icon: CupertinoIcons.settings,
+                        onTap: () => _openApp(
+                          IosSettings(
+                            onPlatformSwitch: widget.onPlatformSwitch,
+                          ),
+                        ),
                       ),
 
                       // Switch Button
@@ -375,24 +406,28 @@ class _IosHomeState extends State<IosHome> {
                               color: Colors.green,
                               icon: CupertinoIcons.phone_fill,
                               showLabel: false,
+                              onTap: () {},
                             ),
                             AppIcon(
                               name: "",
                               color: Colors.blue,
                               icon: CupertinoIcons.compass,
                               showLabel: false,
+                              onTap: () => _openApp(const IosSafari()),
                             ),
                             AppIcon(
                               name: "",
                               color: Colors.green,
                               icon: CupertinoIcons.chat_bubble_fill,
                               showLabel: false,
+                              onTap: () => _launchURL("sms:"),
                             ),
                             AppIcon(
                               name: "",
                               color: Colors.red,
                               icon: CupertinoIcons.music_note_2,
                               showLabel: false,
+                              onTap: () {},
                             ),
                           ],
                         ),

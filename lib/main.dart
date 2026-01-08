@@ -7,6 +7,7 @@ import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:macos_ui/macos_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:universal_html/html.dart' as html;
+import 'components/platform_toast.dart';
 
 import 'platforms/android/android_home.dart';
 import 'platforms/ios/ios_home.dart';
@@ -15,12 +16,12 @@ import 'platforms/windows/windows_home.dart';
 
 void main() async {
   // We register a factory that CREATES the iframe.
-  // To update it, we will just interact with the DOM elements or 
+  // To update it, we will just interact with the DOM elements or
   // let the widget rebuild.
-  
-  // Actually, for a robust 'Search' demo, let's make the factory 
+
+  // Actually, for a robust 'Search' demo, let's make the factory
   // return a container that we can manipulate, or keep it simple:
-  
+
   ui_web.platformViewRegistry.registerViewFactory(
     'iframe-view',
     (int viewId) => html.IFrameElement()
@@ -28,7 +29,7 @@ void main() async {
       ..style.width = '100%'
       ..style.border = 'none',
   );
-  
+
   // Ensure Flutter bindings are initialized before doing anything else
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -80,8 +81,8 @@ class _PlatformRootState extends State<PlatformRoot> {
     // 3. Logic to pick the correct Main App Widget
     Widget mainAppWidget;
     // If override is null, fallback to browser default.
-    // Note: On Web, defaultTargetPlatform often returns Android or iOS if you are on mobile, 
-    // or Windows/Linux/Mac if on desktop. 
+    // Note: On Web, defaultTargetPlatform often returns Android or iOS if you are on mobile,
+    // or Windows/Linux/Mac if on desktop.
     final currentPlatform = _manualOverride ?? defaultTargetPlatform;
 
     if (currentPlatform == TargetPlatform.android) {
@@ -119,20 +120,33 @@ class _PlatformRootState extends State<PlatformRoot> {
     }
 
     // 4. The FADE TRANSITION Logic
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 1500), 
-      switchInCurve: Curves.easeInOut,
-      switchOutCurve: Curves.easeInOut,
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        return FadeTransition(opacity: animation, child: child);
-      },
-      child: _isLoading
-          ? const MaterialApp(
-              key: ValueKey('Splash'),
-              debugShowCheckedModeBanner: false,
-              home: KevinPortfolioSplash(),
-            )
-          : mainAppWidget,
+    // 4. The FADE TRANSITION Logic
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 1500),
+              switchInCurve: Curves.easeInOut,
+              switchOutCurve: Curves.easeInOut,
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              child: _isLoading
+                  ? const MaterialApp(
+                      key: ValueKey('Splash'),
+                      debugShowCheckedModeBanner: false,
+                      home: KevinPortfolioSplash(),
+                    )
+                  : mainAppWidget,
+            ),
+          ),
+
+          // 5. Cross-Device Promo Toast (Overlay)
+          if (!_isLoading) PlatformToast(simulatedPlatform: currentPlatform),
+        ],
+      ),
     );
   }
 }
@@ -147,7 +161,8 @@ class KevinPortfolioSplash extends StatefulWidget {
   State<KevinPortfolioSplash> createState() => _KevinPortfolioSplashState();
 }
 
-class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with TickerProviderStateMixin {
+class _KevinPortfolioSplashState extends State<KevinPortfolioSplash>
+    with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   Alignment _alignment = Alignment.topLeft;
@@ -160,7 +175,7 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    
+
     _pulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
@@ -170,8 +185,8 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
     _bgTimer = Timer(const Duration(milliseconds: 100), () {
       if (mounted) {
         setState(() {
-          _alignment = _alignment == Alignment.topLeft 
-              ? Alignment.bottomRight 
+          _alignment = _alignment == Alignment.topLeft
+              ? Alignment.bottomRight
               : Alignment.topLeft;
         });
       }
@@ -187,10 +202,11 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
 
   @override
   Widget build(BuildContext context) {
-    final bool isDesktop = kIsWeb && 
-        (defaultTargetPlatform == TargetPlatform.windows || 
-         defaultTargetPlatform == TargetPlatform.linux || 
-         defaultTargetPlatform == TargetPlatform.macOS);
+    final bool isDesktop =
+        kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.windows ||
+            defaultTargetPlatform == TargetPlatform.linux ||
+            defaultTargetPlatform == TargetPlatform.macOS);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -203,28 +219,34 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: _alignment,
-                end: _alignment == Alignment.topLeft ? Alignment.bottomRight : Alignment.topLeft,
+                end: _alignment == Alignment.topLeft
+                    ? Alignment.bottomRight
+                    : Alignment.topLeft,
                 colors: const [
-                  Color(0xFF0F2027), 
-                  Color(0xFF203A43), 
-                  Color(0xFF2C5364), 
+                  Color(0xFF0F2027),
+                  Color(0xFF203A43),
+                  Color(0xFF2C5364),
                 ],
               ),
             ),
           ),
           // Texture Overlay
           Container(
-             decoration: BoxDecoration(
-               color: Colors.black.withValues(alpha: 0.2),
-               backgroundBlendMode: BlendMode.darken,
-             ),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.2),
+              backgroundBlendMode: BlendMode.darken,
+            ),
           ),
           // Center Content
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.terminal_rounded, color: Colors.white.withValues(alpha: 0.8), size: 48),
+                Icon(
+                  Icons.terminal_rounded,
+                  color: Colors.white.withValues(alpha: 0.8),
+                  size: 48,
+                ),
                 const SizedBox(height: 24),
                 Text(
                   "KEVIN'S PORTFOLIO",
@@ -233,9 +255,13 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 4.0,
-                    fontFamily: 'Roboto', 
+                    fontFamily: 'Roboto',
                     shadows: [
-                      Shadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 10, offset: const Offset(0, 4)),
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
                     ],
                   ),
                 ),
@@ -277,7 +303,10 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
               child: FadeTransition(
                 opacity: _pulseAnimation,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(20),
@@ -306,11 +335,16 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -327,7 +361,11 @@ class _KevinPortfolioSplashState extends State<KevinPortfolioSplash> with Ticker
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Icon(Icons.favorite, color: Colors.redAccent, size: 14),
+                        const Icon(
+                          Icons.favorite,
+                          color: Colors.redAccent,
+                          size: 14,
+                        ),
                       ],
                     ),
                   ),
