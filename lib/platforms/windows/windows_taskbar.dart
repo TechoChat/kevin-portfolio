@@ -72,8 +72,14 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
   Future<void> _initBattery() async {
     try {
       final level = await _battery.batteryLevel;
-      setState(() => _batteryLevel = level);
-    } catch (_) {}
+      if (level > 0) {
+        setState(() => _batteryLevel = level);
+      } else {
+        setState(() => _batteryLevel = 100);
+      }
+    } catch (_) {
+      setState(() => _batteryLevel = 100);
+    }
   }
 
   Future<void> _initConnectivity() async {
@@ -198,7 +204,7 @@ class _WindowsTaskbarState extends State<WindowsTaskbar> {
               ),
 
               const SizedBox(width: 8),
-              
+
               // ✅ UPDATED: Email Image Icon
               _TaskbarIcon(
                 assetPath: "assets/img/windows/icons/email.png",
@@ -322,9 +328,9 @@ class _TaskbarWeatherState extends State<_TaskbarWeather> {
 // -----------------------------------------------------------------------------
 
 class _TaskbarIcon extends StatefulWidget {
-  final IconData? icon;      // Optional Icon
-  final String? assetPath;   // Optional Image Path
-  final Color? color;        // Optional Color (for Icons)
+  final IconData? icon; // Optional Icon
+  final String? assetPath; // Optional Image Path
+  final Color? color; // Optional Color (for Icons)
   final VoidCallback onTap;
 
   const _TaskbarIcon({

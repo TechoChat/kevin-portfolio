@@ -290,8 +290,14 @@ class _MacHomeState extends State<MacHome> {
   Future<void> _initBattery() async {
     try {
       final level = await _battery.batteryLevel;
-      setState(() => _batteryLevel = level);
-    } catch (_) {}
+      if (level > 0) {
+        setState(() => _batteryLevel = level);
+      } else {
+        setState(() => _batteryLevel = 100);
+      }
+    } catch (_) {
+      setState(() => _batteryLevel = 100);
+    }
   }
 
   Future<void> _initConnectivity() async {

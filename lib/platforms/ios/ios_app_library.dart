@@ -64,7 +64,7 @@ class _IosAppLibraryState extends State<IosAppLibrary> {
         "Messages",
         CupertinoIcons.chat_bubble_fill,
         Colors.green,
-        () {},
+        () => launchUrl(Uri.parse("sms:")),
       ),
       _LibraryApp("Notes", CupertinoIcons.doc_text_fill, Colors.amber, () {}),
       _LibraryApp(

@@ -85,8 +85,16 @@ class _IosHomeState extends State<IosHome> {
   Future<void> _initBattery() async {
     try {
       final level = await _battery.batteryLevel;
-      setState(() => _batteryLevel = level);
-    } catch (_) {}
+      // On some platforms/browsers (like iOS Web), this might return 0 or be unsupported.
+      // Fallback to 100 to avoid showing 0%.
+      if (level > 0) {
+        setState(() => _batteryLevel = level);
+      } else {
+        setState(() => _batteryLevel = 100);
+      }
+    } catch (_) {
+      setState(() => _batteryLevel = 100);
+    }
   }
 
   Future<void> _initConnectivity() async {

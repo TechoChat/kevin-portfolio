@@ -1152,9 +1152,15 @@ class _AndroidStatusBarState extends State<AndroidStatusBar> {
 
   Future<void> _initBattery() async {
     try {
-      final l = await _battery.batteryLevel;
-      setState(() => _batteryLevel = l);
-    } catch (_) {}
+      final level = await _battery.batteryLevel;
+      if (level > 0) {
+        setState(() => _batteryLevel = level);
+      } else {
+        setState(() => _batteryLevel = 100);
+      }
+    } catch (_) {
+      setState(() => _batteryLevel = 100);
+    }
   }
 
   @override
