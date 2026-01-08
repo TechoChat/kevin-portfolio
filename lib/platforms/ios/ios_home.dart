@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 // ✅ Import your Weather Service
 import '../../components/weather_service.dart';
 import 'apps/ios_app_store.dart';
-import 'apps/ios_photos.dart';
+
 import 'apps/ios_safari.dart';
 import 'apps/ios_settings.dart';
 import 'apps/ios_terminal.dart';
@@ -54,9 +54,10 @@ class _IosHomeState extends State<IosHome> {
     _initWeather();
 
     // Listeners
-    _batteryStateSubscription = _battery.onBatteryStateChanged.listen(
-      (state) => setState(() => _batteryState = state),
-    );
+    _batteryStateSubscription = _battery.onBatteryStateChanged.listen((state) {
+      setState(() => _batteryState = state);
+      _initBattery();
+    });
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (result) => setState(() => _connectionStatus = result),
     );
@@ -202,32 +203,6 @@ class _IosHomeState extends State<IosHome> {
                     physics: const BouncingScrollPhysics(),
                     children: [
                       AppIcon(
-                        name: "FaceTime",
-                        color: Colors.green,
-                        icon: CupertinoIcons.videocam_fill,
-                        onTap: () {}, // No action yet
-                      ),
-                      AppIcon(
-                        name: "Calendar",
-                        color: Colors.white,
-                        icon: CupertinoIcons.calendar,
-                        isWhite: true,
-                        // Shows dynamic date in icon usually, keeping static for now
-                      ),
-                      AppIcon(
-                        name: "Photos",
-                        color: Colors.white,
-                        icon: CupertinoIcons.photo_on_rectangle,
-                        isWhite: true,
-                        onTap: () => _openApp(const IosPhotos()),
-                      ),
-                      AppIcon(
-                        name: "Camera",
-                        color: Colors.grey,
-                        icon: CupertinoIcons.camera_fill,
-                      ),
-
-                      AppIcon(
                         name: "Mail",
                         color: Colors.blue,
                         icon: CupertinoIcons.mail_solid,
@@ -251,35 +226,18 @@ class _IosHomeState extends State<IosHome> {
                           iconColor: Colors.orange,
                         ),
                       ),
-
-                      AppIcon(
-                        name: "Reminders",
-                        color: Colors.white,
-                        icon: CupertinoIcons.list_bullet,
-                        isWhite: true,
-                      ),
                       AppIcon(
                         name: "Clock",
                         color: Colors.white,
                         icon: CupertinoIcons.clock,
                         isWhite: true,
-                      ),
-
-                      AppIcon(
-                        name: "News",
-                        color: Colors.pink,
-                        icon: CupertinoIcons.news,
+                        iconColor: Colors.black,
                       ),
                       AppIcon(
                         name: "Terminal",
                         color: Colors.black,
                         icon: CupertinoIcons.command,
                         onTap: () => _openApp(const IosTerminal()),
-                      ),
-                      AppIcon(
-                        name: "Podcasts",
-                        color: Colors.purple,
-                        icon: CupertinoIcons.mic_fill,
                       ),
                       AppIcon(
                         name: "App Store",
@@ -295,15 +253,9 @@ class _IosHomeState extends State<IosHome> {
                         onTap: () => _launchURL("https://maps.google.com"),
                       ),
                       AppIcon(
-                        name: "Health",
-                        color: Colors.white,
-                        icon: CupertinoIcons.heart_fill,
-                        iconColor: Colors.red,
-                      ),
-                      AppIcon(
-                        name: "Wallet",
-                        color: Colors.black87,
-                        icon: CupertinoIcons.creditcard_fill,
+                        name: "LinkedIn",
+                        color: Color(0xFF0077B5),
+                        icon: CupertinoIcons.briefcase_fill,
                         onTap: () => _launchURL(
                           "https://www.linkedin.com/in/techochat/",
                         ),

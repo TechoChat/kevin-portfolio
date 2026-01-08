@@ -157,7 +157,7 @@ class _PlatformToastState extends State<PlatformToast>
       width: 320,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1F1F1F).withOpacity(0.95), // Windows Dark
+        color: const Color(0xFF1F1F1F).withValues(alpha: 0.95), // Windows Dark
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white10),
         boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 20)],
@@ -268,7 +268,7 @@ class _PlatformToastState extends State<PlatformToast>
         child: Container(
           width: 360,
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-          color: Colors.black.withOpacity(0.8),
+          color: Colors.black.withValues(alpha: 0.8),
           child: Row(
             children: [
               Container(
@@ -327,11 +327,14 @@ class _PlatformToastState extends State<PlatformToast>
           width: 320,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7), // Glassy Light
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            color: Colors.white.withValues(alpha: 0.7), // Glassy Light
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+              ),
             ],
           ),
           child: Row(

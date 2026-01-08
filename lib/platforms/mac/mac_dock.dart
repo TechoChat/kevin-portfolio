@@ -9,8 +9,8 @@ class MacDock extends StatelessWidget {
   final VoidCallback onOpenSafari;
   final VoidCallback onOpenMail;
   final VoidCallback onOpenMaps;
-  final VoidCallback onOpenGitHub;    // ✅ Added GitHub Callback
-  final VoidCallback onOpenLinkedIn;  // ✅ Added LinkedIn Callback
+  final VoidCallback onOpenGitHub; // ✅ Added GitHub Callback
+  final VoidCallback onOpenLinkedIn; // ✅ Added LinkedIn Callback
 
   const MacDock({
     super.key,
@@ -37,11 +37,11 @@ class MacDock extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3), 
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.4), 
-                  width: 1.5
+                  color: Colors.white.withValues(alpha: 0.4),
+                  width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -56,30 +56,87 @@ class MacDock extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  GestureDetector(onTap: onOpenFinder, child: const _DockIcon("assets/img/mac/icons/finder.svg", "Finder")),
-                  
+                  GestureDetector(
+                    onTap: onOpenFinder,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/finder.svg",
+                      "Finder",
+                    ),
+                  ),
+
                   // ✅ Wired up Launchpad
-                  GestureDetector(onTap: onOpenLaunchpad, child: const _DockIcon("assets/img/mac/icons/launchpad.svg", "Launchpad")),
-                  
-                  GestureDetector(onTap: onOpenSafari, child: const _DockIcon("assets/img/mac/icons/safari.svg", "Safari")),
-                  
+                  GestureDetector(
+                    onTap: onOpenLaunchpad,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/launchpad.svg",
+                      "Launchpad",
+                    ),
+                  ),
+
+                  GestureDetector(
+                    onTap: onOpenSafari,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/safari.svg",
+                      "Safari",
+                    ),
+                  ),
+
                   // ✅ Replaced Messages with LinkedIn
-                  GestureDetector(onTap: onOpenLinkedIn, child: const _DockIcon("assets/img/mac/icons/linkedin.svg", "LinkedIn")),
-                  
-                  GestureDetector(onTap: onOpenMail, child: const _DockIcon("assets/img/mac/icons/mail.svg", "Mail")),
-                  GestureDetector(onTap: onOpenMaps, child: const _DockIcon("assets/img/mac/icons/maps.svg", "Maps")),
-                  
+                  GestureDetector(
+                    onTap: onOpenLinkedIn,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/linkedin.svg",
+                      "LinkedIn",
+                      useSquircle: true,
+                    ),
+                  ),
+
+                  GestureDetector(
+                    onTap: onOpenMail,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/mail.svg",
+                      "Mail",
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: onOpenMaps,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/maps.svg",
+                      "Maps",
+                    ),
+                  ),
+
                   // ✅ Replaced Photos with GitHub
-                  GestureDetector(onTap: onOpenGitHub, child: const _DockIcon("assets/img/mac/icons/github.svg", "GitHub")),
-                  
-                  GestureDetector(onTap: onOpenTerminal, child: const _DockIcon("assets/img/mac/icons/terminal.svg", "Terminal")),
-                  const _DockIcon("assets/img/mac/icons/settings.svg", "Settings"),
-                  
+                  GestureDetector(
+                    onTap: onOpenGitHub,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/github.svg",
+                      "GitHub",
+                    ),
+                  ),
+
+                  GestureDetector(
+                    onTap: onOpenTerminal,
+                    child: const _DockIcon(
+                      "assets/img/mac/icons/terminal.svg",
+                      "Terminal",
+                    ),
+                  ),
+                  const _DockIcon(
+                    "assets/img/mac/icons/settings.svg",
+                    "Settings",
+                  ),
+
                   const SizedBox(width: 12),
                   // Divider Line
-                  Container(width: 1.5, height: 45, color: Colors.white.withValues(alpha: 0.4), margin: const EdgeInsets.only(bottom: 5)),
+                  Container(
+                    width: 1.5,
+                    height: 45,
+                    color: Colors.white.withValues(alpha: 0.4),
+                    margin: const EdgeInsets.only(bottom: 5),
+                  ),
                   const SizedBox(width: 12),
-                  
+
                   const _DockIcon("assets/img/mac/icons/bin.svg", "Bin"),
                 ],
               ),
@@ -94,7 +151,9 @@ class MacDock extends StatelessWidget {
 class _DockIcon extends StatefulWidget {
   final String? imagePath;
   final String label;
-  const _DockIcon(this.imagePath, this.label);
+  final bool useSquircle;
+
+  const _DockIcon(this.imagePath, this.label, {this.useSquircle = false});
 
   @override
   State<_DockIcon> createState() => _DockIconState();
@@ -106,8 +165,8 @@ class _DockIconState extends State<_DockIcon> {
   @override
   Widget build(BuildContext context) {
     // macOS Dock Effect: Icons grow significantly when hovered
-    final double size = _isHovered ? 60 : 48; 
-    
+    final double size = _isHovered ? 60 : 48;
+
     final isSvg = widget.imagePath?.toLowerCase().endsWith('.svg') ?? false;
 
     return MouseRegion(
@@ -124,16 +183,28 @@ class _DockIconState extends State<_DockIcon> {
           width: size,
           height: size,
           margin: EdgeInsets.symmetric(
-            horizontal: _isHovered ? 6 : 8, 
-            vertical: _isHovered ? 0 : 6 // Moves up when growing
+            horizontal: _isHovered ? 6 : 8,
+            vertical: _isHovered ? 0 : 6, // Moves up when growing
           ),
           child: widget.imagePath == null
               ? const Icon(Icons.apps, color: Colors.grey)
-              : (isSvg
-                  ? SvgPicture.asset(widget.imagePath!, fit: BoxFit.contain)
-                  : Image.asset(widget.imagePath!, fit: BoxFit.contain)),
+              : _buildIconContent(isSvg, size),
         ),
       ),
     );
+  }
+
+  Widget _buildIconContent(bool isSvg, double size) {
+    final icon = isSvg
+        ? SvgPicture.asset(widget.imagePath!, fit: BoxFit.contain)
+        : Image.asset(widget.imagePath!, fit: BoxFit.contain);
+
+    if (widget.useSquircle) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(size * 0.22),
+        child: icon,
+      );
+    }
+    return icon;
   }
 }

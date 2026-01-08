@@ -964,7 +964,7 @@ class _TypewriterTextState extends State<TypewriterText> {
     super.initState();
     _timer = Timer.periodic(widget.speed, (timer) {
       if (_charIndex < widget.text.length) {
-        if (mounted){
+        if (mounted) {
           setState(() => _displayedText += widget.text[_charIndex++]);
         }
       } else {
@@ -1044,16 +1044,18 @@ class _AndroidAppIcon extends StatelessWidget {
           Flexible(
             child: Text(
               name,
-              style: appDrawer ? TextStyle(
-                // app_drwawwer then black else white
-                color: Colors.black,
-                fontSize: 12,
-                fontFamily: 'Roboto',
-              ): TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontFamily: 'Roboto',
-              ),
+              style: appDrawer
+                  ? TextStyle(
+                      // app_drwawwer then black else white
+                      color: Colors.black,
+                      fontSize: 12,
+                      fontFamily: 'Roboto',
+                    )
+                  : TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontFamily: 'Roboto',
+                    ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -1078,6 +1080,7 @@ class _AndroidStatusBarState extends State<AndroidStatusBar> {
   final Battery _battery = Battery();
   int _batteryLevel = 100;
   final Connectivity _connectivity = Connectivity();
+  BatteryState _batteryState = BatteryState.unknown;
   List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
 
   @override
@@ -1088,7 +1091,10 @@ class _AndroidStatusBarState extends State<AndroidStatusBar> {
       const Duration(seconds: 1),
       (_) => setState(() => _time = DateTime.now()),
     );
-    _battery.onBatteryStateChanged.listen((state) {});
+    _battery.onBatteryStateChanged.listen((state) {
+      setState(() => _batteryState = state);
+      _initBattery();
+    });
     _connectivity.onConnectivityChanged.listen(
       (res) => setState(() => _connectionStatus = res),
     );
@@ -1130,7 +1136,23 @@ class _AndroidStatusBarState extends State<AndroidStatusBar> {
               size: 18,
             ),
             const SizedBox(width: 8),
-            Icon(Icons.battery_full, color: widget.iconColor, size: 18),
+            Text(
+              "$_batteryLevel%",
+              style: TextStyle(
+                color: widget.iconColor,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              _batteryState == BatteryState.charging ||
+                      _batteryState == BatteryState.full
+                  ? Icons.battery_charging_full
+                  : Icons.battery_full,
+              color: widget.iconColor,
+              size: 18,
+            ),
           ],
         ),
       ],
@@ -1149,7 +1171,7 @@ class _GoogleSearchPageState extends State<GoogleSearchPage> {
   Future<void> _launchGoogleSearch(String query) async {
     if (query.trim().isEmpty) return;
     final Uri url = Uri.https('www.google.com', '/search', {'q': query});
-    if (await canLaunchUrl(url)){
+    if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
   }

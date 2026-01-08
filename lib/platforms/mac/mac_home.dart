@@ -46,7 +46,7 @@ class _MacHomeState extends State<MacHome> {
   bool _isLoadingWeather = true;
 
   // --- app Openers ---
-  
+
   void _openFinder() {
     _openMacWindow(const MacFinder());
   }
@@ -67,19 +67,19 @@ class _MacHomeState extends State<MacHome> {
     );
     await launchUrl(emailLaunchUri);
   }
-  
+
   Future<void> _launchMaps() async {
-      await launchUrl(Uri.parse("https://maps.google.com"));
+    await launchUrl(Uri.parse("https://maps.google.com"));
   }
 
   // ✅ UPDATED: GitHub (Replaces Photos)
   Future<void> _launchGitHub() async {
-      await launchUrl(Uri.parse("https://github.com/TechoChat"));
+    await launchUrl(Uri.parse("https://github.com/TechoChat"));
   }
 
   // ✅ NEW: LinkedIn (Replaces Messages)
   Future<void> _launchLinkedIn() async {
-      await launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/"));
+    await launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/"));
   }
 
   void _openMacWindow(Widget child) {
@@ -112,7 +112,8 @@ class _MacHomeState extends State<MacHome> {
             // 1. Blurred Background
             Positioned.fill(
               child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(), // Tap background to close
+                onTap: () =>
+                    Navigator.of(context).pop(), // Tap background to close
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                   child: Container(
@@ -136,46 +137,67 @@ class _MacHomeState extends State<MacHome> {
                       label: "Finder",
                       svgPath: "assets/img/mac/icons/finder.svg",
                       color: Colors.blueAccent,
-                      onTap: () { Navigator.pop(context); _openFinder(); },
+                      onTap: () {
+                        Navigator.pop(context);
+                        _openFinder();
+                      },
                     ),
                     _LaunchpadItem(
                       label: "Safari",
                       icon: CupertinoIcons.compass, // System Icon
                       color: Colors.blue,
-                      onTap: () { Navigator.pop(context); _launchSafari(); },
+                      onTap: () {
+                        Navigator.pop(context);
+                        _launchSafari();
+                      },
                     ),
                     _LaunchpadItem(
                       label: "Mail",
                       icon: CupertinoIcons.mail_solid, // System Icon
                       color: Colors.blueAccent,
-                      onTap: () { Navigator.pop(context); _launchMail(); },
+                      onTap: () {
+                        Navigator.pop(context);
+                        _launchMail();
+                      },
                     ),
                     _LaunchpadItem(
                       label: "Terminal",
                       // adding terminal image as SVG
                       svgPath: "assets/img/mac/icons/terminal.svg",
                       color: Colors.grey[800]!,
-                      onTap: () { Navigator.pop(context); _openTerminal(); },
+                      onTap: () {
+                        Navigator.pop(context);
+                        _openTerminal();
+                      },
                     ),
                     _LaunchpadItem(
                       label: "Maps",
                       icon: CupertinoIcons.map_fill, // System Icon
                       color: Colors.greenAccent,
-                      onTap: () { Navigator.pop(context); _launchMaps(); },
+                      onTap: () {
+                        Navigator.pop(context);
+                        _launchMaps();
+                      },
                     ),
-                    
+
                     // ✅ SVG Icon: GitHub
                     _LaunchpadItem(
                       label: "GitHub",
                       svgPath: "assets/img/mac/icons/github.svg",
-                      onTap: () { Navigator.pop(context); _launchGitHub(); },
+                      onTap: () {
+                        Navigator.pop(context);
+                        _launchGitHub();
+                      },
                     ),
 
                     // ✅ SVG Icon: LinkedIn
                     _LaunchpadItem(
                       label: "LinkedIn",
                       svgPath: "assets/img/mac/icons/linkedin.svg",
-                      onTap: () { Navigator.pop(context); _launchLinkedIn(); },
+                      onTap: () {
+                        Navigator.pop(context);
+                        _launchLinkedIn();
+                      },
                     ),
                   ],
                 ),
@@ -200,9 +222,12 @@ class _MacHomeState extends State<MacHome> {
 
     _batteryStateSubscription = _battery.onBatteryStateChanged.listen((state) {
       setState(() => _batteryState = state);
+      _initBattery();
     });
 
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((result) {
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((
+      result,
+    ) {
       setState(() => _connectionStatus = result);
     });
   }
@@ -222,11 +247,15 @@ class _MacHomeState extends State<MacHome> {
 
   IconData _mapToCupertinoIcon(String code) {
     switch (code) {
-      case '01d': return CupertinoIcons.sun_max_fill;
-      case '01n': return CupertinoIcons.moon_fill;
-      case '02d': 
-      case '02n': return CupertinoIcons.cloud_sun_fill;
-      default: return CupertinoIcons.cloud_fill;
+      case '01d':
+        return CupertinoIcons.sun_max_fill;
+      case '01n':
+        return CupertinoIcons.moon_fill;
+      case '02d':
+      case '02n':
+        return CupertinoIcons.cloud_sun_fill;
+      default:
+        return CupertinoIcons.cloud_fill;
     }
   }
 
@@ -281,8 +310,12 @@ class _MacHomeState extends State<MacHome> {
                       BatteryRing(
                         percent: _batteryLevel / 100,
                         label: "$_batteryLevel%",
-                        icon: _batteryState == BatteryState.charging ? CupertinoIcons.bolt_fill : CupertinoIcons.device_laptop,
-                        color: _batteryState == BatteryState.charging ? const Color(0xFF52D598) : Colors.blueAccent,
+                        icon: _batteryState == BatteryState.charging
+                            ? CupertinoIcons.bolt_fill
+                            : CupertinoIcons.device_laptop,
+                        color: _batteryState == BatteryState.charging
+                            ? const Color(0xFF52D598)
+                            : Colors.blueAccent,
                       ),
                       const BatteryRing(
                         percent: 1.00,
@@ -348,7 +381,10 @@ class _MacHomeState extends State<MacHome> {
 
           // 4. Menu Bar
           Positioned(
-            top: 0, left: 0, right: 0, height: 28,
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 28,
             child: MacMenuBar(
               batteryLevel: _batteryLevel,
               batteryState: _batteryState,
@@ -358,7 +394,9 @@ class _MacHomeState extends State<MacHome> {
 
           // 5. Dock (Updated with GitHub & LinkedIn)
           Positioned(
-            bottom: 10, left: 0, right: 0, 
+            bottom: 10,
+            left: 0,
+            right: 0,
             child: MacDock(
               onOpenLaunchpad: _openLaunchpad, // ✅ Added Launchpad Trigger
               onOpenFinder: _openFinder,
@@ -366,8 +404,9 @@ class _MacHomeState extends State<MacHome> {
               onOpenSafari: _launchSafari,
               onOpenMail: _launchMail,
               onOpenMaps: _launchMaps,
-              onOpenGitHub: _launchGitHub,   // ✅ Replaced Photos
-              onOpenLinkedIn: _launchLinkedIn, // ✅ Replaced Messages (Ensure MacDock accepts this)
+              onOpenGitHub: _launchGitHub, // ✅ Replaced Photos
+              onOpenLinkedIn:
+                  _launchLinkedIn, // ✅ Replaced Messages (Ensure MacDock accepts this)
             ),
           ),
         ],
@@ -406,7 +445,9 @@ class _LaunchpadItem extends StatelessWidget {
             width: 64,
             decoration: BoxDecoration(
               // If it's a system icon, give it a background squircle
-              color: svgPath == null ? (color ?? Colors.blue) : Colors.transparent,
+              color: svgPath == null
+                  ? (color ?? Colors.blue)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -417,8 +458,15 @@ class _LaunchpadItem extends StatelessWidget {
               ],
             ),
             child: svgPath != null
-                ? SvgPicture.asset(svgPath!, fit: BoxFit.contain) // ✅ Render SVG
-                : Icon(icon, size: 36, color: Colors.white), // ✅ Render System Icon
+                ? SvgPicture.asset(
+                    svgPath!,
+                    fit: BoxFit.contain,
+                  ) // ✅ Render SVG
+                : Icon(
+                    icon,
+                    size: 36,
+                    color: Colors.white,
+                  ), // ✅ Render System Icon
           ),
           const SizedBox(height: 8),
           Text(

@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
-
 // 5. ✅ UPDATED iOS Status Bar (Receives Real Data)
 class IosStatusBar extends StatefulWidget {
   final int batteryLevel;
@@ -31,7 +30,10 @@ class _IosStatusBarState extends State<IosStatusBar> {
   void initState() {
     super.initState();
     _timeString = _formatTime();
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateTime());
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer t) => _updateTime(),
+    );
   }
 
   void _updateTime() {
@@ -96,25 +98,40 @@ class _IosStatusBarState extends State<IosStatusBar> {
             children: [
               // Signal Bars (Mocked mostly, or tied to connection type)
               Icon(
-                widget.connectionStatus.contains(ConnectivityResult.none) 
-                    ? CupertinoIcons.bars 
-                    : CupertinoIcons.antenna_radiowaves_left_right, 
-                color: Colors.white, 
-                size: 18
-              ), 
+                widget.connectionStatus.contains(ConnectivityResult.none)
+                    ? CupertinoIcons.bars
+                    : CupertinoIcons.antenna_radiowaves_left_right,
+                color: Colors.white,
+                size: 18,
+              ),
               const SizedBox(width: 6),
-              
+
               // WiFi Icon
-              Icon(_getWifiIcon(), color: Colors.white, size: 18), 
+              Icon(_getWifiIcon(), color: Colors.white, size: 18),
               const SizedBox(width: 6),
-              
+
+              // NEW: Battery Percentage
+              Text(
+                "${widget.batteryLevel}%",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: '.SF Pro Text',
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              const SizedBox(width: 4),
+
               // Battery Icon
               Icon(
-                _getBatteryIcon(), 
-                color: widget.batteryLevel < 20 && widget.batteryState != BatteryState.charging 
-                    ? Colors.red 
-                    : Colors.white, 
-                size: 24
+                _getBatteryIcon(),
+                color:
+                    widget.batteryLevel < 20 &&
+                        widget.batteryState != BatteryState.charging
+                    ? Colors.red
+                    : Colors.white,
+                size: 24,
               ),
             ],
           ),
