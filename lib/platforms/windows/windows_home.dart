@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kevins_tech/platforms/windows/file_explorer_window.dart';
 import 'package:kevins_tech/platforms/windows/windows_taskbar.dart';
@@ -6,6 +5,7 @@ import 'package:kevins_tech/platforms/windows/windows_start_menu.dart';
 import 'package:kevins_tech/platforms/windows/windows_icon.dart';
 import 'package:kevins_tech/platforms/windows/windows_terminal.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../components/made_with_flutter.dart';
 
 class WindowsHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -18,36 +18,6 @@ class WindowsHome extends StatefulWidget {
 
 class _WindowsHomeState extends State<WindowsHome> {
   bool _isStartMenuOpen = false;
-
-  // --- Scrolling Text Variables ---
-  late PageController _pageController;
-  Timer? _timer;
-  final List<String> _words = ["Passion", "Care", "Love", "Flutter"];
-  int _currentPage = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
-
-    _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) {
-      if (_pageController.hasClients) {
-        _currentPage++;
-        _pageController.animateToPage(
-          _currentPage,
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeOutQuart,
-        );
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pageController.dispose();
-    super.dispose();
-  }
 
   void _toggleStartMenu() {
     setState(() {
@@ -117,7 +87,9 @@ class _WindowsHomeState extends State<WindowsHome> {
           iconColor: Colors.yellow,
           label: "Resume.pdf",
           onTap: () => launchUrl(
-            Uri.parse("https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing"),
+            Uri.parse(
+              "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
+            ),
           ),
         ),
       ],
@@ -134,7 +106,8 @@ class _WindowsHomeState extends State<WindowsHome> {
           iconColor: Colors.blue,
           label: "LinkedIn",
           subLabel: "Connected",
-          onTap: () => launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/")),
+          onTap: () =>
+              launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/")),
         ),
         ExplorerItem(
           icon: Icons.code,
@@ -210,12 +183,14 @@ class _WindowsHomeState extends State<WindowsHome> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SizedBox(
-                  height: constraints.maxHeight, // Force Wrap to know its vertical limit
+                  height: constraints
+                      .maxHeight, // Force Wrap to know its vertical limit
                   child: Wrap(
                     direction: Axis.vertical, // Fill Top-to-Bottom
                     alignment: WrapAlignment.start,
-                    runAlignment: WrapAlignment.start, 
-                    spacing: 0,     // Vertical gap (DesktopIcon has built-in margin)
+                    runAlignment: WrapAlignment.start,
+                    spacing:
+                        0, // Vertical gap (DesktopIcon has built-in margin)
                     runSpacing: 10, // Horizontal gap between columns
                     children: [
                       DesktopIcon(
@@ -239,40 +214,49 @@ class _WindowsHomeState extends State<WindowsHome> {
                         onTap: _openProjects,
                       ),
                       // Spacer isn't needed in Wrap usually, but adding small box for visual separation
-                      const SizedBox(height: 10, width: 85), 
-                      
+                      const SizedBox(height: 10, width: 85),
+
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/github.png",
                         label: "GitHub",
-                        onTap: () => launchUrl(Uri.parse("https://github.com/TechoChat")),
+                        onTap: () => launchUrl(
+                          Uri.parse("https://github.com/TechoChat"),
+                        ),
                       ),
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/linkedin.png",
                         label: "LinkedIn",
-                        onTap: () => launchUrl(Uri.parse("https://www.linkedin.com/in/techochat/")),
+                        onTap: () => launchUrl(
+                          Uri.parse("https://www.linkedin.com/in/techochat/"),
+                        ),
                       ),
-                      
-                      const SizedBox(height: 10, width: 85), 
-                      
+
+                      const SizedBox(height: 10, width: 85),
+
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/adobe.png",
                         label: "Resume.pdf",
                         onTap: () async {
-                          const url = 'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
+                          const url =
+                              'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
                           if (await canLaunchUrl(Uri.parse(url))) {
-                            await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                            await launchUrl(
+                              Uri.parse(url),
+                              mode: LaunchMode.externalApplication,
+                            );
                           }
                         },
                       ),
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/macos.png",
                         label: "Move to Mac",
-                        onTap: () => widget.onPlatformSwitch(TargetPlatform.macOS),
+                        onTap: () =>
+                            widget.onPlatformSwitch(TargetPlatform.macOS),
                       ),
                     ],
                   ),
                 );
-              }
+              },
             ),
           ),
 
@@ -281,55 +265,7 @@ class _WindowsHomeState extends State<WindowsHome> {
             bottom: 60, // Sits just above taskbar
             left: 0,
             right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const FlutterLogo(size: 14),
-                    const SizedBox(width: 6),
-                    const Text(
-                      "Made with ",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontFamily: "Segoe UI",
-                      ),
-                    ),
-                    SizedBox(
-                      height: 18, 
-                      width: 50,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        scrollDirection: Axis.vertical,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return Container(
-                            alignment: Alignment.centerLeft, 
-                            child: Text(
-                              _words[index % _words.length],
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: "Segoe UI",
-                                height: 1.0, 
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: const Center(child: MadeWithFlutter()),
           ),
 
           // 4. Start Menu

@@ -7,6 +7,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/weather_service.dart';
+import 'apps/android_chrome.dart';
+import '../../components/made_with_flutter.dart';
 
 class AndroidHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -333,6 +335,8 @@ class _AndroidHomeState extends State<AndroidHome>
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                const Center(child: MadeWithFlutter()),
+                                const SizedBox(height: 8),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
@@ -359,8 +363,11 @@ class _AndroidHomeState extends State<AndroidHome>
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () =>
-                                          _launchUrl("https://google.com"),
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => const AndroidChrome(),
+                                        ),
+                                      ),
                                       child: const _AndroidAppIcon(
                                         name: "",
                                         asset: "chrome",
@@ -434,7 +441,6 @@ class _AndroidHomeState extends State<AndroidHome>
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
                               ],
                             ),
                           ),
@@ -529,10 +535,22 @@ class _AndroidHomeState extends State<AndroidHome>
                                 "pdf",
                                 "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
                               ),
-                              _buildDrawerItem(
-                                "Chrome",
-                                "chrome",
-                                "https://google.com",
+                              GestureDetector(
+                                onTap: () {
+                                  _toggleDrawer(false);
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const AndroidChrome(),
+                                    ),
+                                  );
+                                },
+                                child: const _AndroidAppIcon(
+                                  name: "Chrome",
+                                  asset: "chrome",
+                                  bgColor: Colors.white,
+                                  showLabel: true,
+                                  appDrawer: true,
+                                ),
                               ),
                               _buildDrawerItem(
                                 "Phone",

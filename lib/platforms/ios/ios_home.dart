@@ -11,10 +11,12 @@ import 'package:url_launcher/url_launcher.dart';
 // ✅ Import your Weather Service
 import '../../components/weather_service.dart';
 import 'apps/ios_app_store.dart';
+import '../../components/made_with_flutter.dart';
 
 import 'apps/ios_safari.dart';
 import 'apps/ios_settings.dart';
 import 'apps/ios_terminal.dart';
+import 'ios_app_library.dart';
 
 class IosHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -157,237 +159,242 @@ class _IosHomeState extends State<IosHome> {
                   ),
                 ),
 
-                // --- TOP WIDGETS ROW ---
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // ✅ Dynamic Weather Widget
-                      IosWidgetContainer(
-                        width: size.width * 0.43,
-                        height: size.width * 0.43,
-                        color: const Color(0xFF1C6BC8),
-                        child: WeatherWidget(
-                          temp: _weatherTemp,
-                          city: _weatherCity,
-                          condition: _weatherCondition,
-                          highLow: _weatherHighLow,
-                          isLoading: _isLoadingWeather,
-                        ),
-                      ),
-
-                      // Map Widget (Still Static/Mocked for now)
-                      IosWidgetContainer(
-                        width: size.width * 0.43,
-                        height: size.width * 0.43,
-                        color: Colors.white.withValues(alpha: 0.8),
-                        child: MapWidget(
-                          city: _weatherCity,
-                        ), // Pass city name to map too
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // --- APP GRID ---
+                // --- PAGE VIEW (Home Screens + App Library) ---
                 Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 4,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.75,
-                    physics: const BouncingScrollPhysics(),
+                  child: PageView(
                     children: [
-                      AppIcon(
-                        name: "Mail",
-                        color: Colors.blue,
-                        icon: CupertinoIcons.mail_solid,
-                        onTap: () => _launchURL("mailto:contact@techo.chat"),
-                      ),
-                      GestureDetector(
-                        onTap: () async {
-                          const url =
-                              'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
-                          if (await canLaunchUrl(Uri.parse(url))) {
-                            await launchUrl(
-                              Uri.parse(url),
-                              mode: LaunchMode.externalApplication,
-                            );
-                          }
-                        },
-                        child: AppIcon(
-                          name: "Acrobat",
-                          color: Colors.yellow.shade100,
-                          icon: CupertinoIcons.doc_text_fill,
-                          iconColor: Colors.orange,
-                        ),
-                      ),
-                      AppIcon(
-                        name: "Clock",
-                        color: Colors.white,
-                        icon: CupertinoIcons.clock,
-                        isWhite: true,
-                        iconColor: Colors.black,
-                      ),
-                      AppIcon(
-                        name: "Terminal",
-                        color: Colors.black,
-                        icon: CupertinoIcons.command,
-                        onTap: () => _openApp(const IosTerminal()),
-                      ),
-                      AppIcon(
-                        name: "App Store",
-                        color: Colors.blueAccent,
-                        icon: CupertinoIcons.app_badge_fill,
-                        onTap: () => _openApp(const IosAppStore()),
-                      ),
+                      // Page 1: Main Home Screen
+                      Column(
+                        children: [
+                          // --- TOP WIDGETS ROW ---
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // ✅ Dynamic Weather Widget
+                                IosWidgetContainer(
+                                  width: size.width * 0.43,
+                                  height: size.width * 0.43,
+                                  color: const Color(0xFF1C6BC8),
+                                  child: WeatherWidget(
+                                    temp: _weatherTemp,
+                                    city: _weatherCity,
+                                    condition: _weatherCondition,
+                                    highLow: _weatherHighLow,
+                                    isLoading: _isLoadingWeather,
+                                  ),
+                                ),
 
-                      AppIcon(
-                        name: "Maps",
-                        color: Colors.greenAccent,
-                        icon: CupertinoIcons.location_fill,
-                        onTap: () => _launchURL("https://maps.google.com"),
-                      ),
-                      AppIcon(
-                        name: "LinkedIn",
-                        color: Color(0xFF0077B5),
-                        icon: CupertinoIcons.briefcase_fill,
-                        onTap: () => _launchURL(
-                          "https://www.linkedin.com/in/techochat/",
-                        ),
-                      ),
-                      AppIcon(
-                        name: "Settings",
-                        color: Colors.grey,
-                        icon: CupertinoIcons.settings,
-                        onTap: () => _openApp(
-                          IosSettings(
-                            onPlatformSwitch: widget.onPlatformSwitch,
+                                // Map Widget (Still Static/Mocked for now)
+                                IosWidgetContainer(
+                                  width: size.width * 0.43,
+                                  height: size.width * 0.43,
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                  child: MapWidget(
+                                    city: _weatherCity,
+                                  ), // Pass city name to map too
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+
+                          const SizedBox(height: 25),
+
+                          // --- APP GRID ---
+                          Expanded(
+                            child: GridView.count(
+                              crossAxisCount: 4,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              mainAxisSpacing: 20,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 0.75,
+                              physics: const BouncingScrollPhysics(),
+                              children: [
+                                AppIcon(
+                                  name: "Mail",
+                                  color: Colors.blue,
+                                  icon: CupertinoIcons.mail_solid,
+                                  onTap: () =>
+                                      _launchURL("mailto:contact@techo.chat"),
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    const url =
+                                        'https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing';
+                                    if (await canLaunchUrl(Uri.parse(url))) {
+                                      await launchUrl(
+                                        Uri.parse(url),
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    }
+                                  },
+                                  child: AppIcon(
+                                    name: "Acrobat",
+                                    color: Colors.yellow.shade100,
+                                    icon: CupertinoIcons.doc_text_fill,
+                                    iconColor: Colors.orange,
+                                  ),
+                                ),
+                                AppIcon(
+                                  name: "Clock",
+                                  color: Colors.white,
+                                  icon: CupertinoIcons.clock,
+                                  isWhite: true,
+                                  iconColor: Colors.black,
+                                ),
+                                AppIcon(
+                                  name: "Terminal",
+                                  color: Colors.black,
+                                  icon: CupertinoIcons.command,
+                                  onTap: () => _openApp(const IosTerminal()),
+                                ),
+                                AppIcon(
+                                  name: "App Store",
+                                  color: Colors.blueAccent,
+                                  icon: CupertinoIcons.app_badge_fill,
+                                  onTap: () => _openApp(const IosAppStore()),
+                                ),
+
+                                AppIcon(
+                                  name: "Maps",
+                                  color: Colors.greenAccent,
+                                  icon: CupertinoIcons.location_fill,
+                                  onTap: () =>
+                                      _launchURL("https://maps.google.com"),
+                                ),
+                                AppIcon(
+                                  name: "LinkedIn",
+                                  color: const Color(0xFF0077B5),
+                                  icon: CupertinoIcons.briefcase_fill,
+                                  onTap: () => _launchURL(
+                                    "https://www.linkedin.com/in/techochat/",
+                                  ),
+                                ),
+                                AppIcon(
+                                  name: "Settings",
+                                  color: Colors.grey,
+                                  icon: CupertinoIcons.settings,
+                                  onTap: () => _openApp(
+                                    IosSettings(
+                                      onPlatformSwitch: widget.onPlatformSwitch,
+                                    ),
+                                  ),
+                                ),
+
+                                // Switch Button
+                                GestureDetector(
+                                  onTap: () => widget.onPlatformSwitch(
+                                    TargetPlatform.android,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.android,
+                                          color: Colors.green,
+                                          size: 35,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      const Text(
+                                        "Switch OS",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontFamily: '.SF Pro Text',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // --- MADE WITH CAPSULE ---
+                          const MadeWithFlutter(),
+
+                          const SizedBox(height: 15),
+
+                          // --- DOCK ---
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(35),
+                              child: BackdropFilter(
+                                filter: ui.ImageFilter.blur(
+                                  sigmaX: 20,
+                                  sigmaY: 20,
+                                ),
+                                child: Container(
+                                  height: 95,
+                                  width: double.infinity,
+                                  color: Colors.white.withValues(alpha: 0.25),
+                                  padding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    18,
+                                    16,
+                                    18,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      AppIcon(
+                                        name: "",
+                                        color: Colors.green,
+                                        icon: CupertinoIcons.phone_fill,
+                                        showLabel: false,
+                                        onTap: () {},
+                                      ),
+                                      AppIcon(
+                                        name: "",
+                                        color: Colors.blue,
+                                        icon: CupertinoIcons.compass,
+                                        showLabel: false,
+                                        onTap: () =>
+                                            _openApp(const IosSafari()),
+                                      ),
+                                      AppIcon(
+                                        name: "",
+                                        color: Colors.green,
+                                        icon: CupertinoIcons.chat_bubble_fill,
+                                        showLabel: false,
+                                        onTap: () => _launchURL("sms:"),
+                                      ),
+                                      AppIcon(
+                                        name: "",
+                                        color: Colors.red,
+                                        icon: CupertinoIcons.music_note_2,
+                                        showLabel: false,
+                                        onTap: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
 
-                      // Switch Button
-                      GestureDetector(
-                        onTap: () =>
-                            widget.onPlatformSwitch(TargetPlatform.android),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: const Icon(
-                                Icons.android,
-                                color: Colors.green,
-                                size: 35,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            const Text(
-                              "Switch OS",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontFamily: '.SF Pro Text',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Page 2: App Library (Drawer)
+                      IosAppLibrary(onPlatformSwitch: widget.onPlatformSwitch),
                     ],
                   ),
                 ),
-
-                // --- SEARCH PILL ---
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(
-                        CupertinoIcons.search,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        "Search",
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                // --- DOCK ---
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(35),
-                    child: BackdropFilter(
-                      filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                      child: Container(
-                        height: 95,
-                        width: double.infinity,
-                        color: Colors.white.withValues(alpha: 0.25),
-                        padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AppIcon(
-                              name: "",
-                              color: Colors.green,
-                              icon: CupertinoIcons.phone_fill,
-                              showLabel: false,
-                              onTap: () {},
-                            ),
-                            AppIcon(
-                              name: "",
-                              color: Colors.blue,
-                              icon: CupertinoIcons.compass,
-                              showLabel: false,
-                              onTap: () => _openApp(const IosSafari()),
-                            ),
-                            AppIcon(
-                              name: "",
-                              color: Colors.green,
-                              icon: CupertinoIcons.chat_bubble_fill,
-                              showLabel: false,
-                              onTap: () => _launchURL("sms:"),
-                            ),
-                            AppIcon(
-                              name: "",
-                              color: Colors.red,
-                              icon: CupertinoIcons.music_note_2,
-                              showLabel: false,
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
               ],
             ),
           ),

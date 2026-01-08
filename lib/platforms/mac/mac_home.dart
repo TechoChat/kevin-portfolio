@@ -11,10 +11,12 @@ import 'package:kevins_tech/platforms/mac/mac_widget.dart';
 import 'package:kevins_tech/platforms/mac/desktop_icon.dart';
 import 'package:kevins_tech/platforms/mac/mac_finder.dart';
 import 'package:kevins_tech/platforms/mac/mac_terminal.dart';
+import 'apps/mac_safari.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // ✅ Import your Weather Service
 import '../../components/weather_service.dart';
+import '../../components/made_with_flutter.dart';
 
 class MacHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -55,9 +57,8 @@ class _MacHomeState extends State<MacHome> {
     _openMacWindow(const MacTerminal());
   }
 
-  Future<void> _launchSafari() async {
-    const url = 'https://www.google.com';
-    if (await canLaunchUrl(Uri.parse(url))) await launchUrl(Uri.parse(url));
+  void _launchSafari() {
+    _openMacWindow(const MacSafari());
   }
 
   Future<void> _launchMail() async {
@@ -392,7 +393,15 @@ class _MacHomeState extends State<MacHome> {
             ),
           ),
 
-          // 5. Dock (Updated with GitHub & LinkedIn)
+          // Made With Flutter
+          Positioned(
+            bottom: 125,
+            left: 0,
+            right: 0,
+            child: const Center(child: MadeWithFlutter()),
+          ),
+
+          // 4.5 Active Window
           Positioned(
             bottom: 10,
             left: 0,

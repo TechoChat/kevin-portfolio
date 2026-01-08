@@ -7,6 +7,7 @@ class MacWindow extends StatefulWidget {
   final double width;
   final double height;
   final VoidCallback onClose;
+  final VoidCallback? onMinimize; // ✅ Added optional minimize
 
   const MacWindow({
     super.key,
@@ -14,6 +15,7 @@ class MacWindow extends StatefulWidget {
     this.width = 950,
     this.height = 600,
     required this.onClose,
+    this.onMinimize,
   });
 
   @override
@@ -41,15 +43,18 @@ class _MacWindowState extends State<MacWindow> {
           decoration: BoxDecoration(
             color: const Color(0xFF1E1E1E).withValues(alpha: 0.85),
             borderRadius: BorderRadius.circular(borderRadius),
-            border: _isMaximized 
-                ? null 
-                : Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
+            border: _isMaximized
+                ? null
+                : Border.all(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    width: 1,
+                  ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 50,
                 spreadRadius: 10,
-              )
+              ),
             ],
           ),
           child: ClipRRect(
@@ -60,14 +65,16 @@ class _MacWindowState extends State<MacWindow> {
                 children: [
                   // Content
                   widget.child,
-                  
+
                   // Traffic Lights (Positioned absolutely to overlay neatly)
                   Positioned(
                     top: 14,
                     left: 14,
                     child: MacTrafficLights(
                       onClose: widget.onClose,
-                      onMinimize: () => Navigator.pop(context), // Minimize usually closes in portfolio demos
+                      onMinimize: () => Navigator.pop(
+                        context,
+                      ), // Minimize usually closes in portfolio demos
                       onMaximize: () {
                         setState(() {
                           _isMaximized = !_isMaximized;
@@ -118,9 +125,9 @@ class _MacTrafficLightsState extends State<MacTrafficLights> {
         children: [
           // 1. Red (Close)
           _MacWindowButton(
-            color: const Color(0xFFFF5F57), 
+            color: const Color(0xFFFF5F57),
             borderColor: const Color(0xFFE0443E),
-            icon: Icons.close, 
+            icon: Icons.close,
             showIcon: _isHovering,
             onTap: widget.onClose,
           ),
@@ -128,9 +135,9 @@ class _MacTrafficLightsState extends State<MacTrafficLights> {
 
           // 2. Yellow (Minimize)
           _MacWindowButton(
-            color: const Color(0xFFFFBD2E), 
+            color: const Color(0xFFFFBD2E),
             borderColor: const Color(0xFFDEA123),
-            icon: Icons.remove, 
+            icon: Icons.remove,
             showIcon: _isHovering,
             onTap: widget.onMinimize,
           ),
@@ -138,7 +145,7 @@ class _MacTrafficLightsState extends State<MacTrafficLights> {
 
           // 3. Green (Maximize)
           _MacWindowButton(
-            color: const Color(0xFF28C840), 
+            color: const Color(0xFF28C840),
             borderColor: const Color(0xFF1AAB29),
             icon: CupertinoIcons.fullscreen, // Arrows icon
             iconSize: 10, // Maximize icon needs to be slightly smaller visually
@@ -180,13 +187,17 @@ class _MacWindowButton extends StatelessWidget {
           shape: BoxShape.circle,
           // Subtle border for authentic look
           border: Border.all(
-            color: borderColor.withValues(alpha: 0.5), 
-            width: 0.5
+            color: borderColor.withValues(alpha: 0.5),
+            width: 0.5,
           ),
         ),
         alignment: Alignment.center,
-        child: showIcon 
-            ? Icon(icon, size: iconSize, color: Colors.black.withValues(alpha: 0.6)) 
+        child: showIcon
+            ? Icon(
+                icon,
+                size: iconSize,
+                color: Colors.black.withValues(alpha: 0.6),
+              )
             : null,
       ),
     );

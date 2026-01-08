@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'mac_window.dart'; // Ensure this imports your MacWindow file
 
 class MacTerminal extends StatefulWidget {
-  const MacTerminal({super.key});
+  final VoidCallback? onClose;
+  final VoidCallback? onMinimize; // ✅ Added
+  const MacTerminal({super.key, this.onClose, this.onMinimize});
 
   @override
   State<MacTerminal> createState() => _MacTerminalState();
@@ -70,17 +72,24 @@ class _MacTerminalState extends State<MacTerminal> {
         RichText(
           text: TextSpan(
             children: [
-               const TextSpan(
-                 text: "kevin@MacBook-Pro ~ % ", 
-                 style: TextStyle(color: Color(0xFF34C759), fontWeight: FontWeight.bold, fontFamily: 'Courier New')
-               ),
-               TextSpan(
-                 text: input, 
-                 style: const TextStyle(color: Colors.white, fontFamily: 'Courier New')
-               ),
-            ]
-          )
-        )
+              const TextSpan(
+                text: "kevin@MacBook-Pro ~ % ",
+                style: TextStyle(
+                  color: Color(0xFF34C759),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Courier New',
+                ),
+              ),
+              TextSpan(
+                text: input,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Courier New',
+                ),
+              ),
+            ],
+          ),
+        ),
       );
 
       final command = input.toLowerCase().trim();
@@ -98,40 +107,40 @@ class _MacTerminalState extends State<MacTerminal> {
           break;
 
         case 'about':
-          _addAnimatedResponse(_asciiAbout, Colors.cyanAccent); 
+          _addAnimatedResponse(_asciiAbout, Colors.cyanAccent);
           _addAnimatedSection("BIO", [
-             "I am Kevin Shah, an enthusiastic Developer & Engineer.",
-             "Currently pursuing Masters in AI & ML at University of Adelaide [2025-2027].",
-             "Passionate about Agentic AI, Embedded Systems, and solving complex problems.",
-             "Origins: Gujarat, India 🇮🇳 -> Now: Adelaide, SA 🇦🇺"
+            "I am Kevin Shah, an enthusiastic Developer & Engineer.",
+            "Currently pursuing Masters in AI & ML at University of Adelaide [2025-2027].",
+            "Passionate about Agentic AI, Embedded Systems, and solving complex problems.",
+            "Origins: Gujarat, India 🇮🇳 -> Now: Adelaide, SA 🇦🇺",
           ]);
           break;
 
         case 'education':
           _addAnimatedResponse(_asciiEdu, Colors.purpleAccent);
           _addAnimatedSection("MASTERS IN AI & ML (2025 - Present)", [
-             "University of Adelaide, Australia",
-             "Focus: Agentic AI, RAG, Machine Learning"
+            "University of Adelaide, Australia",
+            "Focus: Agentic AI, RAG, Machine Learning",
           ]);
           _addAnimatedSection("BACHELOR OF COMPUTER SCIENCE (2021 - 2024)", [
-             "Babaria Institute of Technology",
-             "CGPA: 8.65/10.0"
+            "Babaria Institute of Technology",
+            "CGPA: 8.65/10.0",
           ]);
           break;
 
         case 'skills':
           _addAnimatedResponse(_asciiSkills, Colors.orangeAccent);
           _addAnimatedSection("AI & MACHINE LEARNING", [
-             "Python, RAG Pipelines, Agentic Systems, LLMs",
-             "Data Processing, Automation"
+            "Python, RAG Pipelines, Agentic Systems, LLMs",
+            "Data Processing, Automation",
           ]);
           _addAnimatedSection("WEB & BACKEND", [
-             "PHP, Laravel, REST APIs, WordPress Automation",
-             "Google Cloud, Firebase, MySQL"
+            "PHP, Laravel, REST APIs, WordPress Automation",
+            "Google Cloud, Firebase, MySQL",
           ]);
           _addAnimatedSection("MOBILE & EMBEDDED", [
-             "Flutter (App Dev), C Programming, Microcontrollers",
-             "IoT Security, Firmware Development"
+            "Flutter (App Dev), C Programming, Microcontrollers",
+            "IoT Security, Firmware Development",
           ]);
           break;
 
@@ -140,41 +149,44 @@ class _MacTerminalState extends State<MacTerminal> {
           _addAnimatedSection("DSPWORKS [2024-2025]", [
             "Role: Embedded Firmware Developer",
             "• Developed firmware for microcontroller systems.",
-            "• Optimized hardware-software integration."
+            "• Optimized hardware-software integration.",
           ]);
           _addAnimatedSection("WIZARD INFOSYS [2023-2024]", [
             "Role: Backend Web Developer",
             "• Built automated WordPress tools using ChatGPT API.",
-            "• Developed Flutter Stock App with PHP backend."
+            "• Developed Flutter Stock App with PHP backend.",
           ]);
-          
+
           _consoleOutput.add(const SizedBox(height: 10));
           _addAnimatedSection("🚀 MAJOR PROJECTS", [
             "1. AI-POWERED WORDPRESS BOT",
             "2. RAG-BASED Q&A PROTOTYPE",
-            "3. AGENTIC AI EXPLORATION"
+            "3. AGENTIC AI EXPLORATION",
           ]);
           break;
 
         case 'projects':
-           // Just an alias for experience/projects section
-           _handleCommand('experience');
-           return; // Return early to avoid double input clear
+          // Just an alias for experience/projects section
+          _handleCommand('experience');
+          return; // Return early to avoid double input clear
 
         case 'contact':
           _addAnimatedSection("CONTACT DETAILS", [
             "📧 Email: kevinstech0@gmail.com",
             "📞 Phone: +61 0485 516 100",
             "🐙 GitHub: github.com/TechoChat",
-            "💼 LinkedIn: linkedin.com/in/techochat/"
+            "💼 LinkedIn: linkedin.com/in/techochat/",
           ]);
           break;
 
         default:
-          _addAnimatedResponse("zsh: command not found: $command", Colors.redAccent);
+          _addAnimatedResponse(
+            "zsh: command not found: $command",
+            Colors.redAccent,
+          );
       }
-      
-      _consoleOutput.add(const SizedBox(height: 10)); 
+
+      _consoleOutput.add(const SizedBox(height: 10));
     });
 
     _inputController.clear();
@@ -186,14 +198,14 @@ class _MacTerminalState extends State<MacTerminal> {
   void _addAnimatedResponse(String text, Color color) {
     _consoleOutput.add(
       TypewriterText(
-        text: text, 
+        text: text,
         style: TextStyle(
-          color: color, 
-          fontWeight: FontWeight.bold, 
-          fontFamily: 'Courier New', 
-          height: 1.0, 
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Courier New',
+          height: 1.0,
         ),
-      )
+      ),
     );
   }
 
@@ -201,28 +213,28 @@ class _MacTerminalState extends State<MacTerminal> {
   void _addAnimatedSection(String title, List<String> lines) {
     _consoleOutput.add(
       TypewriterText(
-        text: "➜ $title", 
+        text: "➜ $title",
         speed: const Duration(milliseconds: 10),
         style: const TextStyle(
-          color: Colors.greenAccent, 
-          fontWeight: FontWeight.bold, 
-          fontFamily: 'Courier New'
+          color: Colors.greenAccent,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Courier New',
         ),
-      )
+      ),
     );
 
     String fullContent = lines.map((l) => "  $l").join("\n");
-    
+
     _consoleOutput.add(
       TypewriterText(
-        text: fullContent, 
+        text: fullContent,
         speed: const Duration(milliseconds: 5),
         style: const TextStyle(
-          color: Colors.white, 
+          color: Colors.white,
           fontFamily: 'Courier New',
           height: 1.2,
         ),
-      )
+      ),
     );
     _consoleOutput.add(const SizedBox(height: 5));
   }
@@ -237,9 +249,9 @@ class _MacTerminalState extends State<MacTerminal> {
 
   @override
   Widget build(BuildContext context) {
-    // Note: We use the "Unified" MacWindow (passed via child)
     return MacWindow(
-      onClose: () => Navigator.pop(context),
+      onClose: widget.onClose ?? () => Navigator.pop(context),
+      onMinimize: widget.onMinimize, // Pass to MacWindow
       child: Column(
         children: [
           // --- Custom Terminal Header ---
@@ -257,7 +269,7 @@ class _MacTerminalState extends State<MacTerminal> {
                     style: TextStyle(color: Colors.white38, fontSize: 12),
                   ),
                 ),
-                const SizedBox(width: 50), 
+                const SizedBox(width: 50),
               ],
             ),
           ),
@@ -267,7 +279,9 @@ class _MacTerminalState extends State<MacTerminal> {
             child: Container(
               padding: const EdgeInsets.all(16),
               width: double.infinity,
-              color: const Color(0xFF101010).withValues(alpha: 0.95), // Mac Terminal Black
+              color: const Color(
+                0xFF101010,
+              ).withValues(alpha: 0.95), // Mac Terminal Black
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -280,13 +294,17 @@ class _MacTerminalState extends State<MacTerminal> {
                       },
                     ),
                   ),
-                  
+
                   if (!_isBooting)
                     Row(
                       children: [
                         const Text(
                           "kevin@MacBook-Pro ~ % ",
-                          style: TextStyle(color: Color(0xFF34C759), fontFamily: 'Courier New', fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Color(0xFF34C759),
+                            fontFamily: 'Courier New',
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Expanded(
                           child: TextField(
@@ -295,8 +313,14 @@ class _MacTerminalState extends State<MacTerminal> {
                             onSubmitted: _handleCommand,
                             cursorColor: Colors.grey,
                             cursorWidth: 6, // Block cursor
-                            style: const TextStyle(color: Colors.white, fontFamily: 'Courier New'),
-                            decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Courier New',
+                            ),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                            ),
                           ),
                         ),
                       ],
@@ -356,7 +380,6 @@ const String _asciiEdu = r"""
 |_____|____/ \___/ 
 """;
 
-
 // -----------------------------------------------------------------------------
 // ✅ TYPEWRITER ANIMATION (Reuse exact logic from Windows)
 // -----------------------------------------------------------------------------
@@ -367,9 +390,9 @@ class TypewriterText extends StatefulWidget {
   final VoidCallback? onComplete;
 
   const TypewriterText({
-    super.key, 
-    required this.text, 
-    required this.style, 
+    super.key,
+    required this.text,
+    required this.style,
     this.speed = const Duration(milliseconds: 5), // Very fast default
     this.onComplete,
   });
@@ -411,7 +434,7 @@ class _TypewriterTextState extends State<TypewriterText> {
   Widget build(BuildContext context) {
     return Text(
       _displayedText,
-      softWrap: false, 
+      softWrap: false,
       overflow: TextOverflow.visible,
       style: widget.style,
     );
