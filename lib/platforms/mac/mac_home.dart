@@ -14,6 +14,7 @@ import 'package:kevins_tech/platforms/mac/mac_terminal.dart';
 import 'apps/mac_safari.dart';
 import 'apps/mac_contact.dart';
 import 'apps/mac_about_me.dart';
+import 'apps/mac_calculator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // ✅ Import your Weather Service
@@ -225,6 +226,15 @@ class _MacHomeState extends State<MacHome> {
                       onTap: () {
                         Navigator.pop(context);
                         _openContact();
+                      },
+                    ),
+                    _LaunchpadItem(
+                      label: "Calculator",
+                      icon: CupertinoIcons.minus_slash_plus,
+                      color: Colors.orange,
+                      onTap: () {
+                        Navigator.pop(context);
+                        _openMacWindow(const MacCalculator());
                       },
                     ),
                   ],

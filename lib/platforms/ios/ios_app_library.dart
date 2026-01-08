@@ -6,6 +6,7 @@ import 'package:kevins_tech/platforms/ios/apps/ios_safari.dart';
 import 'package:kevins_tech/platforms/ios/apps/ios_settings.dart';
 import 'package:kevins_tech/platforms/ios/apps/ios_terminal.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'apps/ios_calculator.dart';
 
 class IosAppLibrary extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -31,6 +32,12 @@ class _IosAppLibraryState extends State<IosAppLibrary> {
         CupertinoIcons.app_badge_fill,
         Colors.blueAccent,
         () => _openApp(const IosAppStore()),
+      ),
+      _LibraryApp(
+        "Calculator",
+        CupertinoIcons.minus_slash_plus,
+        Colors.orange,
+        () => _openApp(const IosCalculator()),
       ),
       _LibraryApp("Calendar", CupertinoIcons.calendar, Colors.redAccent, () {}),
       _LibraryApp("Camera", CupertinoIcons.camera_fill, Colors.grey, () {}),

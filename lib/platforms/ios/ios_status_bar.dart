@@ -5,18 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
-// 5. ✅ UPDATED iOS Status Bar (Receives Real Data)
 class IosStatusBar extends StatefulWidget {
-  final int batteryLevel;
-  final BatteryState batteryState;
-  final List<ConnectivityResult> connectionStatus;
-
-  const IosStatusBar({
-    required this.batteryLevel,
-    required this.batteryState,
-    required this.connectionStatus,
-    super.key,
-  });
+  const IosStatusBar({super.key});
 
   @override
   State<IosStatusBar> createState() => _IosStatusBarState();
@@ -24,7 +14,16 @@ class IosStatusBar extends StatefulWidget {
 
 class _IosStatusBarState extends State<IosStatusBar> {
   late Timer _timer;
-  late String _timeString;
+  String _timeString = "";
+
+  // Data
+  int _batteryLevel = 100;
+  BatteryState _batteryState = BatteryState.full;
+  List<ConnectivityResult> _connectionStatus = [ConnectivityResult.wifi];
+
+  final Battery _battery = Battery();
+  late StreamSubscription<BatteryState> _batteryStateSubscription;
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
 
   @override
   void initState() {
@@ -34,12 +33,32 @@ class _IosStatusBarState extends State<IosStatusBar> {
       const Duration(seconds: 1),
       (Timer t) => _updateTime(),
     );
+    _initBattery();
+    _initConnectivity();
+  }
+
+  Future<void> _initBattery() async {
+    _batteryStateSubscription = _battery.onBatteryStateChanged.listen((state) {
+      if (mounted) setState(() => _batteryState = state);
+    });
+    try {
+      final level = await _battery.batteryLevel;
+      if (mounted) setState(() => _batteryLevel = level);
+    } catch (_) {}
+  }
+
+  Future<void> _initConnectivity() async {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      result,
+    ) {
+      if (mounted) setState(() => _connectionStatus = result);
+    });
   }
 
   void _updateTime() {
     final String formatted = _formatTime();
     if (_timeString != formatted) {
-      setState(() => _timeString = formatted);
+      if (mounted) setState(() => _timeString = formatted);
     }
   }
 
@@ -48,71 +67,67 @@ class _IosStatusBarState extends State<IosStatusBar> {
   @override
   void dispose() {
     _timer.cancel();
+    _batteryStateSubscription.cancel();
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 
-  // Helpers for icons
   IconData _getWifiIcon() {
-    if (widget.connectionStatus.contains(ConnectivityResult.wifi)) {
+    if (_connectionStatus.contains(ConnectivityResult.wifi)) {
       return CupertinoIcons.wifi;
-    } else if (widget.connectionStatus.contains(ConnectivityResult.mobile)) {
-      return CupertinoIcons.antenna_radiowaves_left_right; // "5G/LTE" metaphor
+    } else if (_connectionStatus.contains(ConnectivityResult.mobile)) {
+      return CupertinoIcons.antenna_radiowaves_left_right;
     } else {
       return CupertinoIcons.wifi_slash;
     }
   }
 
   IconData _getBatteryIcon() {
-    if (widget.batteryState == BatteryState.charging) {
+    if (_batteryState == BatteryState.charging)
       return CupertinoIcons.battery_charging;
-    }
-    // Apple icon logic approximates fullness
-    if (widget.batteryLevel >= 100) return CupertinoIcons.battery_100;
-    if (widget.batteryLevel >= 25) return CupertinoIcons.battery_25;
+    if (_batteryLevel >= 100) return CupertinoIcons.battery_100;
+    if (_batteryLevel >= 25) return CupertinoIcons.battery_25;
     return CupertinoIcons.battery_0;
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       height: 30,
+      color: Colors.black, // Typical iOS status bar background on dark apps
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 1. Time (Left)
+          // Time
           Text(
             _timeString,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               fontFamily: '.SF Pro Text',
               decoration: TextDecoration.none,
             ),
           ),
 
-          // 2. Status Icons (Right)
+          // Icons
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Signal Bars (Mocked mostly, or tied to connection type)
               Icon(
-                widget.connectionStatus.contains(ConnectivityResult.none)
+                _connectionStatus.contains(ConnectivityResult.none)
                     ? CupertinoIcons.bars
                     : CupertinoIcons.antenna_radiowaves_left_right,
                 color: Colors.white,
-                size: 18,
+                size: 16,
               ),
               const SizedBox(width: 6),
-
-              // WiFi Icon
-              Icon(_getWifiIcon(), color: Colors.white, size: 18),
+              Icon(_getWifiIcon(), color: Colors.white, size: 16),
               const SizedBox(width: 6),
-
-              // NEW: Battery Percentage
               Text(
-                "${widget.batteryLevel}%",
+                "$_batteryLevel%",
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
@@ -122,16 +137,13 @@ class _IosStatusBarState extends State<IosStatusBar> {
                 ),
               ),
               const SizedBox(width: 4),
-
-              // Battery Icon
               Icon(
                 _getBatteryIcon(),
                 color:
-                    widget.batteryLevel < 20 &&
-                        widget.batteryState != BatteryState.charging
+                    _batteryLevel < 20 && _batteryState != BatteryState.charging
                     ? Colors.red
                     : Colors.white,
-                size: 24,
+                size: 20,
               ),
             ],
           ),

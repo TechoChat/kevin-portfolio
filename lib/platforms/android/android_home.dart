@@ -2,14 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:battery_plus/battery_plus.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/weather_service.dart';
 import 'apps/android_chrome.dart';
 import '../../components/made_with_flutter.dart';
 import 'apps/android_contact.dart';
+import 'apps/android_calculator.dart';
+import 'android_status_bar.dart';
 
 class AndroidHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -584,6 +584,24 @@ class _AndroidHomeState extends State<AndroidHome>
                                 "linkedin",
                                 "https://linkedin.com/in/techochat",
                               ),
+                              GestureDetector(
+                                onTap: () {
+                                  _toggleDrawer(false);
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const AndroidCalculator(),
+                                    ),
+                                  );
+                                },
+                                child: const _AndroidAppIcon(
+                                  name: "Calculator",
+                                  asset: "calculator",
+                                  iconData: Icons.calculate,
+                                  bgColor: Colors.white,
+                                  showLabel: true,
+                                  appDrawer: true,
+                                ),
+                              ),
 
                               // ✅ TERMINAL APP
                               GestureDetector(
@@ -1112,105 +1130,6 @@ class _AndroidAppIcon extends StatelessWidget {
             ),
           ),
         ],
-      ],
-    );
-  }
-}
-
-class AndroidStatusBar extends StatefulWidget {
-  final Color iconColor;
-  const AndroidStatusBar({super.key, required this.iconColor});
-  @override
-  State<AndroidStatusBar> createState() => _AndroidStatusBarState();
-}
-
-class _AndroidStatusBarState extends State<AndroidStatusBar> {
-  late Timer _timer;
-  DateTime _time = DateTime.now();
-  final Battery _battery = Battery();
-  int _batteryLevel = 100;
-  final Connectivity _connectivity = Connectivity();
-  BatteryState _batteryState = BatteryState.unknown;
-  List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
-
-  @override
-  void initState() {
-    super.initState();
-    _initBattery();
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => setState(() => _time = DateTime.now()),
-    );
-    _battery.onBatteryStateChanged.listen((state) {
-      setState(() => _batteryState = state);
-      _initBattery();
-    });
-    _connectivity.onConnectivityChanged.listen(
-      (res) => setState(() => _connectionStatus = res),
-    );
-  }
-
-  Future<void> _initBattery() async {
-    try {
-      final level = await _battery.batteryLevel;
-      if (level > 0) {
-        setState(() => _batteryLevel = level);
-      } else {
-        setState(() => _batteryLevel = 100);
-      }
-    } catch (_) {
-      setState(() => _batteryLevel = 100);
-    }
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          DateFormat('h:mm a').format(_time),
-          style: TextStyle(
-            color: widget.iconColor,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        Row(
-          children: [
-            Icon(
-              _connectionStatus.contains(ConnectivityResult.wifi)
-                  ? Icons.wifi
-                  : Icons.signal_cellular_alt,
-              color: widget.iconColor,
-              size: 18,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              "$_batteryLevel%",
-              style: TextStyle(
-                color: widget.iconColor,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              _batteryState == BatteryState.charging ||
-                      _batteryState == BatteryState.full
-                  ? Icons.battery_charging_full
-                  : Icons.battery_full,
-              color: widget.iconColor,
-              size: 18,
-            ),
-          ],
-        ),
       ],
     );
   }

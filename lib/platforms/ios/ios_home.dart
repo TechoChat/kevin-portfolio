@@ -2,8 +2,6 @@ import 'dart:ui' as ui; // For ImageFilter
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:battery_plus/battery_plus.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:kevins_tech/platforms/ios/ios_status_bar.dart';
 import 'package:kevins_tech/platforms/ios/ios_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,42 +27,13 @@ class IosHome extends StatefulWidget {
 }
 
 class _IosHomeState extends State<IosHome> {
-  // --- Battery State ---
-  final Battery _battery = Battery();
-  BatteryState _batteryState = BatteryState.unknown;
-  int _batteryLevel = 100;
-  StreamSubscription<BatteryState>? _batteryStateSubscription;
-
-  // --- Network State ---
-  final Connectivity _connectivity = Connectivity();
-  List<ConnectivityResult> _connectionStatus = [ConnectivityResult.none];
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
-
   // --- Weather State ---
   final WeatherService _weatherService = WeatherService();
   String _weatherTemp = "--";
   String _weatherCity = "Loading...";
   String _weatherCondition = "Cloudy"; // Default text
-  String _weatherHighLow =
-      "H:-- L:--"; // We don't get H/L from current API easily, so we can mock or hide
+  String _weatherHighLow = "H:-- L:--";
   bool _isLoadingWeather = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _initBattery();
-    _initConnectivity();
-    _initWeather();
-
-    // Listeners
-    _batteryStateSubscription = _battery.onBatteryStateChanged.listen((state) {
-      setState(() => _batteryState = state);
-      _initBattery();
-    });
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
-      (result) => setState(() => _connectionStatus = result),
-    );
-  }
 
   Future<void> _initWeather() async {
     final weather = await _weatherService.getWeather();
@@ -82,32 +51,8 @@ class _IosHomeState extends State<IosHome> {
     }
   }
 
-  Future<void> _initBattery() async {
-    try {
-      final level = await _battery.batteryLevel;
-      // On some platforms/browsers (like iOS Web), this might return 0 or be unsupported.
-      // Fallback to 100 to avoid showing 0%.
-      if (level > 0) {
-        setState(() => _batteryLevel = level);
-      } else {
-        setState(() => _batteryLevel = 100);
-      }
-    } catch (_) {
-      setState(() => _batteryLevel = 100);
-    }
-  }
-
-  Future<void> _initConnectivity() async {
-    try {
-      final result = await _connectivity.checkConnectivity();
-      setState(() => _connectionStatus = result);
-    } catch (_) {}
-  }
-
   @override
   void dispose() {
-    _batteryStateSubscription?.cancel();
-    _connectivitySubscription?.cancel();
     super.dispose();
   }
 
@@ -161,11 +106,7 @@ class _IosHomeState extends State<IosHome> {
                     right: 24,
                     bottom: 10,
                   ),
-                  child: IosStatusBar(
-                    batteryLevel: _batteryLevel,
-                    batteryState: _batteryState,
-                    connectionStatus: _connectionStatus,
-                  ),
+                  child: const IosStatusBar(),
                 ),
 
                 // --- PAGE VIEW (Home Screens + App Library) ---

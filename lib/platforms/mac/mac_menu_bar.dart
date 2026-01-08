@@ -30,7 +30,10 @@ class _MacMenuBarState extends State<MacMenuBar> {
   void initState() {
     super.initState();
     _timeString = _formatDateTime();
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer t) => _getTime(),
+    );
   }
 
   void _getTime() {
@@ -40,7 +43,8 @@ class _MacMenuBarState extends State<MacMenuBar> {
     }
   }
 
-  String _formatDateTime() => DateFormat('E MMM d  h:mm a').format(DateTime.now());
+  String _formatDateTime() =>
+      DateFormat('E MMM d  h:mm a').format(DateTime.now());
 
   @override
   void dispose() {
@@ -49,14 +53,18 @@ class _MacMenuBarState extends State<MacMenuBar> {
   }
 
   IconData _getNetworkIcon() {
-    if (widget.connectionStatus.contains(ConnectivityResult.ethernet)) return CupertinoIcons.link;
-    if (widget.connectionStatus.contains(ConnectivityResult.wifi)) return CupertinoIcons.wifi;
-    if (widget.connectionStatus.contains(ConnectivityResult.mobile)) return CupertinoIcons.antenna_radiowaves_left_right;
+    if (widget.connectionStatus.contains(ConnectivityResult.ethernet))
+      return CupertinoIcons.link;
+    if (widget.connectionStatus.contains(ConnectivityResult.wifi))
+      return CupertinoIcons.wifi;
+    if (widget.connectionStatus.contains(ConnectivityResult.mobile))
+      return CupertinoIcons.antenna_radiowaves_left_right;
     return CupertinoIcons.wifi_slash;
   }
 
   IconData _getBatteryIcon() {
-    if (widget.batteryState == BatteryState.charging) return CupertinoIcons.battery_charging;
+    if (widget.batteryState == BatteryState.charging)
+      return CupertinoIcons.battery_charging;
     if (widget.batteryLevel >= 90) return CupertinoIcons.battery_full;
     if (widget.batteryLevel >= 25) return CupertinoIcons.battery_25_percent;
     return CupertinoIcons.battery_0;
@@ -74,27 +82,63 @@ class _MacMenuBarState extends State<MacMenuBar> {
             children: [
               const Icon(Icons.apple, size: 20, color: Colors.white),
               const SizedBox(width: 20),
-              const _MenuText("Finder"),
-              const _MenuText("File"),
-              const _MenuText("Edit"),
-              const _MenuText("View"),
-              const _MenuText("Go"),
-              const _MenuText("Window"),
-              const _MenuText("Help"),
-              const Spacer(),
-              Icon(_getNetworkIcon(), size: 16, color: Colors.white),
-              const SizedBox(width: 15),
+              // Use Expanded/SingleChildScrollView to handle overflow
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      const _MenuText("Finder"),
+                      const _MenuText("File"),
+                      const _MenuText("Edit"),
+                      const _MenuText("View"),
+                      const _MenuText("Go"),
+                      const _MenuText("Window"),
+                      const _MenuText("Help"),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              // System Tray
               Row(
+                mainAxisSize: MainAxisSize.min, // Keep tight
                 children: [
-                  Text("${widget.batteryLevel}%", style: const TextStyle(color: Colors.white, fontSize: 13, decoration: TextDecoration.none, fontWeight: FontWeight.w500)),
-                  const SizedBox(width: 6),
-                  Icon(_getBatteryIcon(), size: 18, color: widget.batteryLevel < 20 && widget.batteryState != BatteryState.charging ? Colors.redAccent : Colors.white),
+                  Icon(_getNetworkIcon(), size: 16, color: Colors.white),
+                  const SizedBox(width: 15),
+                  Row(
+                    children: [
+                      Text(
+                        "${widget.batteryLevel}%",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          decoration: TextDecoration.none,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        _getBatteryIcon(),
+                        size: 18,
+                        color:
+                            widget.batteryLevel < 20 &&
+                                widget.batteryState != BatteryState.charging
+                            ? Colors.redAccent
+                            : Colors.white,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 15),
+                  _MenuText(_timeString),
+                  const SizedBox(width: 0), // Reduce spacing if needed
+                  const Icon(
+                    CupertinoIcons.control,
+                    size: 16,
+                    color: Colors.white,
+                  ),
                 ],
               ),
-              const SizedBox(width: 15),
-              _MenuText(_timeString),
-              const SizedBox(width: 15),
-              const Icon(CupertinoIcons.control, size: 16, color: Colors.white),
             ],
           ),
         ),
@@ -107,6 +151,16 @@ class _MenuText extends StatelessWidget {
   final String text;
   const _MenuText(this.text);
   @override
-  Widget build(BuildContext context) => Padding(padding: const EdgeInsets.only(right: 16), child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500, decoration: TextDecoration.none)));
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(right: 16),
+    child: Text(
+      text,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+        decoration: TextDecoration.none,
+      ),
+    ),
+  );
 }
-
