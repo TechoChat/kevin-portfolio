@@ -83,8 +83,9 @@ class _IosStatusBarState extends State<IosStatusBar> {
   }
 
   IconData _getBatteryIcon() {
-    if (_batteryState == BatteryState.charging)
+    if (_batteryState == BatteryState.charging) {
       return CupertinoIcons.battery_charging;
+    }
     if (_batteryLevel >= 100) return CupertinoIcons.battery_100;
     if (_batteryLevel >= 25) return CupertinoIcons.battery_25;
     return CupertinoIcons.battery_0;

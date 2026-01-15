@@ -10,8 +10,13 @@ import 'apps/ios_calculator.dart';
 
 class IosAppLibrary extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
+  final VoidCallback? onBack; // ✅ Add this
 
-  const IosAppLibrary({super.key, required this.onPlatformSwitch});
+  const IosAppLibrary({
+    super.key,
+    required this.onPlatformSwitch,
+    this.onBack, // ✅ Add this
+  });
 
   @override
   State<IosAppLibrary> createState() => _IosAppLibraryState();
@@ -218,9 +223,16 @@ class _IosAppLibraryState extends State<IosAppLibrary> {
                       const SizedBox(width: 10),
                       GestureDetector(
                         onTap: () {
-                          FocusScope.of(context).unfocus();
-                          _searchController.clear();
-                          _filterApps("");
+                          if (_searchController.text.isEmpty) {
+                            // ✅ If empty, trigger the back navigation
+                            widget.onBack?.call();
+                            FocusScope.of(context).unfocus();
+                          } else {
+                            // If not empty, just clear the text
+                            FocusScope.of(context).unfocus();
+                            _searchController.clear();
+                            _filterApps("");
+                          }
                         },
                         child: const Text(
                           "Cancel",
@@ -285,21 +297,25 @@ class _IosAppLibraryState extends State<IosAppLibrary> {
                       if (_searchController.text.isEmpty)
                         Container(
                           width: 20,
-                          margin: const EdgeInsets.symmetric(vertical: 20),
+                          // Reduced vertical margin so it reaches closer to edges
+                          margin: const EdgeInsets.symmetric(vertical: 4),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            // ✅ CHANGED: This makes the letters spread to fill the height
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: letters
                                 .map(
                                   (l) => Padding(
                                     padding: const EdgeInsets.symmetric(
-                                      vertical: 1.0,
-                                    ),
+                                      vertical: 0.5,
+                                    ), // Tiny padding
                                     child: Text(
                                       l,
                                       style: const TextStyle(
-                                        color: Colors.white54,
-                                        fontSize: 10,
+                                        color: Colors
+                                            .blueAccent, // iOS index is usually blue
+                                        fontSize: 11,
                                         fontWeight: FontWeight.w600,
+                                        decoration: TextDecoration.none,
                                       ),
                                     ),
                                   ),

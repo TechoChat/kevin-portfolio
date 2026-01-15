@@ -53,12 +53,15 @@ class _MacMenuBarState extends State<MacMenuBar> {
   }
 
   IconData _getNetworkIcon() {
-    if (widget.connectionStatus.contains(ConnectivityResult.ethernet))
+    if (widget.connectionStatus.contains(ConnectivityResult.ethernet)) {
       return CupertinoIcons.link;
-    if (widget.connectionStatus.contains(ConnectivityResult.wifi))
+    }
+    if (widget.connectionStatus.contains(ConnectivityResult.wifi)) {
       return CupertinoIcons.wifi;
-    if (widget.connectionStatus.contains(ConnectivityResult.mobile))
+    }
+    if (widget.connectionStatus.contains(ConnectivityResult.mobile)) {
       return CupertinoIcons.antenna_radiowaves_left_right;
+    }
     return CupertinoIcons.wifi_slash;
   }
 

@@ -56,9 +56,18 @@ class _IosHomeState extends State<IosHome> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Start fetching weather as soon as the app launches
+    _initWeather();
+  }
+
   void _openApp(Widget app) {
     Navigator.of(context).push(CupertinoPageRoute(builder: (context) => app));
   }
+
+  final PageController _pageController = PageController();
 
   Future<void> _launchURL(String url) async {
     final uri = Uri.parse(url);
@@ -112,6 +121,7 @@ class _IosHomeState extends State<IosHome> {
                 // --- PAGE VIEW (Home Screens + App Library) ---
                 Expanded(
                   child: PageView(
+                    controller: _pageController,
                     children: [
                       // Page 1: Main Home Screen
                       Column(
@@ -343,7 +353,16 @@ class _IosHomeState extends State<IosHome> {
                       ),
 
                       // Page 2: App Library (Drawer)
-                      IosAppLibrary(onPlatformSwitch: widget.onPlatformSwitch),
+                      IosAppLibrary(
+                        onPlatformSwitch: widget.onPlatformSwitch,
+                        onBack: () {
+                          _pageController.animateToPage(
+                            0,
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutQuart,
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
