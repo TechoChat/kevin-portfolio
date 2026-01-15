@@ -96,7 +96,7 @@ class AndroidContact extends StatelessWidget {
                     icon: Icons.message,
                     label: "Message",
                     color: Colors.blue.shade700,
-                    onTap: () => _launchUrl("sms:"),
+                    onTap: () => _launchUrl("sms:+610485516100"),
                   ),
                   _ActionButton(
                     icon: Icons.call,
