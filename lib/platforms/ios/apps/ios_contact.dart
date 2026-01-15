@@ -81,7 +81,7 @@ class IosContact extends StatelessWidget {
                   label: "message",
                   icon: CupertinoIcons.chat_bubble_fill,
                   color: CupertinoColors.activeBlue,
-                  onTap: () => _launchUrl("sms:"),
+                  onTap: () => _launchUrl("sms:+610485516100"),
                 ),
                 const SizedBox(width: 16),
                 _buildActionButton(
