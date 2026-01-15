@@ -83,12 +83,26 @@ class _IosStatusBarState extends State<IosStatusBar> {
   }
 
   IconData _getBatteryIcon() {
+    // 1. Priority: Charging
     if (_batteryState == BatteryState.charging) {
       return CupertinoIcons.battery_charging;
     }
-    if (_batteryLevel >= 100) return CupertinoIcons.battery_100;
-    if (_batteryLevel >= 25) return CupertinoIcons.battery_25;
-    return CupertinoIcons.battery_0;
+
+    // 2. Logic Reversed: Check for LOW battery first
+    // If battery is critically low (e.g. less than 15%), show empty
+    if (_batteryLevel < 15) {
+      return CupertinoIcons.battery_0;
+    }
+
+    // If battery is somewhat low (e.g. less than 40%), show the 25% icon
+    // (You can adjust this number to your preference)
+    if (_batteryLevel < 40) {
+      return CupertinoIcons.battery_25;
+    }
+
+    // 3. Default: For 95%, 100%, or if data is "not available"
+    // defaults to Full icon instead of Empty.
+    return CupertinoIcons.battery_100;
   }
 
   @override
