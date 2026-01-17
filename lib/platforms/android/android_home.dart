@@ -11,6 +11,27 @@ import 'apps/android_contact.dart';
 import 'apps/android_calculator.dart';
 import 'android_status_bar.dart';
 
+// --- DATA MODEL FOR APPS ---
+class _AppModel {
+  final String name;
+  final String asset;
+  final String? url;
+  final WidgetBuilder? pageRoute;
+  final bool isTerminal;
+  final IconData? iconData;
+  final Color bgColor;
+
+  _AppModel({
+    required this.name,
+    required this.asset,
+    this.url,
+    this.pageRoute,
+    this.isTerminal = false,
+    this.iconData,
+    this.bgColor = Colors.white,
+  });
+}
+
 class AndroidHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
 
@@ -34,14 +55,107 @@ class _AndroidHomeState extends State<AndroidHome>
 
   // Drawer State
   bool _isDrawerOpen = false;
+  final TextEditingController _drawerSearchController = TextEditingController();
+
+  // App Data & Filtering
+  late List<_AppModel> _allApps;
+  late List<_AppModel> _filteredApps;
 
   @override
   void initState() {
     super.initState();
     _initWeather();
+    _initApps(); // Initialize app list
 
     _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() => _currentTime = DateTime.now());
+    });
+  }
+
+  // --- INITIALIZE APPS LIST ---
+  void _initApps() {
+    _allApps = [
+      _AppModel(
+        name: "Gmail",
+        asset: "gmail",
+        url: "mailto:kevinstech0@gmail.com",
+      ),
+      _AppModel(
+        name: "Maps",
+        asset: "maps",
+        url: "http://maps.google.com",
+      ),
+      _AppModel(
+        name: "GitHub",
+        asset: "github",
+        url: "https://github.com/TechoChat",
+      ),
+      _AppModel(
+        name: "YouTube",
+        asset: "youtube",
+        url: "https://youtube.com",
+      ),
+      _AppModel(
+        name: "Acrobat",
+        asset: "pdf",
+        url:
+            "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
+      ),
+      _AppModel(
+        name: "Chrome",
+        asset: "chrome",
+        pageRoute: (_) => const AndroidChrome(),
+      ),
+      _AppModel(
+        name: "Contacts",
+        asset: "google_contacts",
+        iconData: Icons.person,
+        pageRoute: (_) => const AndroidContact(),
+      ),
+      _AppModel(
+        name: "LinkedIn",
+        asset: "linkedin",
+        url: "https://linkedin.com/in/techochat",
+      ),
+      _AppModel(
+        name: "Calculator",
+        asset: "calculator",
+        iconData: Icons.calculate,
+        pageRoute: (_) => const AndroidCalculator(),
+      ),
+      _AppModel(
+        name: "Terminal",
+        asset: "terminal",
+        isTerminal: true,
+      ),
+      _AppModel(
+        name: "Settings",
+        asset: "settings",
+        bgColor: Colors.grey,
+        url: "", // Dummy
+      ),
+    ];
+    _filteredApps = List.from(_allApps);
+  }
+
+  // --- SEARCH FUNCTIONALITY ---
+  void _runFilter(String enteredKeyword) {
+    List<_AppModel> results = [];
+    if (enteredKeyword.isEmpty) {
+      results = List.from(_allApps);
+    } else {
+      results =
+          _allApps
+              .where(
+                (app) => app.name.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
+    }
+
+    setState(() {
+      _filteredApps = results;
     });
   }
 
@@ -50,8 +164,9 @@ class _AndroidHomeState extends State<AndroidHome>
     Navigator.of(context).push(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 300),
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const GoogleSearchPage(),
+        pageBuilder:
+            (context, animation, secondaryAnimation) =>
+                const GoogleSearchPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -66,10 +181,12 @@ class _AndroidHomeState extends State<AndroidHome>
         pageBuilder: (context, anim, secAnim) => const AndroidTerminal(),
         transitionsBuilder: (context, anim, secAnim, child) {
           return SlideTransition(
-            position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-                .animate(
-                  CurvedAnimation(parent: anim, curve: Curves.easeOutQuart),
-                ),
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(parent: anim, curve: Curves.easeOutQuart),
+            ),
             child: child,
           );
         },
@@ -78,10 +195,19 @@ class _AndroidHomeState extends State<AndroidHome>
   }
 
   void _toggleDrawer(bool open) {
-    setState(() => _isDrawerOpen = open);
+    setState(() {
+      _isDrawerOpen = open;
+      if (!open) {
+        // Clear search when closing drawer
+        _drawerSearchController.clear();
+        _runFilter("");
+        FocusScope.of(context).unfocus(); // Hide keyboard
+      }
+    });
   }
 
   Future<void> _launchUrl(String url) async {
+    if (url.isEmpty) return;
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     }
@@ -107,13 +233,13 @@ class _AndroidHomeState extends State<AndroidHome>
   @override
   void dispose() {
     _clockTimer.cancel();
+    _drawerSearchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    // final double drawerHeight = size.height; // Full screen drawer
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
@@ -229,7 +355,8 @@ class _AndroidHomeState extends State<AndroidHome>
                             ),
                           ),
                           const Spacer(),
-                          // Home Grid
+
+                          // Home Grid (Static Favorites)
                           SizedBox(
                             height: 290,
                             child: GridView.count(
@@ -242,10 +369,12 @@ class _AndroidHomeState extends State<AndroidHome>
                               childAspectRatio: 0.75,
                               physics: const NeverScrollableScrollPhysics(),
                               children: [
+                                // Standard Shortcuts
                                 GestureDetector(
-                                  onTap: () => _launchUrl(
-                                    "mailto:kevinstech0@gmail.com",
-                                  ),
+                                  onTap:
+                                      () => _launchUrl(
+                                        "mailto:kevinstech0@gmail.com",
+                                      ),
                                   child: const _AndroidAppIcon(
                                     name: "Gmail",
                                     asset: "gmail",
@@ -253,8 +382,10 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () =>
-                                      _launchUrl("http://maps.google.com"),
+                                  onTap:
+                                      () => _launchUrl(
+                                        "http://maps.google.com",
+                                      ),
                                   child: const _AndroidAppIcon(
                                     name: "Maps",
                                     asset: "maps",
@@ -262,9 +393,10 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () => _launchUrl(
-                                    "https://github.com/TechoChat",
-                                  ),
+                                  onTap:
+                                      () => _launchUrl(
+                                        "https://github.com/TechoChat",
+                                      ),
                                   child: const _AndroidAppIcon(
                                     name: "github",
                                     asset: "github",
@@ -272,8 +404,8 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () =>
-                                      _launchUrl("https://youtube.com"),
+                                  onTap:
+                                      () => _launchUrl("https://youtube.com"),
                                   child: const _AndroidAppIcon(
                                     name: "YouTube",
                                     asset: "youtube",
@@ -281,9 +413,10 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () => _launchUrl(
-                                    "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
-                                  ),
+                                  onTap:
+                                      () => _launchUrl(
+                                        "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
+                                      ),
                                   child: const _AndroidAppIcon(
                                     name: "Acrobat",
                                     asset: "pdf",
@@ -295,10 +428,12 @@ class _AndroidHomeState extends State<AndroidHome>
                                   asset: "settings",
                                   bgColor: Colors.grey,
                                 ),
+                                // Switch Platform Icon
                                 GestureDetector(
-                                  onTap: () => widget.onPlatformSwitch(
-                                    TargetPlatform.iOS,
-                                  ),
+                                  onTap:
+                                      () => widget.onPlatformSwitch(
+                                        TargetPlatform.iOS,
+                                      ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -330,40 +465,79 @@ class _AndroidHomeState extends State<AndroidHome>
                               ],
                             ),
                           ),
-                          // Dock
+
+                          // Dock Area
                           Container(
-                            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Center(child: MadeWithFlutter()),
+                                // --- MOUSE/DESKTOP DRAWER TRIGGER ---
+                                // A visual handle that can be clicked to open drawer
+                                GestureDetector(
+                                  onTap: () => _toggleDrawer(true),
+                                  onVerticalDragEnd: (details) {
+                                    if (details.primaryVelocity! < 0) {
+                                      _toggleDrawer(true);
+                                    }
+                                  },
+                                  child: Container(
+                                    color: Colors
+                                        .transparent, // Hit test area boost
+                                    padding: const EdgeInsets.only(
+                                      bottom: 10,
+                                      top: 10,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        const Icon(
+                                          Icons.keyboard_arrow_up,
+                                          color: Colors.white70,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Container(
+                                          width: 32,
+                                          height: 4,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white24,
+                                            borderRadius: BorderRadius.circular(
+                                              2,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                                 const SizedBox(height: 8),
+
+                                // Dock Icons
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
                                     GestureDetector(
-                                      onTap: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              const AndroidContact(),
-                                        ),
-                                      ),
+                                      onTap:
+                                          () => Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (_) => const AndroidContact(),
+                                            ),
+                                          ),
                                       child: const _AndroidAppIcon(
                                         name: "",
-                                        asset:
-                                            "google_contacts", // Fallback to icon if asset missing
-                                        iconData: Icons
-                                            .person, // Use IconData as fallback or primary
+                                        asset: "google_contacts",
+                                        iconData: Icons.person,
                                         showLabel: false,
                                         bgColor: Color(0xFFE8F0FE),
-                                        // iconColor: Colors.blue,
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () => _launchUrl(
-                                        "https://linkedin.com/in/techochat",
-                                      ),
+                                      onTap:
+                                          () => _launchUrl(
+                                            "https://linkedin.com/in/techochat",
+                                          ),
                                       child: const _AndroidAppIcon(
                                         name: "",
                                         asset: "linkedin",
@@ -372,11 +546,13 @@ class _AndroidHomeState extends State<AndroidHome>
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (_) => const AndroidChrome(),
-                                        ),
-                                      ),
+                                      onTap:
+                                          () => Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (_) => const AndroidChrome(),
+                                            ),
+                                          ),
                                       child: const _AndroidAppIcon(
                                         name: "",
                                         asset: "chrome",
@@ -393,6 +569,8 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ],
                                 ),
                                 const SizedBox(height: 24),
+
+                                // Google Search Bar (Home)
                                 GestureDetector(
                                   onTap: _openSearchPage,
                                   child: Hero(
@@ -442,6 +620,7 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 const SizedBox(height: 24),
+                                // Bottom Navigation Bar Indicator
                                 Container(
                                   width: 48,
                                   height: 4,
@@ -462,12 +641,12 @@ class _AndroidHomeState extends State<AndroidHome>
             ),
 
             // -----------------------------------------------------------
-            // 2. APP DRAWER OVERLAY (Replaces ModalBottomSheet)
+            // 2. APP DRAWER OVERLAY (With Functional Search & Grid)
             // -----------------------------------------------------------
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOutQuart,
-              top: _isDrawerOpen ? 0 : size.height, // Slide from bottom
+              top: _isDrawerOpen ? 0 : size.height,
               bottom: _isDrawerOpen ? 0 : -size.height,
               left: 0,
               right: 0,
@@ -479,22 +658,33 @@ class _AndroidHomeState extends State<AndroidHome>
                   }
                 },
                 child: Container(
-                  color: Colors.white.withValues(
-                    alpha: 0.95,
-                  ), // Solid background
+                  color: Colors.white.withValues(alpha: 0.95),
                   child: SafeArea(
                     child: Column(
                       children: [
-                        // Search Bar in Drawer
+                        // Search Bar in Drawer (Functional)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                           child: TextField(
+                            controller: _drawerSearchController,
+                            onChanged: _runFilter,
+                            autofocus: false,
                             decoration: InputDecoration(
                               hintText: "Search apps...",
                               prefixIcon: const Icon(
                                 Icons.search,
                                 color: Colors.grey,
                               ),
+                              suffixIcon:
+                                  _drawerSearchController.text.isNotEmpty
+                                      ? IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: () {
+                                          _drawerSearchController.clear();
+                                          _runFilter("");
+                                        },
+                                      )
+                                      : null,
                               filled: true,
                               fillColor: const Color(0xFFF0F1F5),
                               border: OutlineInputBorder(
@@ -508,119 +698,56 @@ class _AndroidHomeState extends State<AndroidHome>
                           ),
                         ),
 
-                        // All Apps Grid
+                        // Filtered Apps Grid
                         Expanded(
-                          child: GridView.count(
-                            crossAxisCount: 5,
-                            padding: const EdgeInsets.all(16),
-                            mainAxisSpacing: 20,
-                            crossAxisSpacing: 10,
-                            childAspectRatio: 0.75,
-                            // Ensure clicks work, but scrolling still passes gestures if needed
-                            physics: const BouncingScrollPhysics(),
-                            children: [
-                              _buildDrawerItem(
-                                "Gmail",
-                                "gmail",
-                                "mailto:kevinstech0@gmail.com",
-                              ),
-                              _buildDrawerItem(
-                                "Maps",
-                                "maps",
-                                "http://maps.google.com",
-                              ),
-                              _buildDrawerItem(
-                                "github",
-                                "github",
-                                "https://github.com/TechoChat",
-                              ),
-                              _buildDrawerItem(
-                                "YouTube",
-                                "youtube",
-                                "https://youtube.com",
-                              ),
-                              _buildDrawerItem(
-                                "Acrobat",
-                                "pdf",
-                                "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  _toggleDrawer(false);
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => const AndroidChrome(),
-                                    ),
-                                  );
-                                },
-                                child: const _AndroidAppIcon(
-                                  name: "Chrome",
-                                  asset: "chrome",
-                                  bgColor: Colors.white,
-                                  showLabel: true,
-                                  appDrawer: true,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  _toggleDrawer(false);
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => const AndroidContact(),
-                                    ),
-                                  );
-                                },
-                                child: const _AndroidAppIcon(
-                                  name: "Contacts",
-                                  asset: "google_contacts",
-                                  iconData: Icons.person,
-                                  bgColor: Colors.white,
-                                  showLabel: true,
-                                  appDrawer: true,
-                                ),
-                              ),
-                              _buildDrawerItem(
-                                "LinkedIn",
-                                "linkedin",
-                                "https://linkedin.com/in/techochat",
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  _toggleDrawer(false);
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => const AndroidCalculator(),
-                                    ),
-                                  );
-                                },
-                                child: const _AndroidAppIcon(
-                                  name: "Calculator",
-                                  asset: "calculator",
-                                  iconData: Icons.calculate,
-                                  bgColor: Colors.white,
-                                  showLabel: true,
-                                  appDrawer: true,
-                                ),
-                              ),
-
-                              // ✅ TERMINAL APP
-                              GestureDetector(
-                                onTap: () {
-                                  _toggleDrawer(false); // Close drawer first
-                                  _openTerminal();
-                                },
-                                child: const _AndroidAppIcon(
-                                  name: "Terminal",
-                                  asset: "terminal",
-                                  bgColor: Colors.white,
-                                  isTerminal: true,
-                                  appDrawer: true,
-                                ),
-                              ),
-
-                              _buildDrawerItem("Settings", "settings", ""),
-                            ],
-                          ),
+                          child:
+                              _filteredApps.isEmpty
+                                  ? const Center(
+                                    child: Text("No apps found"),
+                                  )
+                                  : GridView.builder(
+                                    padding: const EdgeInsets.all(16),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 5,
+                                          mainAxisSpacing: 20,
+                                          crossAxisSpacing: 10,
+                                          childAspectRatio: 0.75,
+                                        ),
+                                    itemCount: _filteredApps.length,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      final app = _filteredApps[index];
+                                      return GestureDetector(
+                                        onTap: () {
+                                          _toggleDrawer(
+                                            false,
+                                          ); // Close drawer
+                                          if (app.isTerminal) {
+                                            _openTerminal();
+                                          } else if (app.pageRoute != null) {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: app.pageRoute!,
+                                              ),
+                                            );
+                                          } else if (app.url != null &&
+                                              app.url!.isNotEmpty) {
+                                            _launchUrl(app.url!);
+                                          }
+                                        },
+                                        child: _AndroidAppIcon(
+                                          name: app.name,
+                                          asset: app.asset,
+                                          bgColor: app.bgColor,
+                                          showLabel: true,
+                                          appDrawer: true,
+                                          isTerminal: app.isTerminal,
+                                          iconData: app.iconData,
+                                        ),
+                                      );
+                                    },
+                                  ),
                         ),
                       ],
                     ),
@@ -633,23 +760,18 @@ class _AndroidHomeState extends State<AndroidHome>
       ),
     );
   }
-
-  Widget _buildDrawerItem(String name, String asset, String url) {
-    return GestureDetector(
-      onTap: () {
-        _toggleDrawer(false);
-        if (url.isNotEmpty) _launchUrl(url);
-      },
-      child: _AndroidAppIcon(
-        name: name,
-        asset: asset,
-        bgColor: Colors.white,
-        showLabel: true,
-        appDrawer: true,
-      ),
-    );
-  }
 }
+
+// ---------------------------------------------------------
+// ANDROID TERMINAL, TYPEWRITER, ICONS, SEARCH PAGE
+// (Keep existing classes below unmodified)
+// ---------------------------------------------------------
+// ... [The rest of your file: AndroidTerminal, TypewriterText, _AndroidAppIcon, GoogleSearchPage] ...
+// ... [Paste the remaining classes from your original file here] ...
+
+// Note: For completeness in copy-pasting, ensure you keep the original 
+// AndroidTerminal, TypewriterText, _AndroidAppIcon, and GoogleSearchPage classes 
+// at the bottom of the file as they were in your upload.
 
 // ---------------------------------------------------------
 // ✅ ANDROID TERMINAL (Full Features + ASCII Art)
