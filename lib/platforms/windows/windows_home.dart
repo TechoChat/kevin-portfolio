@@ -25,7 +25,7 @@ class _WindowsHomeState extends State<WindowsHome> {
     });
   }
 
-  // --- Window Openers (Keep your existing methods here) ---
+  // --- Window Openers ---
   void _openProjects() {
     _openGenericWindow(
       title: "Projects",
@@ -173,22 +173,24 @@ class _WindowsHomeState extends State<WindowsHome> {
             ),
           ),
 
-          // 2. Desktop Icons
+          // 2. Desktop Icons (Responsive Grid)
           Positioned(
             top: 10,
             left: 10,
-            bottom: 80,
+            bottom: 80, // Space for Taskbar + Footer
             right: 0,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SizedBox(
-                  height: constraints.maxHeight,
+                  height: constraints
+                      .maxHeight, // Force Wrap to know its vertical limit
                   child: Wrap(
-                    direction: Axis.vertical,
+                    direction: Axis.vertical, // Fill Top-to-Bottom
                     alignment: WrapAlignment.start,
                     runAlignment: WrapAlignment.start,
-                    spacing: 0,
-                    runSpacing: 10,
+                    spacing:
+                        0, // Vertical gap (DesktopIcon has built-in margin)
+                    runSpacing: 10, // Horizontal gap between columns
                     children: [
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/computer.png",
@@ -210,7 +212,9 @@ class _WindowsHomeState extends State<WindowsHome> {
                         label: "Projects",
                         onTap: _openProjects,
                       ),
+                      // Spacer isn't needed in Wrap usually, but adding small box for visual separation
                       const SizedBox(height: 10, width: 85),
+
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/github.png",
                         label: "GitHub",
@@ -225,7 +229,9 @@ class _WindowsHomeState extends State<WindowsHome> {
                           Uri.parse("https://www.linkedin.com/in/techochat/"),
                         ),
                       ),
+
                       const SizedBox(height: 10, width: 85),
+
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/adobe.png",
                         label: "Resume.pdf",
@@ -253,15 +259,29 @@ class _WindowsHomeState extends State<WindowsHome> {
             ),
           ),
 
-          // 3. "Made with..." Capsule
+          // 3. "Made with..." Small Animated Capsule
           Positioned(
-            bottom: 60,
+            bottom: 60, // Sits just above taskbar
             left: 0,
             right: 0,
             child: const Center(child: MadeWithFlutter()),
           ),
 
-          // 4. Start Menu
+          // 4. Taskbar
+          // FIXED: Placed BEFORE Start Menu to prevent rebuilding when menu opens.
+          // Added a Key to ensure state (like weather) persists.
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 48,
+            child: WindowsTaskbar(
+              key: const ValueKey('taskbar'),
+              onStartMenuTap: _toggleStartMenu,
+            ),
+          ),
+
+          // 5. Start Menu (Z-Index: On TOP of Taskbar)
           if (_isStartMenuOpen)
             Positioned(
               bottom: 48,
@@ -276,19 +296,6 @@ class _WindowsHomeState extends State<WindowsHome> {
                 ),
               ),
             ),
-
-          // 5. Taskbar (✅ FIXED: Added Key to prevent rebuilds)
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 48,
-            child: WindowsTaskbar(
-              // Key ensures the Taskbar state is preserved even when Start Menu appears
-              key: const ValueKey("WindowsTaskbar"), 
-              onStartMenuTap: _toggleStartMenu,
-            ),
-          ),
         ],
       ),
     );
