@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 class IosStatusBar extends StatefulWidget {
-  const IosStatusBar({super.key});
+  final bool isDark; // If true, text is black (for light backgrounds)
+
+  const IosStatusBar({super.key, this.isDark = false});
 
   @override
   State<IosStatusBar> createState() => _IosStatusBarState();
@@ -107,9 +109,11 @@ class _IosStatusBarState extends State<IosStatusBar> {
 
   @override
   Widget build(BuildContext context) {
+    final color = widget.isDark ? Colors.black : Colors.white;
+
     return Container(
       height: 30,
-      color: Colors.black, // Typical iOS status bar background on dark apps
+      color: Colors.transparent, // Should be transparent for overlay
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -118,8 +122,8 @@ class _IosStatusBarState extends State<IosStatusBar> {
           // Time
           Text(
             _timeString,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: color,
               fontSize: 14,
               fontWeight: FontWeight.w600,
               fontFamily: '.SF Pro Text',
@@ -135,16 +139,16 @@ class _IosStatusBarState extends State<IosStatusBar> {
                 _connectionStatus.contains(ConnectivityResult.none)
                     ? CupertinoIcons.bars
                     : CupertinoIcons.antenna_radiowaves_left_right,
-                color: Colors.white,
+                color: color,
                 size: 16,
               ),
               const SizedBox(width: 6),
-              Icon(_getWifiIcon(), color: Colors.white, size: 16),
+              Icon(_getWifiIcon(), color: color, size: 16),
               const SizedBox(width: 6),
               Text(
                 "$_batteryLevel%",
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: color,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   fontFamily: '.SF Pro Text',
@@ -157,7 +161,7 @@ class _IosStatusBarState extends State<IosStatusBar> {
                 color:
                     _batteryLevel < 20 && _batteryState != BatteryState.charging
                     ? Colors.red
-                    : Colors.white,
+                    : color,
                 size: 20,
               ),
             ],

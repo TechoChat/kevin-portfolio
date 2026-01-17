@@ -6,7 +6,9 @@ import 'package:kevins_tech/platforms/ios/apps/ios_safari.dart';
 import 'package:kevins_tech/platforms/ios/apps/ios_settings.dart';
 import 'package:kevins_tech/platforms/ios/apps/ios_terminal.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../web_portfolio/registry.dart';
 import 'apps/ios_calculator.dart';
+import '../../components/mobile_app_shell.dart';
 
 class IosAppLibrary extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -116,6 +118,25 @@ class _IosAppLibraryState extends State<IosAppLibrary> {
         () {},
       ),
     ];
+
+    // Add Portfolio Apps
+    for (var app in PortfolioRegistry.apps) {
+      _allApps.add(
+        _LibraryApp(
+          app.name,
+          app.icon,
+          Colors.indigo,
+          () => _openApp(
+            MobileAppShellSimple(
+              isAndroid: false,
+              title: app.name,
+              child: app.appBuilder(context),
+            ),
+          ),
+        ),
+      );
+    }
+
     _allApps.sort((a, b) => a.name.compareTo(b.name));
     _filteredApps = List.from(_allApps);
   }

@@ -3,16 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../system_apps/calculator/windows_calculator.dart';
+import '../../web_portfolio/registry.dart';
 
 class WindowsStartMenu extends StatefulWidget {
   final VoidCallback onOpenTerminal;
   final VoidCallback onOpenProjects;
+  final Function(PortfolioApp) onOpenPortfolioApp;
   final VoidCallback onClose; // This callback is what closes the start menu
 
   const WindowsStartMenu({
     super.key,
     required this.onOpenTerminal,
     required this.onOpenProjects,
+    required this.onOpenPortfolioApp,
     required this.onClose,
   });
 
@@ -363,6 +366,110 @@ class _WindowsStartMenuState extends State<WindowsStartMenu> {
   }
 
   Widget _buildAllApps() {
+    // 1. Define all apps (Generic + Portfolio)
+    List<Map<String, dynamic>> allApps = [
+      {
+        "name": "Calculator",
+        "icon": Icons.calculate,
+        "color": Colors.white,
+        "onTap": _openCalculator,
+      },
+      {"name": "Calendar", "icon": Icons.calendar_today, "color": Colors.blue},
+      {"name": "Camera", "icon": Icons.camera_alt, "color": Colors.grey},
+      {"name": "Clock", "icon": Icons.access_time, "color": Colors.white},
+      {
+        "name": "File Explorer",
+        "icon": Icons.folder,
+        "color": Colors.yellow[700]!,
+      },
+      {
+        "name": "GitHub",
+        "icon": Icons.code,
+        "color": Colors.black,
+        "onTap": () => _launchURL("https://github.com/TechoChat"),
+      },
+      {"name": "Google Chrome", "icon": Icons.public, "color": Colors.blue},
+      {
+        "name": "LinkedIn",
+        "icon": Icons.business,
+        "color": Colors.blue[800]!,
+        "onTap": () => _launchURL("https://linkedin.com/in/techochat"),
+      },
+      {
+        "name": "Mail",
+        "icon": Icons.mail,
+        "color": Colors.blueAccent,
+        "onTap": _launchMail,
+      },
+      {"name": "Maps", "icon": Icons.map, "color": Colors.green},
+      {"name": "Microsoft Edge", "icon": Icons.web, "color": Colors.blue},
+      {"name": "Photos", "icon": Icons.photo, "color": Colors.red},
+      {
+        "name": "PowerPoint",
+        "icon": Icons.slideshow,
+        "color": Colors.red[900]!,
+      },
+      {"name": "Settings", "icon": Icons.settings, "color": Colors.grey},
+      {"name": "Spotify", "icon": Icons.music_note, "color": Colors.green},
+      {
+        "name": "Terminal",
+        "icon": Icons.terminal,
+        "color": Colors.white,
+        "onTap": () {
+          widget.onClose();
+          widget.onOpenTerminal();
+        },
+      },
+      {"name": "Word", "icon": Icons.description, "color": Colors.blue[900]!},
+    ];
+
+    // Add Portfolio Apps to the list
+    for (var app in PortfolioRegistry.apps) {
+      allApps.add({
+        "name": app.name,
+        "icon": app.icon, // Use specific app icon
+        "color": Colors.transparent, // Let icon decide or use default
+        "onTap": () {
+          widget.onClose();
+          widget.onOpenPortfolioApp(app);
+        },
+        "isPortfolio": true, // Internal flag if needed
+      });
+    }
+
+    // 2. Sort Alphabetically
+    allApps.sort(
+      (a, b) => (a['name'] as String).compareTo(b['name'] as String),
+    );
+
+    // 3. Build List with Headers
+    List<Widget> listItems = [];
+    String currentLetter = "";
+
+    for (var app in allApps) {
+      String name = app['name'] as String;
+      String firstLetter = name[0].toUpperCase();
+
+      if (firstLetter != currentLetter) {
+        currentLetter = firstLetter;
+        listItems.add(const SizedBox(height: 12));
+        listItems.add(_buildLetterHeader(currentLetter));
+      }
+
+      listItems.add(
+        _buildAppListItem(
+          name,
+          app['icon'] as IconData,
+          app['isPortfolio'] == true
+              ? Colors.purpleAccent
+              : (app['color'] as Color),
+          onTap: app['onTap'] as VoidCallback?,
+        ),
+      );
+    }
+
+    listItems.add(const SizedBox(height: 40)); // Bottom padding
+
     return Column(
       children: [
         // All Apps Header
@@ -410,88 +517,7 @@ class _WindowsStartMenuState extends State<WindowsStartMenu> {
         Expanded(
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            children: [
-              _buildLetterHeader("C"),
-              _buildAppListItem(
-                "Calculator",
-                Icons.calculate,
-                Colors.white,
-                onTap: _openCalculator,
-              ),
-              _buildAppListItem("Calendar", Icons.calendar_today, Colors.blue),
-              _buildAppListItem("Camera", Icons.camera_alt, Colors.grey),
-              _buildAppListItem("Clock", Icons.access_time, Colors.white),
-
-              const SizedBox(height: 12),
-              _buildLetterHeader("F"),
-              _buildAppListItem(
-                "File Explorer",
-                Icons.folder,
-                Colors.yellow[700]!,
-              ),
-
-              const SizedBox(height: 12),
-              _buildLetterHeader("G"),
-              _buildAppListItem(
-                "GitHub",
-                Icons.code,
-                Colors.black,
-                onTap: () => _launchURL("https://github.com/TechoChat"),
-              ),
-              _buildAppListItem("Google Chrome", Icons.public, Colors.blue),
-
-              const SizedBox(height: 12),
-              _buildLetterHeader("L"),
-              _buildAppListItem(
-                "LinkedIn",
-                Icons.business,
-                Colors.blue[800]!,
-                onTap: () => _launchURL("https://linkedin.com/in/techochat"),
-              ),
-
-              const SizedBox(height: 12),
-              _buildLetterHeader("M"),
-              _buildAppListItem(
-                "Mail",
-                Icons.mail,
-                Colors.blueAccent,
-                onTap: _launchMail,
-              ),
-              _buildAppListItem("Maps", Icons.map, Colors.green),
-              _buildAppListItem("Microsoft Edge", Icons.web, Colors.blue),
-
-              const SizedBox(height: 12),
-              _buildLetterHeader("P"),
-              _buildAppListItem("Photos", Icons.photo, Colors.red),
-              _buildAppListItem(
-                "PowerPoint",
-                Icons.slideshow,
-                Colors.red[900]!,
-              ),
-
-              const SizedBox(height: 12),
-              _buildLetterHeader("S"),
-              _buildAppListItem("Settings", Icons.settings, Colors.grey),
-              _buildAppListItem("Spotify", Icons.music_note, Colors.green),
-
-              const SizedBox(height: 12),
-              _buildLetterHeader("T"),
-              _buildAppListItem(
-                "Terminal",
-                Icons.terminal,
-                Colors.white,
-                onTap: () {
-                  widget.onClose();
-                  widget.onOpenTerminal();
-                },
-              ),
-
-              const SizedBox(height: 12),
-              _buildLetterHeader("W"),
-              _buildAppListItem("Word", Icons.description, Colors.blue[900]!),
-
-              const SizedBox(height: 20),
-            ],
+            children: listItems,
           ),
         ),
       ],

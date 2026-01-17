@@ -5,11 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/weather_service.dart';
+import '../../web_portfolio/registry.dart';
 import 'apps/android_chrome.dart';
-import '../../components/made_with_flutter.dart';
 import 'apps/android_contact.dart';
 import 'apps/android_calculator.dart';
 import 'android_status_bar.dart';
+import '../../components/mobile_app_shell.dart';
 
 // --- DATA MODEL FOR APPS ---
 class _AppModel {
@@ -20,6 +21,7 @@ class _AppModel {
   final bool isTerminal;
   final IconData? iconData;
   final Color bgColor;
+  final Color? iconColor;
 
   _AppModel({
     required this.name,
@@ -29,6 +31,7 @@ class _AppModel {
     this.isTerminal = false,
     this.iconData,
     this.bgColor = Colors.white,
+    this.iconColor,
   });
 }
 
@@ -80,21 +83,13 @@ class _AndroidHomeState extends State<AndroidHome>
         asset: "gmail",
         url: "mailto:kevinstech0@gmail.com",
       ),
-      _AppModel(
-        name: "Maps",
-        asset: "maps",
-        url: "http://maps.google.com",
-      ),
+      _AppModel(name: "Maps", asset: "maps", url: "http://maps.google.com"),
       _AppModel(
         name: "GitHub",
         asset: "github",
         url: "https://github.com/TechoChat",
       ),
-      _AppModel(
-        name: "YouTube",
-        asset: "youtube",
-        url: "https://youtube.com",
-      ),
+      _AppModel(name: "YouTube", asset: "youtube", url: "https://youtube.com"),
       _AppModel(
         name: "Acrobat",
         asset: "pdf",
@@ -123,11 +118,7 @@ class _AndroidHomeState extends State<AndroidHome>
         iconData: Icons.calculate,
         pageRoute: (_) => const AndroidCalculator(),
       ),
-      _AppModel(
-        name: "Terminal",
-        asset: "terminal",
-        isTerminal: true,
-      ),
+      _AppModel(name: "Terminal", asset: "terminal", isTerminal: true),
       _AppModel(
         name: "Settings",
         asset: "settings",
@@ -135,6 +126,25 @@ class _AndroidHomeState extends State<AndroidHome>
         url: "", // Dummy
       ),
     ];
+
+    // Add Portfolio Apps dynamically
+    for (var app in PortfolioRegistry.apps) {
+      _allApps.add(
+        _AppModel(
+          name: app.name,
+          asset: "code",
+          iconData: app.icon,
+          bgColor: app.color,
+          iconColor: app.iconColor,
+          pageRoute: (context) => MobileAppShellSimple(
+            isAndroid: true,
+            title: app.name,
+            child: app.appBuilder(context),
+          ),
+        ),
+      );
+    }
+
     _filteredApps = List.from(_allApps);
   }
 
@@ -144,14 +154,12 @@ class _AndroidHomeState extends State<AndroidHome>
     if (enteredKeyword.isEmpty) {
       results = List.from(_allApps);
     } else {
-      results =
-          _allApps
-              .where(
-                (app) => app.name.toLowerCase().contains(
-                  enteredKeyword.toLowerCase(),
-                ),
-              )
-              .toList();
+      results = _allApps
+          .where(
+            (app) =>
+                app.name.toLowerCase().contains(enteredKeyword.toLowerCase()),
+          )
+          .toList();
     }
 
     setState(() {
@@ -164,9 +172,8 @@ class _AndroidHomeState extends State<AndroidHome>
     Navigator.of(context).push(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 300),
-        pageBuilder:
-            (context, animation, secondaryAnimation) =>
-                const GoogleSearchPage(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const GoogleSearchPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -181,12 +188,10 @@ class _AndroidHomeState extends State<AndroidHome>
         pageBuilder: (context, anim, secAnim) => const AndroidTerminal(),
         transitionsBuilder: (context, anim, secAnim, child) {
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 1),
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(parent: anim, curve: Curves.easeOutQuart),
-            ),
+            position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+                .animate(
+                  CurvedAnimation(parent: anim, curve: Curves.easeOutQuart),
+                ),
             child: child,
           );
         },
@@ -371,10 +376,9 @@ class _AndroidHomeState extends State<AndroidHome>
                               children: [
                                 // Standard Shortcuts
                                 GestureDetector(
-                                  onTap:
-                                      () => _launchUrl(
-                                        "mailto:kevinstech0@gmail.com",
-                                      ),
+                                  onTap: () => _launchUrl(
+                                    "mailto:kevinstech0@gmail.com",
+                                  ),
                                   child: const _AndroidAppIcon(
                                     name: "Gmail",
                                     asset: "gmail",
@@ -382,10 +386,8 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap:
-                                      () => _launchUrl(
-                                        "http://maps.google.com",
-                                      ),
+                                  onTap: () =>
+                                      _launchUrl("http://maps.google.com"),
                                   child: const _AndroidAppIcon(
                                     name: "Maps",
                                     asset: "maps",
@@ -393,10 +395,9 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap:
-                                      () => _launchUrl(
-                                        "https://github.com/TechoChat",
-                                      ),
+                                  onTap: () => _launchUrl(
+                                    "https://github.com/TechoChat",
+                                  ),
                                   child: const _AndroidAppIcon(
                                     name: "github",
                                     asset: "github",
@@ -404,8 +405,8 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap:
-                                      () => _launchUrl("https://youtube.com"),
+                                  onTap: () =>
+                                      _launchUrl("https://youtube.com"),
                                   child: const _AndroidAppIcon(
                                     name: "YouTube",
                                     asset: "youtube",
@@ -413,10 +414,9 @@ class _AndroidHomeState extends State<AndroidHome>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap:
-                                      () => _launchUrl(
-                                        "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
-                                      ),
+                                  onTap: () => _launchUrl(
+                                    "https://drive.google.com/file/d/1_YtPDqTXcC_eBlAPqsHSq3G1n_2_MJPs/view?usp=sharing",
+                                  ),
                                   child: const _AndroidAppIcon(
                                     name: "Acrobat",
                                     asset: "pdf",
@@ -430,10 +430,9 @@ class _AndroidHomeState extends State<AndroidHome>
                                 ),
                                 // Switch Platform Icon
                                 GestureDetector(
-                                  onTap:
-                                      () => widget.onPlatformSwitch(
-                                        TargetPlatform.iOS,
-                                      ),
+                                  onTap: () => widget.onPlatformSwitch(
+                                    TargetPlatform.iOS,
+                                  ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -518,13 +517,12 @@ class _AndroidHomeState extends State<AndroidHome>
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
                                     GestureDetector(
-                                      onTap:
-                                          () => Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (_) => const AndroidContact(),
-                                            ),
-                                          ),
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const AndroidContact(),
+                                        ),
+                                      ),
                                       child: const _AndroidAppIcon(
                                         name: "",
                                         asset: "google_contacts",
@@ -534,10 +532,9 @@ class _AndroidHomeState extends State<AndroidHome>
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap:
-                                          () => _launchUrl(
-                                            "https://linkedin.com/in/techochat",
-                                          ),
+                                      onTap: () => _launchUrl(
+                                        "https://linkedin.com/in/techochat",
+                                      ),
                                       child: const _AndroidAppIcon(
                                         name: "",
                                         asset: "linkedin",
@@ -546,13 +543,11 @@ class _AndroidHomeState extends State<AndroidHome>
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap:
-                                          () => Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (_) => const AndroidChrome(),
-                                            ),
-                                          ),
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => const AndroidChrome(),
+                                        ),
+                                      ),
                                       child: const _AndroidAppIcon(
                                         name: "",
                                         asset: "chrome",
@@ -677,14 +672,14 @@ class _AndroidHomeState extends State<AndroidHome>
                               ),
                               suffixIcon:
                                   _drawerSearchController.text.isNotEmpty
-                                      ? IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: () {
-                                          _drawerSearchController.clear();
-                                          _runFilter("");
-                                        },
-                                      )
-                                      : null,
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: () {
+                                        _drawerSearchController.clear();
+                                        _runFilter("");
+                                      },
+                                    )
+                                  : null,
                               filled: true,
                               fillColor: const Color(0xFFF0F1F5),
                               border: OutlineInputBorder(
@@ -700,54 +695,49 @@ class _AndroidHomeState extends State<AndroidHome>
 
                         // Filtered Apps Grid
                         Expanded(
-                          child:
-                              _filteredApps.isEmpty
-                                  ? const Center(
-                                    child: Text("No apps found"),
-                                  )
-                                  : GridView.builder(
-                                    padding: const EdgeInsets.all(16),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 5,
-                                          mainAxisSpacing: 20,
-                                          crossAxisSpacing: 10,
-                                          childAspectRatio: 0.75,
-                                        ),
-                                    itemCount: _filteredApps.length,
-                                    physics: const BouncingScrollPhysics(),
-                                    itemBuilder: (context, index) {
-                                      final app = _filteredApps[index];
-                                      return GestureDetector(
-                                        onTap: () {
-                                          _toggleDrawer(
-                                            false,
-                                          ); // Close drawer
-                                          if (app.isTerminal) {
-                                            _openTerminal();
-                                          } else if (app.pageRoute != null) {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: app.pageRoute!,
-                                              ),
-                                            );
-                                          } else if (app.url != null &&
-                                              app.url!.isNotEmpty) {
-                                            _launchUrl(app.url!);
-                                          }
-                                        },
-                                        child: _AndroidAppIcon(
-                                          name: app.name,
-                                          asset: app.asset,
-                                          bgColor: app.bgColor,
-                                          showLabel: true,
-                                          appDrawer: true,
-                                          isTerminal: app.isTerminal,
-                                          iconData: app.iconData,
-                                        ),
-                                      );
-                                    },
-                                  ),
+                          child: _filteredApps.isEmpty
+                              ? const Center(child: Text("No apps found"))
+                              : GridView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 5,
+                                        mainAxisSpacing: 20,
+                                        crossAxisSpacing: 10,
+                                        childAspectRatio: 0.75,
+                                      ),
+                                  itemCount: _filteredApps.length,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    final app = _filteredApps[index];
+                                    return GestureDetector(
+                                      onTap: () {
+                                        _toggleDrawer(false); // Close drawer
+                                        if (app.isTerminal) {
+                                          _openTerminal();
+                                        } else if (app.pageRoute != null) {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: app.pageRoute!,
+                                            ),
+                                          );
+                                        } else if (app.url != null &&
+                                            app.url!.isNotEmpty) {
+                                          _launchUrl(app.url!);
+                                        }
+                                      },
+                                      child: _AndroidAppIcon(
+                                        name: app.name,
+                                        asset: app.asset,
+                                        bgColor: app.bgColor,
+                                        showLabel: true,
+                                        appDrawer: true,
+                                        isTerminal: app.isTerminal,
+                                        iconData: app.iconData,
+                                      ),
+                                    );
+                                  },
+                                ),
                         ),
                       ],
                     ),
@@ -769,8 +759,8 @@ class _AndroidHomeState extends State<AndroidHome>
 // ... [The rest of your file: AndroidTerminal, TypewriterText, _AndroidAppIcon, GoogleSearchPage] ...
 // ... [Paste the remaining classes from your original file here] ...
 
-// Note: For completeness in copy-pasting, ensure you keep the original 
-// AndroidTerminal, TypewriterText, _AndroidAppIcon, and GoogleSearchPage classes 
+// Note: For completeness in copy-pasting, ensure you keep the original
+// AndroidTerminal, TypewriterText, _AndroidAppIcon, and GoogleSearchPage classes
 // at the bottom of the file as they were in your upload.
 
 // ---------------------------------------------------------
@@ -1176,6 +1166,7 @@ class _AndroidAppIcon extends StatelessWidget {
   final bool isTerminal;
   final bool appDrawer;
   final IconData? iconData;
+  final Color? iconColor;
 
   const _AndroidAppIcon({
     required this.name,
@@ -1185,6 +1176,7 @@ class _AndroidAppIcon extends StatelessWidget {
     this.isTerminal = false,
     this.appDrawer = false,
     this.iconData,
+    this.iconColor,
   });
 
   @override
@@ -1214,7 +1206,11 @@ class _AndroidAppIcon extends StatelessWidget {
               : EdgeInsets.zero,
           child: iconData != null
               ? Center(
-                  child: Icon(iconData, color: Colors.blue.shade700, size: 28),
+                  child: Icon(
+                    iconData,
+                    size: 28,
+                    color: iconColor ?? Colors.black,
+                  ),
                 )
               : (isTerminal
                     ? const Icon(

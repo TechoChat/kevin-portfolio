@@ -66,8 +66,9 @@ class _MacMenuBarState extends State<MacMenuBar> {
   }
 
   IconData _getBatteryIcon() {
-    if (widget.batteryState == BatteryState.charging)
+    if (widget.batteryState == BatteryState.charging) {
       return CupertinoIcons.battery_charging;
+    }
     if (widget.batteryLevel >= 90) return CupertinoIcons.battery_full;
     if (widget.batteryLevel >= 25) return CupertinoIcons.battery_25_percent;
     return CupertinoIcons.battery_0;

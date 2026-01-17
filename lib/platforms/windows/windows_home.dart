@@ -4,6 +4,8 @@ import 'package:kevins_tech/platforms/windows/windows_taskbar.dart';
 import 'package:kevins_tech/platforms/windows/windows_start_menu.dart';
 import 'package:kevins_tech/platforms/windows/windows_icon.dart';
 import 'package:kevins_tech/platforms/windows/windows_terminal.dart';
+import 'package:kevins_tech/platforms/windows/windows_browser_window.dart';
+import 'package:kevins_tech/web_portfolio/registry.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../components/made_with_flutter.dart';
 
@@ -155,6 +157,22 @@ class _WindowsHomeState extends State<WindowsHome> {
     );
   }
 
+  void _openPortfolioWindow(PortfolioApp app) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Close",
+      pageBuilder: (context, _, _) => WindowsBrowserWindow(initialApp: app),
+      transitionDuration: const Duration(milliseconds: 200),
+      transitionBuilder: (context, anim, _, child) {
+        return Transform.scale(
+          scale: anim.value,
+          child: Opacity(opacity: anim.value, child: child),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -292,6 +310,7 @@ class _WindowsHomeState extends State<WindowsHome> {
                 child: WindowsStartMenu(
                   onOpenTerminal: _openTerminalWindow,
                   onOpenProjects: _openProjects,
+                  onOpenPortfolioApp: _openPortfolioWindow,
                   onClose: () => setState(() => _isStartMenuOpen = false),
                 ),
               ),

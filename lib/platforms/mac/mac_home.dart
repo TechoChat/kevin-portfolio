@@ -20,6 +20,8 @@ import 'package:url_launcher/url_launcher.dart';
 // ✅ Import your Weather Service
 import '../../components/weather_service.dart';
 import '../../components/made_with_flutter.dart';
+import '../../web_portfolio/registry.dart';
+import 'apps/mac_browser_window.dart';
 
 class MacHome extends StatefulWidget {
   final ValueChanged<TargetPlatform> onPlatformSwitch;
@@ -237,6 +239,18 @@ class _MacHomeState extends State<MacHome> {
                         _openMacWindow(const MacCalculator());
                       },
                     ),
+
+                    // --- Portfolio Apps ---
+                    for (var app in PortfolioRegistry.apps)
+                      _LaunchpadItem(
+                        label: app.name,
+                        icon: app.icon,
+                        color: Colors.indigoAccent,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openMacWindow(MacBrowserWindow(initialApp: app));
+                        },
+                      ),
                   ],
                 ),
               ),
