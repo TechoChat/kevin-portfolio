@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../../components/apps/browser_view.dart';
+import 'package:kevins_tech/system_apps/browser/browser_app.dart';
 
 class IosSafari extends StatefulWidget {
   const IosSafari({super.key});
@@ -56,10 +56,7 @@ class _IosSafariState extends State<IosSafari> {
             Expanded(
               child: _showHome
                   ? _buildFavorites()
-                  : BrowserView(
-                      initialUrl: _currentUrl,
-                      onUrlChanged: (url) {},
-                    ),
+                  : BrowserApp(initialUrl: _currentUrl, onUrlChanged: (url) {}),
             ),
 
             // Bottom Toolbar (Address Bar)

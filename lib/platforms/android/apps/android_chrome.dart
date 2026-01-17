@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../components/apps/browser_view.dart';
+import 'package:kevins_tech/system_apps/browser/browser_app.dart';
 
 class AndroidChrome extends StatefulWidget {
   const AndroidChrome({super.key});
@@ -160,10 +160,7 @@ class _AndroidChromeState extends State<AndroidChrome> {
               Expanded(
                 child: _showHome
                     ? _buildHome()
-                    : BrowserView(
-                        initialUrl: _currentUrl,
-                        onUrlChanged: (u) {},
-                      ),
+                    : BrowserApp(initialUrl: _currentUrl, onUrlChanged: (u) {}),
               ),
             ],
           ),

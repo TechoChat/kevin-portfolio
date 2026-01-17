@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../../components/apps/browser_view.dart';
+import 'package:kevins_tech/system_apps/browser/browser_app.dart';
 import '../mac_window.dart';
 
 class MacSafari extends StatefulWidget {
@@ -150,7 +150,7 @@ class _MacSafariState extends State<MacSafari> {
             Expanded(
               child: _showHome
                   ? _buildHome()
-                  : BrowserView(initialUrl: _currentUrl, onUrlChanged: (u) {}),
+                  : BrowserApp(initialUrl: _currentUrl, onUrlChanged: (u) {}),
             ),
           ],
         ),

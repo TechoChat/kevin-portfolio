@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'apps/windows_calculator.dart';
+import '../../system_apps/calculator/windows_calculator.dart';
 
 class WindowsStartMenu extends StatefulWidget {
   final VoidCallback onOpenTerminal;

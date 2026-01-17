@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../apps/calculator_app.dart';
+import 'package:kevins_tech/system_apps/calculator/calculator_app.dart';
 import '../android_status_bar.dart';
 
 class AndroidCalculator extends StatelessWidget {

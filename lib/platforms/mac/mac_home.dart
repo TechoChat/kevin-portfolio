@@ -14,7 +14,7 @@ import 'package:kevins_tech/platforms/mac/mac_terminal.dart';
 import 'apps/mac_safari.dart';
 import 'apps/mac_contact.dart';
 import 'apps/mac_about_me.dart';
-import 'apps/mac_calculator.dart';
+import 'package:kevins_tech/system_apps/calculator/mac_calculator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // ✅ Import your Weather Service
