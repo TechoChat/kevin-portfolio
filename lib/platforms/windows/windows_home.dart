@@ -25,7 +25,7 @@ class _WindowsHomeState extends State<WindowsHome> {
     });
   }
 
-  // --- Window Openers ---
+  // --- Window Openers (Keep your existing methods here) ---
   void _openProjects() {
     _openGenericWindow(
       title: "Projects",
@@ -173,25 +173,22 @@ class _WindowsHomeState extends State<WindowsHome> {
             ),
           ),
 
-          // 2. Desktop Icons (Responsive Grid)
-          // ✅ FIX: Using LayoutBuilder to force height constraint
+          // 2. Desktop Icons
           Positioned(
             top: 10,
             left: 10,
-            bottom: 80, // Space for Taskbar + Footer
+            bottom: 80,
             right: 0,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SizedBox(
-                  height: constraints
-                      .maxHeight, // Force Wrap to know its vertical limit
+                  height: constraints.maxHeight,
                   child: Wrap(
-                    direction: Axis.vertical, // Fill Top-to-Bottom
+                    direction: Axis.vertical,
                     alignment: WrapAlignment.start,
                     runAlignment: WrapAlignment.start,
-                    spacing:
-                        0, // Vertical gap (DesktopIcon has built-in margin)
-                    runSpacing: 10, // Horizontal gap between columns
+                    spacing: 0,
+                    runSpacing: 10,
                     children: [
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/computer.png",
@@ -213,9 +210,7 @@ class _WindowsHomeState extends State<WindowsHome> {
                         label: "Projects",
                         onTap: _openProjects,
                       ),
-                      // Spacer isn't needed in Wrap usually, but adding small box for visual separation
                       const SizedBox(height: 10, width: 85),
-
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/github.png",
                         label: "GitHub",
@@ -230,9 +225,7 @@ class _WindowsHomeState extends State<WindowsHome> {
                           Uri.parse("https://www.linkedin.com/in/techochat/"),
                         ),
                       ),
-
                       const SizedBox(height: 10, width: 85),
-
                       DesktopIcon(
                         iconPath: "assets/img/windows/icons/adobe.png",
                         label: "Resume.pdf",
@@ -260,9 +253,9 @@ class _WindowsHomeState extends State<WindowsHome> {
             ),
           ),
 
-          // 3. "Made with..." Small Animated Capsule
+          // 3. "Made with..." Capsule
           Positioned(
-            bottom: 60, // Sits just above taskbar
+            bottom: 60,
             left: 0,
             right: 0,
             child: const Center(child: MadeWithFlutter()),
@@ -284,13 +277,17 @@ class _WindowsHomeState extends State<WindowsHome> {
               ),
             ),
 
-          // 5. Taskbar
+          // 5. Taskbar (✅ FIXED: Added Key to prevent rebuilds)
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             height: 48,
-            child: WindowsTaskbar(onStartMenuTap: _toggleStartMenu),
+            child: WindowsTaskbar(
+              // Key ensures the Taskbar state is preserved even when Start Menu appears
+              key: const ValueKey("WindowsTaskbar"), 
+              onStartMenuTap: _toggleStartMenu,
+            ),
           ),
         ],
       ),
